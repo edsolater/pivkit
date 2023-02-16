@@ -1,0 +1,23 @@
+{
+  "name": "@edsolater/pivkit",
+  "version": "0.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "files": [
+    "src"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@edsolater/fnkit": "^0.1.10",
+    "@edsolater/piv": "^0.0.0",
+    "solid-js": "^1.6.10"
+  }
+}
