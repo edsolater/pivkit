@@ -26,6 +26,6 @@ export function createGlobalConfigContext<Config extends AnyObj>(defaultGlobalCo
     GlobalConfigProvider,
     useGlobalConfigContext,
     setStoredGlobalConfig,
-    storedGlobalConfig,
+    storedGlobalConfig
   }
 }

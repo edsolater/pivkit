@@ -9,11 +9,17 @@ type OnClickOutSideCallback = (
 
 export type UseClickOutsideOptions =
   | {
-      disable?: boolean | Accessor<boolean>
+      enabled?: boolean | Accessor<boolean>
+      disabled?: boolean | Accessor<boolean>
       onClickOutSide?: OnClickOutSideCallback
     }
   | OnClickOutSideCallback
 
+/**
+ * inner use (bubbled to root) click event's `event.composedPath()` to check if the click event is outside of the target elements
+ * @param els can be a single element or an array of elements or even a function that returns an element or an array of elements
+ * @param options
+ */
 export function useClickOutside(els: ElementRefs, options?: UseClickOutsideOptions) {
   const parasedOptions = typeof options === 'function' ? { onClickOutSide: options } : options
   const getOption = () => parasedOptions
@@ -23,8 +29,11 @@ export function useClickOutside(els: ElementRefs, options?: UseClickOutsideOptio
       globalThis.document,
       'click',
       (payload) => {
-        const isDisabled = shrinkFn(getOption()?.disable)
-        if (isDisabled) return
+        const enabled = shrinkFn(getOption()?.enabled)
+        const disabled = shrinkFn(getOption()?.disabled)
+        const isEnabled = enabled != null ? enabled : !disabled
+
+        if (!isEnabled) return
         if (!targetElements.length) return
         const path = payload.ev.composedPath()
         const isTargetInPath = targetElements.some((el) => el && path.includes(el))
