@@ -1,22 +1,22 @@
-import { isArray, MayArray, MayFn, shrinkFn } from '@edsolater/fnkit'
-import { compressICSSToObj, ICSS, KitProps, mergeProps, Piv, useKitProps } from '@edsolater/piv'
-import { CRef, PivProps } from '@edsolater/piv/src/types/piv'
-import { JSX } from 'solid-js'
+import { flap, isMeanfulArray, MayArray, MayFn, shrinkFn } from '@edsolater/fnkit'
+import { createMemo } from 'solid-js'
+import { mergeObjects } from '@edsolater/fnkit'
 import { createRef } from '../hooks/createRef'
-import { useGlobalKitTheme } from '../hooks/useGlobalKitTheme'
-import { useStatusRef } from '../hooks/useStatusRef'
+import { compressICSSToObj, ICSS, mergeProps, omit, parsePivChildren, Piv, PivChild } from '../piv'
+import { renderHTMLDOM } from '../piv/propHandlers/renderHTMLDOM'
 import { cssColors } from '../styles/cssColors'
 import { CSSColorString, CSSStyle } from '../styles/type'
+import { KitProps, useKitProps } from '../createKit'
 type BooleanLike = unknown
 
-export interface ButtonStatus {
+export interface ButtonController {
   click?: () => void
   focus?: () => void
 }
 
 const cssTransitionTimeFnOutCubic = 'cubic-bezier(0.22, 0.61, 0.36, 1)'
 
-export type ButtonProps = KitProps<{
+export interface ButtonProps {
   /**
    * @default 'solid'
    */
@@ -25,20 +25,18 @@ export type ButtonProps = KitProps<{
    * @default 'md'
    */
   size?: 'xs' | 'sm' | 'md' | 'lg'
-
   /**
    * !only for app's uikit <Button>
    * button's mean  color (apply to all variant of button)
-   * default {@link cssColors.buttonPrimaryColor } when in darkMode
+   * default {@link cssColors.component_button_bg_primary } when in darkMode
    */
   theme?: {
-    mainColor?: MayFn<CSSColorString, [props: Readonly<Omit<ButtonProps, 'theme'>>]>
-    mainTextColor?: MayFn<CSSColorString, [props: Readonly<Omit<ButtonProps, 'theme'>>]>
-    contentGap?: MayFn<CSSStyle['gap'], [props: Readonly<Omit<ButtonProps, 'theme'>>]>
-    disableOpacity?: MayFn<CSSStyle['opacity'], [props: Readonly<Omit<ButtonProps, 'theme'>>]>
-    cssProps?: MayFn<ICSS, [props: Readonly<Omit<ButtonProps, 'theme'>>]>
+    mainBgColor?: MayFn<CSSColorString, [props: Omit<ButtonProps, 'theme' | 'validators'>]>
+    mainTextColor?: MayFn<CSSColorString, [props: Omit<ButtonProps, 'theme' | 'validators'>]>
+    contentGap?: MayFn<CSSStyle['gap'], [props: Omit<ButtonProps, 'theme' | 'validators'>]>
+    disableOpacity?: MayFn<CSSStyle['opacity'], [props: Omit<ButtonProps, 'theme' | 'validators'>]>
+    cssProps?: MayFn<ICSS, [props: Omit<ButtonProps, 'theme' | 'validators'>]>
   }
-
   /** a short cut for validator */
   disabled?: boolean
   /** must all condition passed */
@@ -51,142 +49,139 @@ export type ButtonProps = KitProps<{
     fallbackProps?: Omit<ButtonProps, 'validators' | 'disabled'>
   }>
   /** normally, it's an icon  */
-  prefix?: MayFn<JSX.Element, [utils: ButtonStatus]>
+  prefix?: PivChild
   /** normally, it's an icon  */
-  suffix?: MayFn<JSX.Element, [utils: ButtonStatus]>
-  statusRef?: CRef<ButtonStatus>
-  clildren?: MayFn<JSX.Element, [utils: ButtonStatus]>
-}>
+  suffix?: PivChild
+}
+
+export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonController }>
 
 /**
  * feat: build-in click ui effect
  */
-export function Button(props: ButtonProps) {
-  /* ---------------------------------- props --------------------------------- */
-  const themeProps = useGlobalKitTheme<ButtonProps>(Button.name)
-  const { validators, ...otherButtonProps } = mergeProps(themeProps, props)
-
-  /* ------------------------------- validation ------------------------------- */
-  const failedValidator = (isArray(validators) ? validators.length > 0 : validators)
-    ? [validators!].flat().find(({ should }) => !shrinkFn(should))
-    : undefined
-  const mergedProps = {
-    ...otherButtonProps,
-    ...failedValidator?.fallbackProps
-  }
-  const isActive = failedValidator?.forceActive || (!failedValidator && !mergedProps.disabled)
-  const disable = !isActive
-
-  /* ------------------------------ detail props ------------------------------ */
-  const [
-    { variant = 'solid', size = 'md', theme, prefix, suffix, statusRef, children, onClick: originalOnClick },
-    pivProps
-  ] = useKitProps(mergedProps)
-
-  const {
-    mainColor = cssColors.buttonPrimaryColor,
-    mainTextColor = variant === 'solid' ? 'white' : shrinkFn(mainColor, [mergedProps]),
-    contentGap = 4,
-    disableOpacity = 0.3,
-    cssProps
-  } = theme ?? {}
-
-  const [ref, setRef] = createRef<HTMLButtonElement>()
-
-  const innerStatus = {
+export function Button(kitProps: ButtonKitProps) {
+  const innerController: ButtonController = {
     click: () => {
       ref()?.click()
     },
     focus: () => {
       ref()?.focus()
-    }
+    },
   }
+  /* ---------------------------------- props --------------------------------- */
+  const { props } = useKitProps(kitProps, {
+    controller: () => innerController,
+    name: 'Button',
+    defaultProps: { variant: 'solid', size: 'md' },
+  })
 
-  useStatusRef(statusRef, innerStatus)
+  /* ------------------------------- validation ------------------------------- */
+  const failedTestValidator = createMemo(() =>
+    isMeanfulArray(props.validators) || props.validators
+      ? flap(props.validators!).find(({ should }) => !shrinkFn(should))
+      : undefined
+  )
+  const mergedProps = mergeProps(props, failedTestValidator()?.fallbackProps)
 
+  const isActive = createMemo(
+    () => failedTestValidator()?.forceActive || (!failedTestValidator() && !mergedProps.disabled)
+  )
+
+  const mainBgColor = props.theme?.mainBgColor ?? cssColors.component_button_bg_primary
+  const mainTextColor = props.theme?.mainTextColor ?? cssColors.component_button_text_primary
+  const contentGap = props.theme?.contentGap ?? 4
+  const disableOpacity = props.theme?.disableOpacity ?? 0.3
+  const cssProps = props.theme?.cssProps
+
+  const [ref, setRef] = createRef<HTMLButtonElement>()
+
+  const size = props.size
   const cssPadding = {
     lg: '14px 24px',
     md: '10px 16px',
     sm: '8px 16px',
-    xs: '2px 6px'
+    xs: '2px 6px',
   }[size]
   const cssFontSize = {
-    lg: 16,
-    md: 16,
-    sm: 14,
-    xs: 12
+    lg: '16px',
+    md: '16px',
+    sm: '14px',
+    xs: '12px',
   }[size]
   const cssBorderRadius = {
-    lg: 12,
-    md: 8,
-    sm: 8,
-    xs: 4
+    lg: '12px',
+    md: '8px',
+    sm: '8px',
+    xs: '4px',
   }[size]
   const cssOutlineWidth = {
-    lg: 2,
-    md: 2,
-    sm: 1,
-    xs: 0.5
+    lg: '2px',
+    md: '2px',
+    sm: '1px',
+    xs: '0.5px',
   }[size]
+
+  const mergedController =
+    'innerController' in props ? mergeObjects(props.innerController!, innerController) : innerController
   return (
     <Piv<'button'>
-      shadowProps={pivProps}
-      class={Button.name}
-      as={(parsedPivProps) => <button {...parsedPivProps} />}
-      onClick={(...args) => !disable && originalOnClick?.(...args)}
+      render:self={(selfProps) => renderHTMLDOM('button', selfProps)}
+      shadowProps={omit(props, 'onClick')} // omit onClick for need to invoke the function manually, see below 👇
+      onClick={(...args) => isActive() && props.onClick?.(...args)}
       htmlProps={{ type: 'button' }}
       icss={[
-        { transition: `200ms ${cssTransitionTimeFnOutCubic}` }, // make it's change smooth
-        { border: 'none' }, // initialize
-        { color: shrinkFn(mainTextColor, [mergedProps]) }, // light mode
         {
-          display: 'inline-flex',
-          gap: shrinkFn(contentGap, [mergedProps]),
-          alignItems: 'center',
-          justifyContent: 'center'
-        }, // center the items
-        {
+          transition: `50ms ${cssTransitionTimeFnOutCubic}`, // make it's change smooth
+          border: 'none',
+          color: shrinkFn(mainTextColor, [mergedProps]), // light mode
           cursor: 'pointer',
           userSelect: 'none',
-          width: 'max-content'
+          width: 'max-content',
         },
-        disable && {
+        {
+          display: 'inline-flex',
+          gap: shrinkFn(contentGap, [mergedProps]) + 'px',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }, // center the items
+        !isActive() && {
           opacity: shrinkFn(disableOpacity, [mergedProps]),
-          cursor: 'not-allowed'
+          cursor: 'not-allowed',
         },
         {
           padding: cssPadding,
           fontSize: cssFontSize,
           borderRadius: cssBorderRadius,
-          fontWeight: 500
+          fontWeight: '500',
         },
-        variant === 'solid' && {
-          backgroundColor: shrinkFn(mainColor, [mergedProps]),
-          ':hover': {
-            filter: 'brightness(95%)'
+        (!props.variant || props.variant === 'solid') && {
+          backgroundColor: shrinkFn(mainBgColor, [mergedProps]),
+          '&:hover': {
+            filter: 'brightness(95%)',
           },
-          ':active': {
-            transform: 'scale(0.96)',
-            filter: 'brightness(90%)'
-          }
+          '&:active': {
+            transform: 'scale(0.98)',
+            filter: 'brightness(90%)',
+          },
         },
-        variant === 'outline' && {
+        props.variant === 'outline' && {
           background: cssColors.transparent,
-          outline: `${cssOutlineWidth} solid ${mainColor}`,
-          outlineOffset: `-${cssOutlineWidth}`
+          outline: `${cssOutlineWidth} solid ${mainBgColor}`,
+          outlineOffset: `-${cssOutlineWidth}`,
         },
-        variant === 'text' && {
-          ':hover': {
-            backgroundColor: opacityCSSColor(shrinkFn(mainColor, [mergedProps]), 0.15)
-          }
+        props.variant === 'text' && {
+          '&:hover': {
+            backgroundColor: opacityCSSColor(shrinkFn(mainBgColor, [mergedProps]), 0.15),
+          },
         },
-        compressICSSToObj(shrinkFn(cssProps, [mergedProps]))
+        compressICSSToObj(shrinkFn(cssProps, [mergedProps])),
       ]}
-      ref={setRef}
+      domRef={setRef}
     >
-      {shrinkFn(prefix, [innerStatus])}
-      {children}
-      {shrinkFn(suffix, [innerStatus])}
+      {parsePivChildren(props.prefix, mergedController)}
+      {/* TODO: no need. this is because kitProp don't support Access and Deaccess */}
+      {parsePivChildren(props.children, mergedController)}
+      {parsePivChildren(props.suffix, mergedController)}
     </Piv>
   )
 }
@@ -195,5 +190,5 @@ export function Button(props: ButtonProps) {
  * @todo TEMP, currently force it, should use NPM css color utils
  */
 export function opacityCSSColor(cssColor: CSSColorString, /* 0~1 */ opacity: number) {
-  return cssColor === cssColors.buttonPrimaryColor ? '#7c859826' /* 0.15 */ : `${cssColor}${opacity}` //TODO: temp
+  return cssColor === cssColors.component_button_bg_primary ? '#7c859826' /* 0.15 */ : `${cssColor}${opacity}` //TODO: temp
 }

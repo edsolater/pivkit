@@ -1,6 +1,8 @@
+import { cssVar } from './cssValues'
 import { tailwindPaletteColors } from './tailwindPaletteColors'
 import { CSSColorString } from './type'
 
+// TODO: just inner the uikit, but should export to outside
 export const cssColors = {
   screenBg: '#f3f5f7',
 
@@ -23,5 +25,20 @@ export const cssColors = {
 
   opacityGray: '#6767675e' as CSSColorString,
   /** use for dark mode button default  color */
-  buttonPrimaryColor: tailwindPaletteColors.indigo600
+
+  //---- button
+  // theme:solid
+  component_button_bg_primary: tailwindPaletteColors.gray300,
+  component_button_text_primary: tailwindPaletteColors.gray700,
+
+  //---- label
+  component_label_bg_default: '#e1e3e769',
+
+  //---- input
+  component_input_bg_default: 'transparent',
+
+  accentColor: 'dodgerblue',
+  // accentColorInactive: 'dodgerblue',
 } as const
+
+export const cssCurrentColor = cssVar('--current-color', 'currentcolor')

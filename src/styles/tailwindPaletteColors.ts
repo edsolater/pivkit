@@ -1,3 +1,4 @@
+// https://tailwindcss.com/docs/customizing-colors
 export const tailwindPaletteColors = {
   slate50: '#f8fafc',
   slate100: '#f1f5f9',
@@ -239,5 +240,5 @@ export const tailwindPaletteColors = {
   rose600: '#e11d48',
   rose700: '#be123c',
   rose800: '#9f1239',
-  rose900: '#881337'
+  rose900: '#881337',
 }
