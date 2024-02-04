@@ -3,7 +3,7 @@
  * this component is related to useKitProps
  */
 import { createContext, useContext } from 'solid-js'
-import { PivProps, ValidProps, mergeProps, omit } from '.'
+import { PivProps, ValidProps, mergeProps, omitProps } from '.'
 import { Fragnment } from './Fragnment'
 
 /** add props is implied by solidjs context */
@@ -16,7 +16,7 @@ const _PropContext = createContext<ValidProps[]>()
 export function PropContext<Props extends ValidProps = PivProps>(props: Props) {
   const parentPropContext = useContext(_PropContext) ?? []
   const selfPropContextValue = parentPropContext.concat(
-    omit(props, 'children') // PropContext should not change inners children
+    omitProps(props, 'children') // PropContext should not change inners children
   )
   return (
     <_PropContext.Provider value={selfPropContextValue}>

@@ -1,6 +1,6 @@
 import { AnyFn, MayArray, isArray, isObject, shakeNil } from '@edsolater/fnkit'
 import { PivProps } from '../Piv'
-import { omit } from '../utils'
+import { omitProps } from '../utils'
 import { getPivPropsValue } from '../utils/mergeProps'
 
 export type PivShadowProps<OriginalProps> = MayArray<Partial<Omit<OriginalProps, 'as' | 'children'>>>
@@ -63,6 +63,6 @@ function getNeedToMergeKeys(props: Partial<PivProps<any>>) {
         : []
   }
   const shadowKeys = getShadowPropKeys(props)
-  const selfProps = Object.getOwnPropertyNames(omit(props, ['shadowProps']))
+  const selfProps = Object.getOwnPropertyNames(omitProps(props, ['shadowProps']))
   return selfProps.concat(shadowKeys)
 }

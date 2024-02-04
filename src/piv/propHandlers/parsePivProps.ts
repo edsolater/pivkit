@@ -10,7 +10,7 @@ import { parseIStyles } from './istyle'
 import { parseOnClick } from './onClick'
 import { handlePluginProps } from './handlePluginProps'
 import { handleShadowProps } from './shadowProps'
-import { mergeProps, omit } from '../utils'
+import { mergeProps, omitProps } from '../utils'
 import { PivProps } from '../Piv'
 import { getPropsFromPropContextContext } from '../PropContext'
 import { handleMergifyOnCallbackProps } from './mergifyProps'
@@ -39,7 +39,7 @@ function getPropsInfoOfRawPivProps(raw: Partial<PivProps>) {
       ? () => Boolean(shrinkFn(parsedPivProps.ifSelfShown))
       : undefined
   const selfCoverNode =
-    'render:self' in parsedPivProps ? parsedPivProps['render:self']?.(omit(parsedPivProps, ['render:self'])) : undefined
+    'render:self' in parsedPivProps ? parsedPivProps['render:self']?.(omitProps(parsedPivProps, ['render:self'])) : undefined
   return { parsedPivProps, controller, ifOnlyNeedRenderChildren, selfCoverNode, ifOnlyNeedRenderSelf }
 }
 

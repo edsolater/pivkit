@@ -2,7 +2,7 @@ import { Accessor, JSX, createEffect, createMemo, createSignal, splitProps, useC
 import { useKitProps } from '../../createKit'
 import useResizeObserver from '../../domkit/hooks/useResizeObserver'
 import { createRef } from '../../hooks/createRef'
-import { Piv, PivProps, omit } from '../../piv'
+import { Piv, PivProps, omitProps } from '../../piv'
 import { ListContext } from './List'
 import { createDomRef } from '../../hooks'
 import isClientSide from '../../jFetch/utils/isSSR'
@@ -52,7 +52,7 @@ export function ListItem(originalProps: ListItemProps) {
     <Piv
       class='ListItem'
       domRef={[setItemDom, setSizeDetectorTarget]} // FIXME: why ref not setted🤔?
-      shadowProps={omit(props, 'children')} // FIXME: should not use tedius omit
+      shadowProps={omitProps(props, 'children')} // FIXME: should not use tedius omit
       style={isIntersecting() ? undefined : { height: `${innerHeight()}px`, width: `${innerWidth()}px` }}
       icss={{ contentVisibility: isIntersecting() ? 'visible' : 'hidden', width: '100%' }}
     >
