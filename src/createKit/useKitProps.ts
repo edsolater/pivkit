@@ -14,7 +14,7 @@ import { HTMLTag, ValidController, ValidProps } from '../piv/typeTools'
 import { mergeProps } from '../piv/utils'
 import { AddDefaultPivProps, addDefaultPivProps } from '../piv/utils/addDefaultProps'
 import { omitItem } from './utils'
-import { LazyLoadObj, runtimeObjectFromAccess } from 'src/fnkit'
+import { LazyLoadObj, runtimeObjectFromAccess } from '../fnkit'
 
 /** used for {@link useKitProps}'s option */
 export type KitPropsOptions<

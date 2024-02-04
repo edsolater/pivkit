@@ -1,6 +1,6 @@
 import { hasProperty, mergeObjects } from '@edsolater/fnkit'
 import { Accessor, createEffect, createMemo, createSignal, on } from 'solid-js'
-import { useElementFocus } from 'src/domkit'
+import { useElementFocus } from '../../domkit'
 import { KitProps, useKitProps } from '../../createKit'
 import { runtimeObject } from '../../fnkit/runtimeObject'
 import { createDomRef } from '../../hooks'
