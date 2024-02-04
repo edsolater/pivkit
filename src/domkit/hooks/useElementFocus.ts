@@ -1,7 +1,7 @@
 import { Accessor, createEffect, createSignal, onCleanup } from 'solid-js'
-import { addEventListener } from '../../../domkit'
+import { addEventListener } from '..'
 
-export function useFocus(dom: Accessor<HTMLInputElement | undefined>, defaultValue: boolean = false) {
+export function useElementFocus(dom: Accessor<HTMLInputElement | undefined>, defaultValue: boolean = false) {
   const [isFocused, setIsFocused] = createSignal(defaultValue)
   createEffect(() => {
     const el = dom()

@@ -1,7 +1,7 @@
 import { createSignal, Show } from 'solid-js'
 import { KitProps, useKitProps } from '../../createKit'
 import { createRef } from '../../hooks/createRef'
-import { useClickOutside } from '../../hooks/useClickOutside'
+import { useClickOutside } from '../../domkit/hooks/useClickOutside'
 import { Piv } from '../../piv'
 import { drawerKeyboardShortcut } from '../../plugins/drawerKeyboardShortcut'
 import { PopPortal } from '../PopPortal'

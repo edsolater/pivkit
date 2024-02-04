@@ -45,7 +45,7 @@ export interface ModalProps {
     | 'always' // always stay DOM
 }
 
-export type ModalKitProps = KitProps<ModalProps>
+export type ModalKitProps = KitProps<ModalProps, { controller: ModalController }>
 
 export const ModalContext = createComponentContext<Partial<ModalController>>()
 
@@ -64,12 +64,12 @@ export function Modal(kitProps: ModalKitProps) {
     isOpen: innerOpen,
     open: mergeFunction(open, openModal),
     close: mergeFunction(close, closeModal),
-    toggle: toggle,
+    toggle: toggle
   }))
 
   const { props, shadowProps } = useKitProps(kitProps, {
     name: 'Modal',
-    controller: () => modalController,
+    controller: () => modalController
   })
   const [dialogDOM, setDialogDOM] = createRef<HTMLDialogElement>()
   const [dialogContentDOM, setDialogContentDOM] = createRef<HTMLDivElement>()
@@ -81,7 +81,7 @@ export function Modal(kitProps: ModalKitProps) {
     },
     onOpen() {
       props.onOpen?.()
-    },
+    }
   })
   const { shouldRenderDOM } = useShouldRenderDOMDetector({ props, innerOpen })
 
@@ -107,7 +107,7 @@ export function Modal(kitProps: ModalKitProps) {
     onClickOutSide: () => {
       close()
       closeModal()
-    },
+    }
   })
 
   return (
@@ -126,7 +126,7 @@ export function Modal(kitProps: ModalKitProps) {
               overflowY: 'visible',
               maxHeight: '100dvh',
               maxWidth: '100dvw',
-              '&::backdrop': props.backdropICSS,
+              '&::backdrop': props.backdropICSS
             }}
           >
             <Piv domRef={setDialogContentDOM} icss={{ display: 'contents' }}>
@@ -154,8 +154,8 @@ export const plugin_modalTitle = createPlugin(
       icss: {
         fontSize: '1.5rem',
         fontWeight: 'bold',
-        marginBottom: '.5em',
-      },
+        marginBottom: '.5em'
+      }
     } satisfies PivProps
   },
   { name: 'modalTitle' }

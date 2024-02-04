@@ -1,7 +1,8 @@
 import { hasProperty, mergeObjects } from '@edsolater/fnkit'
 import { Accessor, createEffect, createMemo, createSignal, on } from 'solid-js'
-import { runtimeObject } from '../../fnkit/runtimeObject'
+import { useElementFocus } from 'src/domkit'
 import { KitProps, useKitProps } from '../../createKit'
+import { runtimeObject } from '../../fnkit/runtimeObject'
 import { createDomRef } from '../../hooks'
 import { createDisclosure } from '../../hooks/createDisclosure'
 import { createRef } from '../../hooks/createRef'
@@ -12,7 +13,6 @@ import { icssRow } from '../../styles'
 import { ElementRefs, getElementFromRefs } from '../../utils'
 import { DeAccessifyProps } from '../../utils/accessifyProps'
 import { Box } from '../Boxes'
-import { useFocus } from './hooks/useFocus'
 
 export interface InputController {
   text: string
@@ -61,17 +61,17 @@ export type InputKitProps = KitProps<InputProps, { controller: InputController }
  */
 export function Input(rawProps: InputKitProps) {
   const { dom: inputBodyDom, setDom: setInputBodyDom } = createDomRef<HTMLInputElement>()
-  const isFocused = useFocus(inputBodyDom)
+  const isFocused = useElementFocus(inputBodyDom)
 
   const controller = runtimeObject<InputController>({
     text: () => innerText(),
     setText: () => updateText,
-    isFocused: () => isFocused,
+    isFocused: () => isFocused
   })
 
   const { props, shadowProps } = useKitProps(rawProps, {
     name: 'Input',
-    controller: () => controller,
+    controller: () => controller
   })
 
   const [additionalProps, { innerText, updateText }] = useInputInnerValue(props, controller)
@@ -83,8 +83,8 @@ export function Input(rawProps: InputKitProps) {
         fn: () => {
           props.onEnter?.(innerText(), controller)
         },
-        keyboardShortcut: 'Enter',
-      },
+        keyboardShortcut: 'Enter'
+      }
     },
     { when: isFocused, disabled: !hasProperty(props, 'onEnter') }
   )
@@ -102,14 +102,14 @@ export function Input(rawProps: InputKitProps) {
         domRef={setInputBodyDom}
         htmlProps={{
           placeholder: props.placeholder,
-          autofocus: props.autoFocus,
+          autofocus: props.autoFocus
         }}
         render:self={(selfProps) => renderHTMLDOM('input', selfProps)}
         shadowProps={additionalProps()}
         icss={[
           { flex: 1, background: 'transparent', minWidth: props.isFluid ? undefined : '14em' },
           /* initialize */
-          { border: 'none', outline: 'none', padding: '4px', fontSize: '0.8333em' },
+          { border: 'none', outline: 'none', padding: '4px', fontSize: '0.8333em' }
         ]}
       />
       {props.renderSuffix}
@@ -231,9 +231,9 @@ function useInputInnerValue(props: DeAccessifyProps<InputKitProps>, controller: 
             props.onUserInput?.(text, controller)
           },
           onFocus: focusInput,
-          onBlur: unfocusInput,
-        },
-      } as PivProps<'input'>)
+          onBlur: unfocusInput
+        }
+      }) as PivProps<'input'>
   )
   return [
     additionalProps,
@@ -244,7 +244,7 @@ function useInputInnerValue(props: DeAccessifyProps<InputKitProps>, controller: 
       isFocused,
       focusInput,
       unfocusInput,
-      setCachedOutsideValue,
-    },
+      setCachedOutsideValue
+    }
   ] as const
 }

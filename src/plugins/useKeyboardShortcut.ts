@@ -21,7 +21,7 @@ import {
 } from '../domkit'
 import { createSharedSignal } from '../hooks/createSharedSignal'
 import { Accessify, ElementRefs, getElementFromRefs } from '../utils'
-import useResizeObserver from '../hooks/useResizeObserver'
+import useResizeObserver from '../domkit/hooks/useResizeObserver'
 
 type Description = string
 

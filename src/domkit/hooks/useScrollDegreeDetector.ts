@@ -1,5 +1,5 @@
 import { Accessor, createEffect, onCleanup } from 'solid-js'
-import { addEventListener } from '..'
+import { addEventListener } from '../..'
 
 export interface UseScrollDegreeDetectorOptions {
   onReachBottom?: () => void
