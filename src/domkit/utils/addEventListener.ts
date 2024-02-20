@@ -21,17 +21,22 @@ const eventIdMap = new Map<
 
 export type EventCallback<
   K extends keyof HTMLElementEventMap,
-  El extends HTMLElement | Document | Window | undefined | null,
+  El extends HTMLElement | Document | Window | undefined | null
 > = {
   ev: HTMLElementEventMap[K]
   el: El
   eventListenerController: EventListenerController
+  isSelf(): boolean
+  isBubbled(): boolean
+  stopPropagation(): void
+  preventDefault(): void
+  eventPath(): HTMLElement[]
 }
 
 // TODO: !!! move to domkit
 export function addEventListener<
   El extends HTMLElement | Document | Window | undefined | null,
-  K extends keyof HTMLElementEventMap,
+  K extends keyof HTMLElementEventMap
 >(
   el: El,
   eventName: K,
@@ -45,12 +50,21 @@ export function addEventListener<
     eventId: targetEventId,
     abort() {
       abortEvent(targetEventId, options)
-    },
+    }
   } as EventListenerController
   const newEventCallback = (ev: Event) => {
     if (options?.stopPropergation) ev.stopPropagation()
     if (options?.onlyTargetIsSelf && el !== ev.target) return
-    fn({ el, ev: ev as HTMLElementEventMap[K], eventListenerController: controller })
+    fn({
+      el,
+      ev: ev as HTMLElementEventMap[K],
+      eventListenerController: controller,
+      isSelf: () => el === ev.target,
+      isBubbled: () => el !== ev.target,
+      stopPropagation: () => ev.stopPropagation(),
+      preventDefault: () => ev.preventDefault(),
+      eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[]
+    })
   }
   el?.addEventListener(eventName as unknown as string, newEventCallback, defaultedOptions)
   eventIdMap.set(targetEventId, { el, eventName: eventName as unknown as string, cb: newEventCallback })
