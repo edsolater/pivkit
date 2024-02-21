@@ -1,7 +1,7 @@
-import { CRef } from '../Piv'
+import { CallbackRef } from '../Piv'
 
-export function mergeRefs<T = any>(...refs: (CRef<T> | null | undefined)[]): CRef<T> {
+export function mergeRefs<T = any>(...refs: (CallbackRef<T> | null | undefined)[]): CallbackRef<T> {
   return ((el) => {
     refs.forEach((ref) => ref?.(el))
-  }) as CRef<T>
+  }) as CallbackRef<T>
 }

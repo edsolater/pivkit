@@ -2,7 +2,7 @@ import { isExist } from '@edsolater/fnkit'
 import { Accessor, createEffect } from 'solid-js'
 import { DeKitProps, KitProps, useKitProps } from '../../createKit'
 import { createDomRef, useClickOutside } from '../../hooks'
-import { AddDefaultPivProps, ClickController, Piv, PivChild } from '../../piv'
+import { AddDefaultPivProps, Piv, PivChild } from '../../piv'
 import { buildPopover, useKeyboardShortcut } from '../../plugins'
 import { cssVar, icssCardPanel, icssClickable, icssRow } from '../../styles'
 import { Box } from '../Boxes'
@@ -74,7 +74,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
 
   // controller
   const controller = {
-    name: () => props.name ?? '',
+    name: () => props.name ?? ''
   } satisfies SelectableController
   lazyLoadController(controller)
 
@@ -86,7 +86,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
     items: props.items,
     defaultValue: props.defaultValue,
     getItemValue: methods.getItemValue,
-    onChange: methods.onChange,
+    onChange: methods.onChange
   })
 
   // compute render functions
@@ -98,22 +98,22 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
     {
       'close': {
         fn: () => popoverState.close(),
-        keyboardShortcut: 'Escape',
+        keyboardShortcut: 'Escape'
       },
       'select confirm': {
         fn: () => {
           //TODO: do with focusItem
         },
-        keyboardShortcut: 'Enter',
+        keyboardShortcut: 'Enter'
       },
       'select prev item': {
         fn: selectPrevItem,
-        keyboardShortcut: 'ArrowUp',
+        keyboardShortcut: 'ArrowUp'
       },
       'select next item': {
         fn: selectNextItem,
-        keyboardShortcut: 'ArrowDown',
-      },
+        keyboardShortcut: 'ArrowDown'
+      }
     },
     { enabled: popoverState.isTriggerOn }
   )
@@ -126,7 +126,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
   })
 
   // handle item click
-  const onItemClick = (clickController: ClickController, i: T) => {
+  const onItemClick = (_clickController, i: T) => {
     setItem(i)
     popoverState.close()
   }
@@ -134,7 +134,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
   // click outside to close popover
   useClickOutside(selectFaceDom, {
     enabled: popoverState.isTriggerOn,
-    onClickOutSide: () => popoverState.close(),
+    onClickOutSide: () => popoverState.close()
   })
 
   return (
@@ -147,14 +147,14 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
         plugin={popoverPlugins.trigger}
         icss={[
           { background: '#000', minWidth: '3em', maxWidth: '12em', minHeight: '1lh', borderRadius: '8px' },
-          icssRow({}), //FIXME: 💩 why type is ANY?
+          icssRow({}) //FIXME: 💩 why type is ANY?
         ]}
       >
         {renderTriggerItem({
           item,
           index,
           value: () => utils.getItemValue(item()),
-          triggerIsOpen: popoverState.isTriggerOn,
+          triggerIsOpen: popoverState.isTriggerOn
         })}
       </Piv>
       <Box
@@ -179,15 +179,15 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
                     borderRadius: '4px',
                     background: isSelected() ? cssVar('--item-selected-bg', '#fff4') : undefined,
                     boxShadow: isSelected() ? cssVar('--item-selected-shadow', '0 0 0 4px #fff4') : undefined,
-                    color: isSelected() ? cssVar('--select-active-item-text-color', '#c8d7e0') : undefined,
-                  },
+                    color: isSelected() ? cssVar('--select-active-item-text-color', '#c8d7e0') : undefined
+                  }
                 ]}
               >
                 {renderItem({
                   item: () => i,
                   index: idx,
                   value: itemValue,
-                  isSelected,
+                  isSelected
                 })}
               </ItemBox>
             )
