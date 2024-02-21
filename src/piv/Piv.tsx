@@ -15,20 +15,20 @@ import { renderHTMLDOM } from './propHandlers/renderHTMLDOM'
 import { HTMLTag, PivChild, ValidController } from './typeTools'
 import { omitProps } from './utils'
 
-type Boollike = any
+type BooleanLike = any
 
 export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends ValidController = ValidController> {
-  /** if is settled and is flase , only it's children will render */
-  if?: MayFn<Boollike>
-  /** if is settled and is flase , only it's children will render */
-  ifSelfShown?: MayFn<Boollike>
+  /** if is settled and is false , only it's children will render */
+  if?: MayFn<BooleanLike>
+  /** if is settled and is false , only it's children will render */
+  ifSelfShown?: MayFn<BooleanLike>
 
   debugLog?: (keyof PivProps)[]
 
   /**
    * auto merge by shadowProps
    */
-  domRef?: MayArray<CRef<any> | null | undefined>
+  domRef?: MayArray<CallbackRef<any> | null | undefined>
 
   /**
    * auto merge by shadowProps
@@ -106,7 +106,7 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
 
 type DangerousWrapperNodeFn = (originalChildren: JSXElement) => JSXElement // change outter wrapper element
 
-export type CRef<T> = (el: T) => void // not right
+export type CallbackRef<T> = (el: T) => void // not right
 
 export const pivPropsNames = [
   'id',

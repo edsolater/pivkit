@@ -1,6 +1,6 @@
 import { AnyFn, MayArray, MayDeepArray } from '@edsolater/fnkit'
 import { AccessifyProps } from '..'
-import { CRef, PivProps } from '../piv/Piv'
+import { CallbackRef, PivProps } from '../piv/Piv'
 import { MergifyProps } from '../piv/propHandlers/mergifyProps'
 import { GetPluginParams, Plugin } from '../piv/propHandlers/plugin'
 import { HTMLTag, ValidController, ValidProps } from '../piv/typeTools'
@@ -30,7 +30,7 @@ type KitPropsInstance<
       // shadowProps?: MayArray<KitPropsInstance<RawProps, Controller, Plugins, TagName, NeedAccessifyProps> | undefined> // component must merged before `<Div>`
       // -------- additional --------
       // auto inject controller to it
-      controllerRef?: CRef<Controller>
+      controllerRef?: CallbackRef<Controller>
     },
     keyof RawProps
   >

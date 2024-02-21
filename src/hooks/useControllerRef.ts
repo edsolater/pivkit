@@ -1,5 +1,5 @@
-import { CRef, ValidController } from '../piv'
+import { CallbackRef, ValidController } from '../piv'
 
-export function useControllerRef(propsRef: CRef<any> | undefined, componentController: ValidController) {
+export function useControllerRef(propsRef: CallbackRef<any> | undefined, componentController: ValidController) {
   propsRef?.(componentController)
 }
