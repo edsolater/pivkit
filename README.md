@@ -11,3 +11,7 @@
 - `domRef?: MayArray<CallbackRef<any> | null | undefined>` --- accept domSetter(return from createDomRef) to access the dom
 - `class?: MayArray<ClassName<Controller>>` --- htmlElement's class
 - `id?: string` --- id for `useComponentByID`. So others can access component's controller without set `props:controllerRef` to component, this have to have access to certain component instance
+
+# special
+- render - `render_SUBCOMPONENT` or `render_item`
+- TODO: `layout`
