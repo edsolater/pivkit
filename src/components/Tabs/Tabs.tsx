@@ -64,16 +64,16 @@ export const TabsControllerContext = createContext<TabsController>(TabsControlle
  *
  * @example
  * <Tabs>
- *   <Tab.List>
- *     <Tab>Tab 1</Tab>
- *     <Tab>Tab 2</Tab>
- *     <Tab>Tab 3</Tab>
- *   </Tab.List>
- *   <Tab.Panels>
- *     <Tab.Panel>Content 1</Tab.Panel>
- *     <Tab.Panel>Content 2</Tab.Panel>
- *     <Tab.Panel>Content 3</Tab.Panel>
- *   </Tab.Panels>
+ *   <Tabs.List>
+ *     <Tabs>Tabs 1</Tabs>
+ *     <Tabs>Tabs 2</Tabs>
+ *     <Tabs>Tabs 3</Tabs>
+ *   </Tabs.List>
+ *   <Tabs.Panels>
+ *     <Tabs.Panel>Content 1</Tabs.Panel>
+ *     <Tabs.Panel>Content 2</Tabs.Panel>
+ *     <Tabs.Panel>Content 3</Tabs.Panel>
+ *   </Tabs.Panels>
  * </Tabs>
  */
 export function Tabs(rawProps: TabsKitProps) {

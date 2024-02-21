@@ -1,12 +1,15 @@
-import { MayFn, flap, shrinkFn } from '@edsolater/fnkit'
+import { MayFn, shrinkFn } from '@edsolater/fnkit'
 import { For, JSXElement, createMemo } from 'solid-js'
 import { KitProps, useKitProps } from '../createKit'
-import { Piv, PivChild, parsePivChildren } from '../piv'
 import { createRef } from '../hooks/createRef'
+import { AddProps, PivChild, parsePivChildren } from '../piv'
 
 export interface LoopController {}
 
+type ComponentStructure = (...anys: any[]) => JSXElement
+
 export type LoopProps<T> = {
+  wrapper?: ComponentStructure
   of?: MayFn<Iterable<T>>
   children(item: T, index: () => number): PivChild
 }
@@ -18,10 +21,11 @@ export type LoopKitProps<T> = KitProps<LoopProps<T>, { controller: LoopControlle
  * if for layout , don't render important content in Box
  */
 export function Loop<T>(kitProps: LoopKitProps<T>) {
-  const { props } = useKitProps(kitProps, {
+  const { props, shadowProps } = useKitProps(kitProps, {
     name: 'Loop',
-    noNeedDeAccessifyChildren: true,
+    noNeedDeAccessifyChildren: true
   })
+  const Wrapper = kitProps.wrapper ?? AddProps //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
 
   // [configs]
   const allItems = createMemo(() => Array.from(shrinkFn(props.of ?? []) as T[]))
@@ -29,9 +33,10 @@ export function Loop<T>(kitProps: LoopKitProps<T>) {
   // [loop ref]
   const [loopRef, setRef] = createRef<HTMLElement>()
 
+  const content = <For each={allItems()}>{(item, idx) => parsePivChildren(props.children(item, idx))}</For>
   return (
-    <Piv  domRef={setRef} shadowProps={props}>
-      <For each={allItems()}>{(item, idx) => parsePivChildren(props.children(item, idx))}</For>
-    </Piv>
+    <Wrapper domRef={setRef} shadowProps={shadowProps}>
+      {content}
+    </Wrapper>
   )
 }
