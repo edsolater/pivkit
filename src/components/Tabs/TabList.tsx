@@ -18,7 +18,7 @@ export function TabList(rawProps: TabListKitProps) {
   const tabListController: TabListController = {}
   lazyLoadController(tabListController)
   return (
-    <Piv class='Tabs-List' shadowProps={shadowProps}>
+    <Piv icss={{ display: 'flex' }} shadowProps={shadowProps}>
       {props.children}
     </Piv>
   )

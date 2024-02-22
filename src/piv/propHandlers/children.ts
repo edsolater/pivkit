@@ -1,7 +1,7 @@
-import { AnyFn, hasProperty, isArray, isFunction, shrinkFn } from '@edsolater/fnkit'
+import { AnyFn, hasProperty, isArray, isBigInt, isFunction, isObject } from '@edsolater/fnkit'
+import { JSXElement } from 'solid-js'
 import { KitProps } from '../../createKit/KitProps'
 import { ValidController } from '../typeTools'
-import { JSXElement } from 'solid-js'
 
 export function loadPropsControllerRef<Controller extends ValidController | unknown>(
   props: Partial<KitProps<{ controllerRef?: (getController: Controller) => void }>>,
@@ -14,15 +14,23 @@ export function loadPropsControllerRef<Controller extends ValidController | unkn
 
 export function parsePivChildren<
   P extends unknown | ((controller: Controller) => unknown),
-  Controller extends ValidController | unknown,
+  Controller extends ValidController | unknown
 >(originalChildren: P, controller: Controller = {} as Controller): JSXElement {
   return isArray(originalChildren)
     ? originalChildren.map((i) => parsePivChildren(i, controller))
-    : isNormalControllerChildren(originalChildren)
-      ? originalChildren(controller)
-      : originalChildren
+    : handleChildrenVariable(
+        isNormalControllerChildren(originalChildren) ? originalChildren(controller) : originalChildren
+      )
 }
-
+function handleChildrenVariable(children: unknown): JSXElement {
+  return (
+    isFunction(children)
+      ? (...any: any[]) => children(...any)
+      : (isObject(children) && 'toString' in children) || isBigInt(children)
+        ? String(children)
+        : children
+  ) as any
+}
 /**
  * solid children is normal children, so must have a judger function to distingrish normal function and solidjs children function
  * @param node children
