@@ -25,12 +25,12 @@ export function createLazySignal<V>(lazyLoadInitValue: () => V): Signal<V> {
   function set(...args: Parameters<typeof _setValue>) {
     untrack(() => {
       if (hasAccessed()) {
-        return _setValue(...args)
+        return _setValue.apply(null, args)
       } else {
         const oldInnerOnFirstAccessFunction = innerOnFirstAccessFunction
         innerOnFirstAccessFunction = () => {
           oldInnerOnFirstAccessFunction()
-          _setValue(...args)
+          _setValue.apply(null, args)
           return value() as V
         }
       }
