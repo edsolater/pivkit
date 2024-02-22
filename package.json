@@ -1,6 +1,6 @@
 {
   "name": "@edsolater/pivkit",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "license": "MIT",
   "author": "edsolater",
@@ -55,7 +55,7 @@
     "solid-js": "^1.6.0"
   },
   "dependencies": {
-    "@edsolater/fnkit": "^0.1.66",
+    "@edsolater/fnkit": "^0.1.68",
     "goober": "^2.1.14",
     "solid-js": "^1.6.0"
   },
