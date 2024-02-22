@@ -1,4 +1,4 @@
-import { AnyFn, hasProperty, isArray, isBigInt, isFunction, isObject } from '@edsolater/fnkit'
+import { AnyFn, hasProperty, isArray, isFunction } from '@edsolater/fnkit'
 import { JSXElement } from 'solid-js'
 import { KitProps } from '../../createKit/KitProps'
 import { ValidController } from '../typeTools'
@@ -18,19 +18,11 @@ export function parsePivChildren<
 >(originalChildren: P, controller: Controller = {} as Controller): JSXElement {
   return isArray(originalChildren)
     ? originalChildren.map((i) => parsePivChildren(i, controller))
-    : handleChildrenVariable(
-        isNormalControllerChildren(originalChildren) ? originalChildren(controller) : originalChildren
-      )
+    : isNormalControllerChildren(originalChildren)
+      ? originalChildren(controller)
+      : originalChildren
 }
-function handleChildrenVariable(children: unknown): JSXElement {
-  return (
-    isFunction(children)
-      ? (...any: any[]) => children(...any)
-      : (isObject(children) && 'toString' in children) || isBigInt(children)
-        ? String(children)
-        : children
-  ) as any
-}
+
 /**
  * solid children is normal children, so must have a judger function to distingrish normal function and solidjs children function
  * @param node children
