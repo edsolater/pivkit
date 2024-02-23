@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@edsolater/fnkit': ^0.1.68
+  '@edsolater/fnkit': ^0.1.70
   '@storybook/addon-essentials': ^7.6.12
   '@storybook/addon-interactions': ^7.6.12
   '@storybook/addon-links': ^7.6.12
@@ -33,7 +33,7 @@ specifiers:
   vitest: ^1.2.2
 
 dependencies:
-  '@edsolater/fnkit': 0.1.68
+  '@edsolater/fnkit': 0.1.70
   goober: 2.1.14
   solid-js: 1.6.10
 
@@ -1366,8 +1366,8 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: true
 
-  /@edsolater/fnkit/0.1.68:
-    resolution: {integrity: sha512-zIwnyZH68pLifo2KooFz4sa2ZWzwPQ2ghJUjrWAt1qDX29s4C/k33vfjkEe9ubHkOwA2a24iZPxRILV4ryELug==}
+  /@edsolater/fnkit/0.1.70:
+    resolution: {integrity: sha512-Qrb9gxofPG8Tnx2B7ot+rsLPlAp/bNtjuz3HVLYjj9ObJID988dMguH58fQSET2qHnMsOsKLdctf3q/T7Bsjbg==}
     dev: false
 
   /@emotion/use-insertion-effect-with-fallbacks/1.0.1_react@18.2.0:
