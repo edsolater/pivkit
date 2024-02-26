@@ -7,9 +7,8 @@ import { renderHTMLDOM } from '../piv/propHandlers/renderHTMLDOM'
 import { createCSSCollapsePlugin } from '../plugins/useCSSTransition'
 import { createController } from '../utils/createController'
 import { Box } from './Boxes'
-import { motivate } from '../fnkit'
 
-export interface CollapseBoxRowProps {
+export interface CollapseBoxProps {
   /** TODO: open still can't auto lock the trigger not controled component now */
   open?: boolean
   defaultOpen?: boolean
@@ -24,7 +23,7 @@ export interface CollapseBoxRowProps {
   //TODO
   // 'renderMapLayout'?:
 }
-export type CollapseBoxProps = KitProps<CollapseBoxRowProps, { controller: CollapseBoxController }>
+export type CollapseBoxKitProps = KitProps<CollapseBoxProps, { controller: CollapseBoxController }>
 
 export interface CollapseBoxController {
   readonly isOpen: boolean
@@ -36,7 +35,7 @@ export interface CollapseBoxController {
 }
 
 const CollapseContext = createContext<CollapseBoxController>({} as CollapseBoxController, {
-  name: 'CollapseController',
+  name: 'CollapseController'
 })
 
 /**
@@ -46,14 +45,14 @@ const CollapseContext = createContext<CollapseBoxController>({} as CollapseBoxCo
  *				<Content />
  *			</WrapperBox>)} />
  */
-export function CollapseBox(kitProps: CollapseBoxProps) {
+export function CollapseBox(kitProps: CollapseBoxKitProps) {
   const { dom: boxDom, setDom: setBoxDom } = createDomRef()
   const { props, shadowProps } = useKitProps(kitProps, { name: 'Collapse', controller: () => controller })
 
   const [innerOpen, { toggle, open, close, set }] = createDisclosure(() => props.open ?? props.defaultOpen ?? false, {
     onClose: props.onClose,
     onOpen: props.onOpen,
-    onToggle: props.onToggle,
+    onToggle: props.onToggle
   })
 
   const controller = createController<CollapseBoxController>({
@@ -62,12 +61,12 @@ export function CollapseBox(kitProps: CollapseBoxProps) {
     open: () => open,
     close: () => close,
     toggle: () => toggle,
-    set: () => set,
+    set: () => set
   })
 
   const {
     controller: { open: openCollapse, close: closeCollapse, toggle: toggleCollapse, opened: isCollapseOpened },
-    plugin,
+    plugin
   } = createCSSCollapsePlugin()
 
   //sync with innerOpen
@@ -80,7 +79,12 @@ export function CollapseBox(kitProps: CollapseBoxProps) {
     <Box shadowProps={shadowProps} domRef={setBoxDom}>
       {/* Face */}
       {props['renderFace'] && (
-        <Box class='Face' onClick={motivate(toggle)}>
+        <Box
+          class='Face'
+          onClick={() => {
+            toggle()
+          }}
+        >
           {props['renderFace']}
         </Box>
       )}
