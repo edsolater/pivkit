@@ -16,16 +16,3 @@ export function Grid(rawProps: KitProps<GridBoxProps>) {
   const icssOption = getICSSFromProps(props)
   return <Box shadowProps={shadowProps} icss={icssGrid(icssOption)} />
 }
-
-export type GridItemBoxProps = {
-  'icss:area'?: ICSSGridItemOption['area']
-} & BoxProps
-
-/**
- * for direct sub component of `<GridBox>`
- * @deprecated no , should use `<Box icss={{gridArea: 'xxx'}} />` instead
- */
-export function GridItem(rawProps: KitProps<GridItemBoxProps>) {
-  const { shadowProps, props } = useKitProps(rawProps, { name: 'GridItemBox' })
-  return <Box shadowProps={shadowProps} icss={{ gridArea: props['icss:area'] }} />
-}
