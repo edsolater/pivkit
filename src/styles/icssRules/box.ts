@@ -41,7 +41,7 @@ export const icssRow = createICSS(
     justifyItems,
     justifyContent,
     gap,
-    '> *': childItems ? { flex: childItems } : undefined,
+    '& > *': childItems ? { flex: childItems } : undefined,
   })
 )
 
@@ -78,7 +78,7 @@ export const icssCol = createICSS(
     justifyItems,
     justifyContent,
     gap,
-    '> *': childItems ? { flex: childItems } : undefined,
+    '& > *': childItems ? { flex: childItems } : undefined,
   })
 )
 

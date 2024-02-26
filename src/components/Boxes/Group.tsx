@@ -11,5 +11,5 @@ export type GroupProps = BoxProps & {
 export function Group(kitProps: KitProps<GroupProps>) {
   const { props, shadowProps } = useKitProps(kitProps, { name: 'Group' })
   /* ---------------------------------- props --------------------------------- */
-  return <Box class={props.name} shadowProps={shadowProps} />
+  return <Box class={props.name} shadowProps={shadowProps} icss={{ display: 'contents' }} />
 }
