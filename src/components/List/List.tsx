@@ -36,7 +36,7 @@ export type ListProps<T> = {
   items?: MayFn<ItemList<T>>
 
   /** lazy render for get init frame faster */
-  lazy?: boolean
+  async?: boolean
   /**
    * only meaningfull when turnOnScrollObserver is true
    * @default 30
@@ -77,7 +77,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
 
   // [configs]
 
-  const _allItems = props.lazy
+  const _allItems = props.async
     ? createAsyncMemo(() => toArray(shrinkFn(props.items ?? [])), [] as T[])
     : createMemo(() => toArray(shrinkFn(props.items ?? [])))
   const allItems = createDeferred(_allItems) // ⚡ to smoother the render
