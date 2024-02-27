@@ -267,8 +267,8 @@ export function createCSSCollapsePlugin(options?: {
   let inTransitionDuration = false // flag for transition is start from transition cancel
   let cachedElementHeight: number | undefined = undefined // for transition start may start from transition cancel, which height is not correct
   const { plugin, controller, el } = createTransitionPlugin({
-    cssTransitionDurationMs: options?.durationMs ?? 350,
-    cssTransitionTimingFunction: 'ease',
+    cssTransitionDurationMs: options?.durationMs ?? 170,
+    cssTransitionTimingFunction: 'ease-out',
     enterProps: {
       icss: {
         userSelect: 'none',
