@@ -1,4 +1,4 @@
-import { AnyObj, switchCase } from '@edsolater/fnkit'
+import { AnyObj } from '@edsolater/fnkit'
 import { JSX, JSXElement, Show } from 'solid-js'
 import { PivProps } from '../Piv'
 import { HTMLTag } from '../typeTools'
@@ -6,7 +6,9 @@ import { domMap } from './domMap'
 import { NativeProps, parsePivProps } from './parsePivProps'
 
 function getSolidJSXNode(type: HTMLTag, parsedProps: NativeProps, additionalProps?: AnyObj): JSX.Element | undefined {
-  return switchCase(type, domMap(parsedProps, additionalProps))
+  const node = domMap[type](parsedProps, additionalProps)
+  console.log('node: ', node)
+  return node
 }
 
 /**

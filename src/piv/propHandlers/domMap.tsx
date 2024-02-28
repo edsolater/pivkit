@@ -1,11 +1,10 @@
 import { AnyObj } from '@edsolater/fnkit'
-import { Dynamic } from 'solid-js/web'
 import { NativeProps } from '..'
 
-export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) => ({
-  div: () => (
+export const domMap = {
+  div: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <div
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -16,10 +15,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </div>
   ),
-
-  span: () => (
+  span: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <span
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -30,9 +28,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </span>
   ),
-  p: () => (
+  p: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <p
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -43,9 +41,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </p>
   ),
-  button: () => (
+  button: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <button
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -56,9 +54,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </button>
   ),
-  input: () => (
+  input: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <input
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -67,9 +65,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {...additionalProps}
     />
   ),
-  textarea: () => (
+  textarea: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <textarea
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -78,9 +76,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {...additionalProps}
     />
   ),
-  select: () => (
+  select: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <select
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -91,9 +89,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </select>
   ),
-  form: () => (
+  form: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <form
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -106,9 +104,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </form>
   ),
-  section: () => (
+  section: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <section
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -119,9 +117,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </section>
   ),
-  article: () => (
+  article: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <article
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -132,9 +130,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </article>
   ),
-  header: () => (
+  header: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <header
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -145,9 +143,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </header>
   ),
-  footer: () => (
+  footer: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <footer
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -158,9 +156,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </footer>
   ),
-  main: () => (
+  main: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <main
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -171,9 +169,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </main>
   ),
-  aside: () => (
+  aside: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <aside
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -183,9 +181,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </aside>
   ),
-  label: () => (
+  label: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <label
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -196,9 +194,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </label>
   ),
-  h1: () => (
+  h1: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <h1
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -209,9 +207,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </h1>
   ),
-  h2: () => (
+  h2: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <h2
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -222,9 +220,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </h2>
   ),
-  h3: () => (
+  h3: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <h3
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -235,9 +233,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </h3>
   ),
-  h4: () => (
+  h4: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <h4
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -248,9 +246,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </h4>
   ),
-  h5: () => (
+  h5: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <h5
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -261,9 +259,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </h5>
   ),
-  h6: () => (
+  h6: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <h6
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -274,9 +272,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </h6>
   ),
-  nav: () => (
+  nav: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <nav
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -287,9 +285,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </nav>
   ),
-  ul: () => (
+  ul: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <ul
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -300,9 +298,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </ul>
   ),
-  li: () => (
+  li: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <li
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -313,9 +311,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </li>
   ),
-  img: () => (
+  img: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <img
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -323,9 +321,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {...additionalProps}
     />
   ),
-  svg: () => (
+  svg: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <svg
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       // @ts-ignore
       ref={props.ref}
@@ -334,9 +332,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {...additionalProps}
     />
   ),
-  a: () => (
+  a: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <a
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -346,9 +344,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </a>
   ),
-  iframe: () => (
+  iframe: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <iframe
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -356,9 +354,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {...additionalProps}
     />
   ),
-  summary: () => (
+  summary: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <summary
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -368,9 +366,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </summary>
   ),
-  datails: () => (
+  datails: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <details
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -380,9 +378,9 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
       {props.children}
     </details>
   ),
-  dialog: () => (
+  dialog: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <dialog
-      // solidjs prefer solid props for variable reactive
+      // solidjs prefer static props for variable reactive
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
@@ -391,5 +389,5 @@ export const domMap = (props: NativeProps, additionalProps: AnyObj | undefined) 
     >
       {props.children}
     </dialog>
-  ),
-})
+  )
+}
