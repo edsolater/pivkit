@@ -1,28 +1,40 @@
+import { createSignal } from 'solid-js'
 import { Box } from './Boxes'
+import { Button } from './Button'
 import { ViewTransitionSliderBox } from './ViewTransitionSliderBox'
-import { Show, createEffect, createSignal } from 'solid-js'
 
-export type ViewTransitionSliderBoxExampleProps = {
-  triggerIsOn?: boolean
-}
+export type ViewTransitionSliderBoxExampleProps = {}
 
-export const defaultProps: ViewTransitionSliderBoxExampleProps = {
-  triggerIsOn: true
-}
+export const defaultProps: ViewTransitionSliderBoxExampleProps = {}
 
 export function ViewTransitionSliderBoxExample(props: ViewTransitionSliderBoxExampleProps) {
   const [contentIndex, setContentIndex] = createSignal(0)
-  createEffect(() => {
-    setContentIndex(Number(props.triggerIsOn))
-  })
+  const [count, setCount] = createSignal(0)
   return (
-    <ViewTransitionSliderBox contentIndex={contentIndex()}>
-      <Show when={contentIndex() === 0}>
-        <Box icss={{ width: '20em', height: '10em', background: 'dodgerblue', color: 'white' }}>content 0</Box>
-      </Show>
-      <Show when={contentIndex() === 1}>
-        <Box icss={{ width: '20em', height: '10em', background: 'crimson', color: 'white' }}>content 1</Box>
-      </Show>
-    </ViewTransitionSliderBox>
+    <Box>
+      <ViewTransitionSliderBox contentIndex={contentIndex()}>
+        <Box
+          icss={{
+            width: '20em',
+            height: '10em',
+            background: count() % 2 === 0 ? 'crimson' : 'dodgerblue',
+            color: 'white'
+          }}
+        >
+          content {count()}
+        </Box>
+      </ViewTransitionSliderBox>
+
+      <Button
+        onClick={() => {
+          setContentIndex((n) => n + 1)
+          setTimeout(() => {
+            setCount((c) => c + 1)
+          }, 0)
+        }}
+      >
+        Increase Count
+      </Button>
+    </Box>
   )
 }

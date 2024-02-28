@@ -4,7 +4,7 @@ import { createEffect, on } from 'solid-js'
 import { type KitProps, useKitProps } from '../createKit'
 
 export type ViewTransitionSliderBoxProps = {
-  /** change this will cause view transition */
+  /** change this will cause view transition. In solidjs, should change before inner change */
   contentIndex?: number
   direction?: 'horizontal' | 'vertical'
 }
@@ -12,7 +12,7 @@ export type ViewTransitionSliderBoxProps = {
 export type ViewTransitionSliderBoxKitProps = KitProps<ViewTransitionSliderBoxProps>
 
 export function ViewTransitionSliderBox(kitProps: ViewTransitionSliderBoxKitProps) {
-  const { props } = useKitProps(kitProps, { name: 'ViewTransitionSliderBox' })
+  const { props, shadowProps } = useKitProps(kitProps, { name: 'ViewTransitionSliderBox' })
 
   const { dom: boxRef, setDom: setBoxDom } = createDomRef<HTMLDivElement>()
   const { dom: prevBoxRef, setDom: setPrevBoxDom } = createDomRef<HTMLDivElement>()
@@ -81,35 +81,37 @@ export function ViewTransitionSliderBox(kitProps: ViewTransitionSliderBoxKitProp
 
   return (
     <Box
+      class={'window'}
+      shadowProps={shadowProps}
       domRef={setBoxDom}
       icss={{
         display: 'flex',
         flexDirection: props.direction === 'vertical' ? 'column' : 'row',
-        contain: 'size',
-        transform: 'translateX(0%)',
-        position: 'relative'
+        position: 'relative',
+        width: 'fit-content',
+        height: 'fit-content'
       }}
       style={{ transition: transitionCSS }}
     >
-      {/* to hold prev node  */}
       <Box
-        ref={setPrevBoxDom}
+        class={'prev-box'}
+        domRef={setPrevBoxDom}
         icss={{ position: 'absolute', inset: 0 }}
         style={{ transform: 'translateX(-100%)', transition: 'inherit' }}
       ></Box>
 
-      {/* to hold current node  */}
       <Box
-        ref={setCurrBoxDom}
-        icss={{ display: 'flex', flexDirection: 'column', contain: 'size', flex: 1 }}
+        class={'curr-box'}
+        domRef={setCurrBoxDom}
+        icss={{ flex: 1 }}
         style={{ transform: 'translateX(0%)', transition: 'inherit' }}
       >
         {props.children}
       </Box>
 
-      {/* to hold next node  */}
       <Box
-        ref={setNextBoxDom}
+        class={'next-box'}
+        domRef={setNextBoxDom}
         icss={{ position: 'absolute', inset: 0 }}
         style={{ transform: 'translateX(100%)', transition: 'inherit' }}
       ></Box>
