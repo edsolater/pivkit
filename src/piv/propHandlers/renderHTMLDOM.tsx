@@ -7,7 +7,6 @@ import { NativeProps, parsePivProps } from './parsePivProps'
 
 function getSolidJSXNode(type: HTMLTag, parsedProps: NativeProps, additionalProps?: AnyObj): JSX.Element | undefined {
   const node = domMap[type](parsedProps, additionalProps)
-  console.log('node: ', node)
   return node
 }
 
