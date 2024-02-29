@@ -6,7 +6,7 @@ settings:
 
 dependencies:
   '@edsolater/fnkit':
-    specifier: ^0.1.77
+    specifier: ^0.1.78
     version: 0.1.78
   goober:
     specifier: ^2.1.14
