@@ -40,7 +40,7 @@ export function createDisclosure(
     }
   })
 
-  let delayActionId: NodeJS.Timeout | number = 0
+  let delayActionId: any = 0
   const setIsOn = (...params: any[]) => {
     if (options.locked) return
     //@ts-expect-error temp

@@ -151,6 +151,6 @@ function handlePropRenderOutWrapper(props: PivProps<any, any>): JSXElement {
   console.log('detect render:outWrapper') // FIXME: <-- why not detected?
   return flap(props['render:outWrapper']).reduce(
     (prevNode, getWrappedNode) => (getWrappedNode ? getWrappedNode(prevNode) : prevNode),
-    (() => handleNormalPivProps(omitProps(props, 'render:outWrapper'))) as JSXElement // 📝 wrap function to let not solidjs read at once when array.prototype.reduce not finish yet
+    (() => handleNormalPivProps(omitProps(props, 'render:outWrapper'))) as unknown as JSXElement // 📝 wrap function to let not solidjs read at once when array.prototype.reduce not finish yet
   )
 }

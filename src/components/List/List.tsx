@@ -1,4 +1,4 @@
-import { MayFn, shrinkFn } from '@edsolater/fnkit'
+import { MayFn, shrinkFn, toList } from '@edsolater/fnkit'
 import {
   Accessor,
   For,
@@ -9,7 +9,7 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  on,
+  on
 } from 'solid-js'
 import { KitProps, useKitProps } from '../../createKit'
 import { ObserveFn, useIntersectionObserver } from '../../domkit/hooks/useIntersectionObserver'
@@ -18,7 +18,6 @@ import { createAsyncMemo } from '../../hooks/createAsyncMemo'
 import { createRef } from '../../hooks/createRef'
 import { Piv } from '../../piv'
 import { ListItem } from './ListItem'
-import { toArray } from '../../fnkit/itemMethods'
 
 export type ItemList<T> =
   | Map<any, T>
@@ -71,15 +70,15 @@ export function List<T>(kitProps: ListKitProps<T>) {
     name: 'List',
     noNeedDeAccessifyChildren: true,
     defaultProps: {
-      reachBottomMargin: 50,
-    },
+      reachBottomMargin: 50
+    }
   })
 
   // [configs]
 
   const _allItems = props.async
-    ? createAsyncMemo(() => toArray(shrinkFn(props.items ?? [])), [] as T[])
-    : createMemo(() => toArray(shrinkFn(props.items ?? [])))
+    ? createAsyncMemo(() => toList(shrinkFn(props.items ?? [])), [] as T[])
+    : createMemo(() => toList(shrinkFn(props.items ?? [])))
   const allItems = createDeferred(_allItems) // ⚡ to smoother the render
   const increaseRenderCount = createMemo(
     () => props.increaseRenderCount ?? Math.min(Math.floor(allItems().length / 10), 30)
@@ -92,7 +91,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
   // [add to context, this observer can make listItem can auto render or not]
   const { observe } = useIntersectionObserver({
     rootRef: listRef,
-    options: { rootMargin: '100%' },
+    options: { rootMargin: '100%' }
   })
 
   // [actually showed item count]
@@ -103,7 +102,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
     onReachBottom: () => {
       setRenderItemLength((n) => n + increaseRenderCount())
     },
-    reachBottomMargin: props.reachBottomMargin,
+    reachBottomMargin: props.reachBottomMargin
   })
 
   // reset when items.length changed
