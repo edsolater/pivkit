@@ -20,7 +20,7 @@ export function Row(kitProps: KitProps<RowProps>) {
   /* ---------------------------------- props --------------------------------- */
   return (
     <Box
-      icss={props.line ? icssRow(mergeObjects(icssOption, { align: 'center' })) : icssRow(icssOption)}
+      icss={props.line ? icssRow(mergeObjects(icssOption, { align: 'center', gap: 'inherit' })) : icssRow(icssOption)}
       shadowProps={shadowProps}
     />
   )

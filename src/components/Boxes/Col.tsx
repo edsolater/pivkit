@@ -1,3 +1,4 @@
+import { mergeObjects } from '@edsolater/fnkit'
 import { KitProps, useKitProps } from '../../createKit'
 import { ICSSColOption, icssCol } from '../../styles/icssRules'
 import { getICSSFromProps } from '../../utils/getICSSFromProps'
@@ -13,5 +14,5 @@ export function Col(rawProps: KitProps<ColProps>) {
   const { props, shadowProps } = useKitProps(rawProps, { name: 'ColBox' })
   const icssOption = getICSSFromProps(props)
   /* ---------------------------------- props --------------------------------- */
-  return <Box icss={icssCol(icssOption)} shadowProps={shadowProps} />
+  return <Box icss={icssCol(mergeObjects(icssOption, { gap: 'inherit' }))} shadowProps={shadowProps} />
 }
