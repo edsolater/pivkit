@@ -11,6 +11,10 @@ export type ViewTransitionSliderBoxProps = {
 
 export type ViewTransitionSliderBoxKitProps = KitProps<ViewTransitionSliderBoxProps>
 
+
+/**
+ * think of solidjs's [`useTransition`](https://docs.solidjs.com/reference/reactive-utilities/use-transition) to make action deffered
+ */
 export function ViewTransitionSliderBox(kitProps: ViewTransitionSliderBoxKitProps) {
   const { props } = useKitProps(kitProps, { name: 'ViewTransitionSliderBox' })
 

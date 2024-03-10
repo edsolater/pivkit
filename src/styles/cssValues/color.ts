@@ -76,9 +76,6 @@ function isColorItem(c: ColorPercent | ColorString | ColorItem | undefined): c i
  * @returns color-mix() string
  */
 export function cssOpacity(color: string, alpha: number) {
-  if (color.toLocaleLowerCase() === 'currentcolor') {
-    console.warn('in edge 109, currentColor is not supported in color-mix()', new Error().stack)
-  }
   return cssColorMix(color, 'transparent', 1 - alpha)
 }
 

@@ -357,17 +357,14 @@ export function createCSSCollapsePlugin(options?: {
 
   // init collapse
   createEffect(() => {
-    el()?.style.setProperty('pointer-events', 'none')
     el()?.style.setProperty('position', 'absolute')
   })
 
   function resumeDOMCache(element: HTMLElement | undefined) {
-    element?.style.removeProperty('pointer-events')
   }
 
   // innerChildren.current = null // clean from internal storage to avoid still render dom
   function destoryDOMCache(element: HTMLElement | undefined) {
-    element?.style.setProperty('pointer-events', 'none')
   }
 
   return {
