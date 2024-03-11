@@ -31,7 +31,6 @@ export function handleShadowProps<P extends Partial<PivProps<any>>>(
   const candidates = () => shakeNil([props].concat(props.shadowProps)) // 🚧 use cache will breake the solidjs's getter logic
   const getOwnKeys = createCachedFunction(() => {
     const keysArray = getNeedToMergeKeys(props)
-
     const keys = new Set(keysArray)
     const uniqueKeys = Array.from(keys)
     return { set: keys, arr: uniqueKeys }
@@ -40,20 +39,23 @@ export function handleShadowProps<P extends Partial<PivProps<any>>>(
   return new Proxy(
     {},
     {
-      get: (_target, key) => getPivPropsValue(candidates(), key),
+      get: (target, key) => (Reflect.has(target, key) ? Reflect.get(target, key) : getPivPropsValue(candidates(), key)),
+      set: (target, key, value) => Reflect.set(target, key, value),
       has: (_target, key) => getOwnKeys().set.has(key as string),
-      set: (_target, key, value) => Reflect.set(_target, key, value),
       ownKeys: () => getOwnKeys().arr,
       // for Object.keys to filter
       getOwnPropertyDescriptor: (_target, key) => ({
         enumerable: true,
         configurable: true,
-        get: () => getPivPropsValue(candidates(), key),
-      }),
+        get: () => getPivPropsValue(candidates(), key)
+      })
     }
   ) as any
 }
 
+/**
+ * except 'shadowProps'
+ */
 function getNeedToMergeKeys(props: Partial<PivProps<any>>) {
   function getShadowPropKeys(props: Partial<PivProps<any>>): string[] {
     return isArray(props.shadowProps)

@@ -25,9 +25,9 @@ export function useCSSFadeIn(additionalOpts: UseFadeInOptions) {
 
   const styleMethods = useFadeInPaddingEffect({ heightOrWidth: 'height' })
 
-  const { setDom, transitionProps } = useCSSTransition({
+  const { setDom, transitionIcss } = useCSSTransition({
     show,
-    hideProps: { icss: { position: 'absolute', opacity: 0, overflow: 'hidden' } },
+    hideIcss: { icss: { position: 'absolute', opacity: 0, overflow: 'hidden' } },
     onBeforeEnter({ el }) {
       if (!el) return
 
@@ -79,7 +79,7 @@ export function useCSSFadeIn(additionalOpts: UseFadeInOptions) {
 
   return {
     refSetter: setDom,
-    transitionProps,
+    transitionIcss,
   }
 }
 

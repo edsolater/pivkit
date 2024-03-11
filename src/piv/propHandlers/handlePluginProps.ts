@@ -30,14 +30,8 @@ function sortPluginByPriority(plugins: Plugin<any>[]) {
   if (plugins.every((plugin) => getPluginPriority(plugin))) return plugins
 
   // judge whether need sort
-  let needSort = false
-  let firstPriority = getPluginPriority(plugins[0]!)
-  for (const plugin of plugins) {
-    if (getPluginPriority(plugin) !== firstPriority) {
-      needSort = true
-      break
-    }
-  }
+  const firstPriority = getPluginPriority(plugins[0]!)
+  const needSort = plugins.some((plugin) => getPluginPriority(plugin) !== firstPriority)
 
   return needSort
     ? plugins.toSorted((pluginA, pluginB) => getPluginPriority(pluginB) - getPluginPriority(pluginA))

@@ -1,12 +1,13 @@
-import { createContext, createEffect, useContext } from 'solid-js'
+import { Show, createContext, createEffect, createSignal, useContext } from 'solid-js'
 import { KitProps, useKitProps } from '../createKit'
 import { createDomRef, useClickOutside } from '../hooks'
 import { createDisclosure } from '../hooks/createDisclosure'
-import { Piv, PivChild, PivProps } from '../piv'
+import { Fragnment, Piv, PivChild, PivProps } from '../piv'
 import { renderHTMLDOM } from '../piv/propHandlers/renderHTMLDOM'
-import { createCSSCollapsePlugin } from '../plugins/useCSSTransition'
+import { loadModuleCSSCollapse } from '../plugins/useCSSTransition'
 import { createController } from '../utils/createController'
 import { Box } from './Boxes'
+import { shrinkFn, type MayFn } from '@edsolater/fnkit'
 
 export interface CollapseBoxProps {
   /** TODO: open still can't auto lock the trigger not controled component now */
@@ -18,8 +19,8 @@ export interface CollapseBoxProps {
   onClose?(): void
   onToggle?(): void
 
-  'renderFace'?: PivChild
-  'renderContent'?: PivChild
+  renderFace?: MayFn<PivChild>
+  renderContent?: MayFn<PivChild>
   //TODO
   // 'renderMapLayout'?:
 }
@@ -66,8 +67,17 @@ export function CollapseBox(kitProps: CollapseBoxKitProps) {
 
   const {
     controller: { open: openCollapse, close: closeCollapse, toggle: toggleCollapse, opened: isCollapseOpened },
-    plugin
-  } = createCSSCollapsePlugin()
+    shadowProps: collapseShadowProps
+  } = loadModuleCSSCollapse()
+
+  // only render content when opened, but don't open twice
+  const [hasCollapseBeenOpened, setHasCollapseBeenOpened] = createSignal(isCollapseOpened())
+  createEffect(() => {
+    const isOpen = isCollapseOpened()
+    if (isOpen) {
+      setHasCollapseBeenOpened(isOpen)
+    }
+  })
 
   //sync with innerOpen
   createEffect(() => (innerOpen() ? openCollapse() : closeCollapse()))
@@ -78,23 +88,23 @@ export function CollapseBox(kitProps: CollapseBoxKitProps) {
   return (
     <Box shadowProps={shadowProps} domRef={setBoxDom}>
       {/* Face */}
-      {props['renderFace'] && (
+      <Show when={'renderFace' in props}>
         <Box
           class='Face'
           onClick={() => {
             toggle()
           }}
         >
-          {props['renderFace']}
+          {shrinkFn(props['renderFace'])}
         </Box>
-      )}
+      </Show>
 
       {/* Content */}
-      {props['renderContent'] && (
-        <Piv class='Content' plugin={plugin} icss={{ overflow: 'hidden' }}>
-          {props['renderContent']}
-        </Piv>
-      )}
+      <Piv class='Content' shadowProps={collapseShadowProps} icss={{ overflow: 'hidden' }}>
+        <Show when={hasCollapseBeenOpened()}>
+          <Fragnment>{shrinkFn(props['renderContent'])}</Fragnment>
+        </Show>
+      </Piv>
     </Box>
   )
 }

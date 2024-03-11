@@ -4,7 +4,7 @@ import { runtimeObject } from '../fnkit/runtimeObject'
 import { addEventListener } from '../domkit'
 import { createDomRef } from '../hooks'
 import { createRef } from '../hooks/createRef'
-import { createPlugin, CSSObject, mergeProps, PivProps } from '../piv'
+import { createPlugin, CSSObject, mergeProps, PivProps, type ICSS } from '../piv'
 import { Accessify, accessifyProps } from '../utils/accessifyProps'
 import { createController2 } from '../utils/createController'
 
@@ -26,20 +26,20 @@ export interface CSSTransactionOptions {
   appear?: Accessify<boolean | undefined, TransitionController>
 
   /** enterFrom + enterTo */
-  enterProps?: PivProps<any, TransitionController>
+  enterIcss?: ICSS<TransitionController>
   /** leaveFrom + leaveTo */
-  leaveProps?: PivProps<any, TransitionController>
+  leaveIcss?: ICSS<TransitionController>
 
-  enterFromProps?: PivProps<any, TransitionController>
-  enterToProps?: PivProps<any, TransitionController>
+  enterFromIcss?: ICSS<TransitionController>
+  enterToIcss?: ICSS<TransitionController>
 
-  leaveFromProps?: PivProps<any, TransitionController>
-  leaveToProps?: PivProps<any, TransitionController>
+  leaveFromIcss?: ICSS<TransitionController>
+  leaveToIcss?: ICSS<TransitionController>
 
   /** enterFrom + leaveTo */
-  hideProps?: PivProps<any, TransitionController> // shortcut for both enterFrom and leaveTo
+  hideIcss?: ICSS<TransitionController> // shortcut for both enterFrom and leaveTo
   /** enterTo + leaveFrom */
-  showProps?: PivProps<any, TransitionController> // shortcut for both enterTo and leaveFrom
+  showIcss?: ICSS<TransitionController> // shortcut for both enterTo and leaveFrom
 
   onBeforeEnter?: (payloads: {
     el: HTMLElement | undefined
@@ -70,43 +70,33 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
   const controller: TransitionController = createController2(() => ({
     from: currentPhase,
     to: targetPhase,
-    contentDom,
+    contentDom
   }))
   const opts = accessifyProps(additionalOpts, controller)
   const [contentDom, setContentDom] = createRef<HTMLElement>()
-  const transitionPhaseProps = createMemo(() => {
+  const transitionPhaseIcss = () => {
     const basic = {
       transition: `${opts.cssTransitionDurationMs ?? 250}ms`,
-      transitionTimingFunction: opts.cssTransitionTimingFunction,
+      transitionTimingFunction: opts.cssTransitionTimingFunction
     }
     const presets = flap(opts.presets)
     return {
-      enterFrom: mergeProps(
-        presets.map((i) => shrinkFn(i)?.enterFromProps),
-        opts.enterProps,
-        opts.enterFromProps ?? opts.hideProps,
-        { style: basic }
-      ) as PivProps,
-      enterTo: mergeProps(
-        presets.map((i) => shrinkFn(i)?.enterToProps),
-        opts.enterProps,
-        opts.enterToProps ?? opts.showProps,
-        { style: basic }
-      ) as PivProps,
-      leaveFrom: mergeProps(
-        presets.map((i) => shrinkFn(i)?.leaveFromProps),
-        opts.leaveProps,
-        opts.leaveFromProps ?? opts.showProps,
-        { style: basic }
-      ) as PivProps,
-      leaveTo: mergeProps(
-        presets.map((i) => shrinkFn(i)?.leaveToProps),
-        opts.leaveProps,
-        opts.leaveToProps ?? opts.hideProps,
-        { style: basic }
-      ) as PivProps,
+      enterFrom: [
+        presets.map((i) => shrinkFn(i)?.enterFromIcss),
+        opts.enterIcss,
+        opts.enterFromIcss ?? opts.hideIcss,
+        basic
+      ],
+      enterTo: [presets.map((i) => shrinkFn(i)?.enterToIcss), opts.enterIcss, opts.enterToIcss ?? opts.showIcss, basic],
+      leaveFrom: [
+        presets.map((i) => shrinkFn(i)?.leaveFromIcss),
+        opts.leaveIcss,
+        opts.leaveFromIcss ?? opts.showIcss,
+        basic
+      ],
+      leaveTo: [presets.map((i) => shrinkFn(i)?.leaveToIcss), opts.leaveIcss, opts.leaveToIcss ?? opts.hideIcss, basic]
     } as Record<TransitionCurrentPhasePropsName, PivProps>
-  })
+  }
 
   const [currentPhase, setCurrentPhase] = createSignal<TransitionPhase>(opts.show && !opts.appear ? 'shown' : 'hidden')
   const targetPhase = createMemo(() => (opts.show ? 'shown' : 'hidden'))
@@ -178,7 +168,7 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
           from: currentPhase,
           to: targetPhase,
           prevPhase: prevCurrentPhase,
-          isFromAbortted: currentPhase === 'during-process' && prevCurrentPhase === 'during-process', // not right
+          isFromAbortted: currentPhase === 'during-process' && prevCurrentPhase === 'during-process' // not right
         } as const
         // -------- process judgers --------
         const isFirstRender = prevCurrentPhase === undefined
@@ -203,22 +193,19 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
           [isAfterEnter, () => opts.onAfterEnter?.(status)],
           [isAfterLeave, () => opts.onAfterLeave?.(status)],
           [isBeforeEnter, () => opts.onBeforeEnter?.(status)],
-          [isBeforeLeave, () => opts.onBeforeLeave?.(status)],
+          [isBeforeLeave, () => opts.onBeforeLeave?.(status)]
         ])
       },
       { defer: true }
     )
   )
 
-  const transitionProps = () => {
-    const mergeProps = transitionPhaseProps()[currentPhasePropsName()]
-    return mergeProps
-  }
+  const transitionIcss = createMemo(() => transitionPhaseIcss()[currentPhasePropsName()])
 
-  return { dom: contentDom, setDom: setContentDom, transitionProps, opened }
+  return { dom: contentDom, setDom: setContentDom, transitionIcss, opened }
 }
 
-export function createTransitionPlugin(options?: Omit<CSSTransactionOptions, 'show'>) {
+export function loadModuleTransition(options?: Omit<CSSTransactionOptions, 'show'>) {
   const [show, setShow] = createSignal(false)
 
   function toggle() {
@@ -231,65 +218,68 @@ export function createTransitionPlugin(options?: Omit<CSSTransactionOptions, 'sh
     setShow(true)
   }
 
-  const { setDom, transitionProps, opened, dom } = useCSSTransition({
+  const { setDom, transitionIcss, opened, dom } = useCSSTransition({
     show,
-    ...options,
+    ...options
   })
 
   const controller = {
     opened,
     toggle,
     open,
-    close,
+    close
   }
 
   return {
+    /**
+     * @deprecated prefer just use shadowProps directly
+     */
     plugin: createPlugin(
       () => () =>
         // does must use a high function ?
         runtimeObject<PivProps>({
           // if not use runtimeObject, the props will be consumed too early
-          shadowProps: () => transitionProps(),
-          domRef: () => setDom,
+          shadowProps: () => transitionIcss(),
+          domRef: () => setDom
         })
     ),
+    shadowProps: {
+      get icss() {
+        return transitionIcss()
+      },
+      domRef: setDom
+    },
     el: dom,
-    controller,
+    controller
   }
 }
 /** will dynamic collapse element height from 'auto' */
 // could it from auto to auto? 🤔
-export function createCSSCollapsePlugin(options?: {
+export function loadModuleCSSCollapse(options?: {
   ignoreEnterTransition?: boolean
   ignoreLeaveTransition?: boolean
   durationMs?: number
 }) {
   let inTransitionDuration = false // flag for transition is start from transition cancel
   let cachedElementHeight: number | undefined = undefined // for transition start may start from transition cancel, which height is not correct
-  const { plugin, controller, el } = createTransitionPlugin({
+  const { plugin, controller, el, shadowProps } = loadModuleTransition({
     cssTransitionDurationMs: options?.durationMs ?? 170,
     cssTransitionTimingFunction: 'ease-out',
-    enterProps: {
-      icss: {
-        userSelect: 'none',
-      },
+    enterIcss: {
+      userSelect: 'none'
     },
-    leaveProps: {
-      icss: {
-        userSelect: 'none',
-      },
+    leaveIcss: {
+      userSelect: 'none'
     },
-    hideProps: {
-      icss: {
-        opacity: 0,
-        // position: 'absolute',
-        // pointerEvents: 'none',
-      },
+    hideIcss: {
+      opacity: 0,
+      userSelect: 'auto'
+      // position: 'absolute',
+      // pointerEvents: 'none',
     },
-    showProps: {
-      icss: {
-        opacity: 1,
-      },
+    showIcss: {
+      opacity: 1,
+      userSelect: 'auto'
     },
     onBeforeEnter({ el }) {
       //why not invoked? 🤔
@@ -352,7 +342,7 @@ export function createCSSCollapsePlugin(options?: {
       el?.style.setProperty('visibility', 'hidden')
       destoryDOMCache(el)
       inTransitionDuration = false
-    },
+    }
   })
 
   // init collapse
@@ -360,24 +350,24 @@ export function createCSSCollapsePlugin(options?: {
     el()?.style.setProperty('position', 'absolute')
   })
 
-  function resumeDOMCache(element: HTMLElement | undefined) {
-  }
+  function resumeDOMCache(element: HTMLElement | undefined) {}
 
   // innerChildren.current = null // clean from internal storage to avoid still render dom
-  function destoryDOMCache(element: HTMLElement | undefined) {
-  }
+  function destoryDOMCache(element: HTMLElement | undefined) {}
 
   return {
-    plugin: plugin,
+    /** @deprecated just use shadowProps is ok */
+    plugin,
+    shadowProps,
     el,
-    controller,
+    controller
   }
 }
 
 /**
  * can create transition from one height:auto to another height:auto
  */
-export function createAutoSizeTransitionPlugin(options?: {
+export function loadModuleAutoSizeTransition(options?: {
   ignoreEnterTransition?: boolean
   ignoreLeaveTransition?: boolean
 }) {
@@ -412,16 +402,16 @@ export function createAutoSizeTransitionPlugin(options?: {
   // })
   return {
     plugin: () => ({
-      domRef: setDom,
-    }),
+      domRef: setDom
+    })
   }
 }
 
 // const cssTransitionPlugin = createPlugin<CSSTransactionOptions, any, any>((options: CSSTransactionOptions = {}) => () => {
-//   const { refSetter, transitionProps, isInnerVisiable } = useCSSTransition(options)
+//   const { refSetter, transitionIcss, isInnerVisiable } = useCSSTransition(options)
 //   return {
 //     ref: refSetter,
-//     ...transitionProps,
+//     ...transitionIcss,
 //     show: isInnerVisiable,
 //   }
 // })
