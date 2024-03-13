@@ -253,13 +253,15 @@ export function loadModuleTransition(options?: Omit<CSSTransactionOptions, 'show
     controller
   }
 }
-/** will dynamic collapse element height from 'auto' */
-// could it from auto to auto? 🤔
-export function loadModuleCSSCollapse(options?: {
+export type FeatureCSSCollapseOption = {
   ignoreEnterTransition?: boolean
   ignoreLeaveTransition?: boolean
   durationMs?: number
-}) {
+}
+
+/** will dynamic collapse element height from 'auto' */
+// could it from auto to auto? 🤔
+export function loadModuleCSSCollapse(options?: FeatureCSSCollapseOption) {
   let inTransitionDuration = false // flag for transition is start from transition cancel
   let cachedElementHeight: number | undefined = undefined // for transition start may start from transition cancel, which height is not correct
   const { plugin, controller, el, shadowProps } = loadModuleTransition({

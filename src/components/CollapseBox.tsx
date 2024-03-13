@@ -1,10 +1,10 @@
 import { Show, createContext, createEffect, createSignal, useContext } from 'solid-js'
-import { KitProps, useKitProps } from '../createKit'
+import { type KitProps, useKitProps } from '../createKit'
 import { createDomRef, useClickOutside } from '../hooks'
 import { createDisclosure } from '../hooks/createDisclosure'
 import { Fragnment, Piv, PivChild, PivProps } from '../piv'
 import { renderHTMLDOM } from '../piv/propHandlers/renderHTMLDOM'
-import { loadModuleCSSCollapse } from '../plugins/useCSSTransition'
+import { loadModuleCSSCollapse, type FeatureCSSCollapseOption } from '../plugins/useCSSTransition'
 import { createController } from '../utils/createController'
 import { Box } from './Boxes'
 import { shrinkFn, type MayFn } from '@edsolater/fnkit'
@@ -15,6 +15,7 @@ export interface CollapseBoxProps {
   defaultOpen?: boolean
   collapseDirection?: 'down' | 'up'
   canCloseByOutsideClick?: boolean
+  optionsOfCSSCollapse?: FeatureCSSCollapseOption
   onOpen?(): void
   onClose?(): void
   onToggle?(): void
@@ -68,7 +69,7 @@ export function CollapseBox(kitProps: CollapseBoxKitProps) {
   const {
     controller: { open: openCollapse, close: closeCollapse, toggle: toggleCollapse, opened: isCollapseOpened },
     shadowProps: collapseShadowProps
-  } = loadModuleCSSCollapse()
+  } = loadModuleCSSCollapse(props.optionsOfCSSCollapse)
 
   // only render content when opened, but don't open twice
   const [hasCollapseBeenOpened, setHasCollapseBeenOpened] = createSignal(isCollapseOpened())
