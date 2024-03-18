@@ -1,26 +1,26 @@
-import { flap, pipe, shakeFalsy, shrinkFn } from '@edsolater/fnkit'
+import { flap, pipeDo, shakeFalsy, shrinkFn } from '@edsolater/fnkit'
 import { mutateByAdditionalObjectDescriptors } from '../../fnkit'
+import { getPropsFromAddPropContext } from '../AddProps'
+import { PivProps } from '../Piv'
+import { getPropsFromPropContextContext } from '../PropContext'
 import { ValidController } from '../typeTools'
+import { mergeProps, omitProps } from '../utils'
 import { mergeRefs } from '../utils/mergeRefs'
-import { classname } from './classname'
 import { parsePivChildren } from './children'
+import { classname } from './classname'
+import { handlePluginProps } from './handlePluginProps'
 import { parseHTMLProps } from './htmlProps'
 import { handleICSSProps } from './icss'
 import { parseIStyles } from './istyle'
-import { parseOnClick } from './onClick'
-import { handlePluginProps } from './handlePluginProps'
-import { handleShadowProps } from './shadowProps'
-import { mergeProps, omitProps } from '../utils'
-import { PivProps } from '../Piv'
-import { getPropsFromPropContextContext } from '../PropContext'
 import { handleMergifyOnCallbackProps } from './mergifyProps'
-import { getPropsFromAddPropContext } from '../AddProps'
+import { parseOnClick } from './onClick'
+import { handleShadowProps } from './shadowProps'
 
 export type NativeProps = ReturnType<typeof parsePivProps>['props']
 
 // first step of parse
 function getPropsInfoOfRawPivProps(raw: Partial<PivProps>) {
-  const parsedPivProps = pipe(
+  const parsedPivProps = pipeDo(
     raw as Partial<PivProps>,
 
     // TODO: should recursively handle shadowProps and plugin. DO NOT manually handle them
@@ -39,7 +39,9 @@ function getPropsInfoOfRawPivProps(raw: Partial<PivProps>) {
       ? () => Boolean(shrinkFn(parsedPivProps.ifSelfShown))
       : undefined
   const selfCoverNode =
-    'render:self' in parsedPivProps ? parsedPivProps['render:self']?.(omitProps(parsedPivProps, ['render:self'])) : undefined
+    'render:self' in parsedPivProps
+      ? parsedPivProps['render:self']?.(omitProps(parsedPivProps, ['render:self']))
+      : undefined
   return { parsedPivProps, controller, ifOnlyNeedRenderChildren, selfCoverNode, ifOnlyNeedRenderSelf }
 }
 
@@ -68,7 +70,7 @@ function getNativeHTMLPropsFromParsedPivProp(props: any, controller: ValidContro
         },
         get children() {
           return parsePivChildren(props.children, controller)
-        },
+        }
       }
     : {
         get class() {
@@ -89,7 +91,7 @@ function getNativeHTMLPropsFromParsedPivProp(props: any, controller: ValidContro
         },
         get children() {
           return parsePivChildren(props.children, controller)
-        },
+        }
       }
 }
 /**
@@ -133,7 +135,7 @@ function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(pr
   return 'render:firstChild' in props
     ? mutateByAdditionalObjectDescriptors(props, {
         newGetters: { children: (props) => flap(props['render:firstChild']).concat(props.children) },
-        deletePropertyNames: ['render:firstChild'],
+        deletePropertyNames: ['render:firstChild']
       })
     : props
 }
@@ -148,9 +150,9 @@ function parsePivRenderAppendChildren<T extends Partial<PivProps<any, any>>>(pro
   return 'render:lastChild' in props
     ? mutateByAdditionalObjectDescriptors(props, {
         newGetters: {
-          children: (props) => flap(props.children).concat(flap(props['render:lastChild'])),
+          children: (props) => flap(props.children).concat(flap(props['render:lastChild']))
         },
-        deletePropertyNames: ['render:lastChild'],
+        deletePropertyNames: ['render:lastChild']
       })
     : props
 }

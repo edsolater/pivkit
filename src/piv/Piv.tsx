@@ -1,4 +1,4 @@
-import { MayArray, MayFn, flap, pipe } from '@edsolater/fnkit'
+import { MayArray, MayFn, flap, pipeDo } from '@edsolater/fnkit'
 import { JSX, JSXElement } from 'solid-js'
 import {
   ClassName,
@@ -138,7 +138,7 @@ export const Piv = <TagName extends HTMLTag = HTMLTag, Controller extends ValidC
   kitProps: PivProps<TagName, Controller>
 ) => {
   // 📝 render:outWrapper may in showProps or plugin. so need to handle it first
-  const props = pipe(kitProps, handleShadowProps, handlePluginProps, handleShadowProps)
+  const props = pipeDo(kitProps, handleShadowProps, handlePluginProps, handleShadowProps)
   return 'render:outWrapper' in props ? handlePropRenderOutWrapper(props) : handleNormalPivProps(props)
 }
 

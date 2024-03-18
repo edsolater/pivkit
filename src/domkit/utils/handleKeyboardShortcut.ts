@@ -1,5 +1,5 @@
+import { shakeFalsy, toLowerCase, unifyItem } from '@edsolater/fnkit'
 import { addEventListener, EventListenerController } from './addEventListener'
-import { mapKey, shakeFalsy, toLowerCase, unifyItem } from '@edsolater/fnkit'
 import { addTabIndex } from './addTabIndex'
 
 /**

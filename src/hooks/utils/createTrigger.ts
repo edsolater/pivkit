@@ -33,7 +33,7 @@ type TriggerController = {
 export function createTrigger({
   id = createUUID().id,
   defaultState = false,
-  state = defaultState, // TODO: signal plugin should handle this
+  state = defaultState // TODO: signal plugin should handle this
 }: {
   id?: UUID
   defaultState?: boolean | Accessor<boolean>
@@ -51,19 +51,17 @@ export function createTrigger({
     off(): void
     toggle(): void
   }>()
-  eventCenter.registEvents({
-    'on': () => {
-      setIsTriggerOn(true)
-      callbackOnStack.forEach((cb) => cb())
-    },
-    'off': () => {
-      setIsTriggerOn(false)
-      callbackOffStack.forEach((cb) => cb())
-    },
-    'toggle': () => {
-      setIsTriggerOn((b) => !b)
-      callbackToggleStack.forEach((cb) => cb())
-    },
+  eventCenter.on('on', () => {
+    setIsTriggerOn(true)
+    callbackOnStack.forEach((cb) => cb())
+  })
+  eventCenter.on('off', () => {
+    setIsTriggerOn(false)
+    callbackOffStack.forEach((cb) => cb())
+  })
+  eventCenter.on('toggle', () => {
+    setIsTriggerOn((b) => !b)
+    callbackToggleStack.forEach((cb) => cb())
   })
 
   function turnTriggerOn() {
@@ -82,7 +80,7 @@ export function createTrigger({
       return {
         cleanup() {
           callbackOnStack.splice(callbackOnStack.indexOf(cb), 1)
-        },
+        }
       }
     },
     onTriggerOff(cb: AnyFn) {
@@ -90,7 +88,7 @@ export function createTrigger({
       return {
         cleanup() {
           callbackOffStack.splice(callbackOffStack.indexOf(cb), 1)
-        },
+        }
       }
     },
     onToggle(cb: AnyFn) {
@@ -98,9 +96,9 @@ export function createTrigger({
       return {
         cleanup() {
           callbackToggleStack.splice(callbackToggleStack.indexOf(cb), 1)
-        },
+        }
       }
-    },
+    }
   } as TriggerController['callbackRegisterer']
 
   return { isTriggerOn, callbackRegisterer, close: turnTriggerOff, open: turnTriggerOn, toggle: toggleTrigger }
