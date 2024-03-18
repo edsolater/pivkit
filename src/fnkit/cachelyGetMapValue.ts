@@ -14,7 +14,7 @@ export type GetMapValue<T extends Map<any, any>> = T extends Map<any, infer V> ?
 export function cacheMapGet<T extends Map<any, any>>(
   cacheMap: T,
   key: GetMapKey<T>,
-  createIfNotInCacheMap: () => GetMapValue<T>
+  createIfNotInCacheMap: () => GetMapValue<T>,
 ): GetMapValue<T> {
   if (!cacheMap.has(key)) {
     const newValue = createIfNotInCacheMap()

@@ -1,13 +1,13 @@
-import { createRef } from '..'
-import { GestureHoverOptions, GestureHoverStates, useGestureHover } from '../domkit/hooks/useGestureHover'
-import { createPlugin } from '../piv'
+import { createRef } from ".."
+import { GestureHoverOptions, GestureHoverStates, useGestureHover } from "../domkit/hooks/useGestureHover"
+import { createPlugin } from "../piv"
 
 /**
  *
  * @param options options for useGestureHover
  * @returns
  */
-export const useHoverPlugin = createPlugin<Omit<GestureHoverOptions, 'el'>, GestureHoverStates>((options) => {
+export const useHoverPlugin = createPlugin<Omit<GestureHoverOptions, "el">, GestureHoverStates>((options) => {
   // if this hook need domRef
   const [dom, setDom] = createRef<HTMLElement>()
 

@@ -2,9 +2,9 @@
  * utils in this folder can be used to override the default theme of the component
  */
 
-import { get, has } from '@edsolater/fnkit'
-import { ButtonKitProps, InputKitProps } from '../components'
-import { ValidProps } from '../piv'
+import { get, has } from "@edsolater/fnkit"
+import { ButtonKitProps, InputKitProps } from "../components"
+import { ValidProps } from "../piv"
 
 export type UIKitThemeConfig = {
   Button?: ButtonKitProps

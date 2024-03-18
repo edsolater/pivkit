@@ -1,11 +1,11 @@
-import { createSubscribable, isSubscribable } from '@edsolater/fnkit'
-import { expect, test } from 'vitest'
-import { assignObjectWithConfigs } from './assignObject'
+import { createSubscribable, isSubscribable } from "@edsolater/fnkit"
+import { expect, test } from "vitest"
+import { assignObjectWithConfigs } from "./assignObject"
 
-test('basic usage', () => {
-  const obj = { a: 'a', b: 'b' }
-  assignObjectWithConfigs(obj, { a: 'hello', b: 'world' })
-  expect(obj.a).toBe('hello')
+test("basic usage", () => {
+  const obj = { a: "a", b: "b" }
+  assignObjectWithConfigs(obj, { a: "hello", b: "world" })
+  expect(obj.a).toBe("hello")
 
   const obj2 = { a: createSubscribable(0) }
   assignObjectWithConfigs(obj2, { a: 2 }, ({ originalValueDescriptor, patchValueDescriptor }) => {

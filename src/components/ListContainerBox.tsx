@@ -1,8 +1,8 @@
-import { Box } from '..'
-import { KitProps, useKitProps } from '../createKit'
+import { Box } from ".."
+import { KitProps, useKitProps } from "../createKit"
 
 export interface ListContainerBoxProps {
-  dir?: 'x' | 'y'
+  dir?: "x" | "y"
 }
 
 export interface ListContainerBoxController {}
@@ -10,7 +10,7 @@ export interface ListContainerBoxController {}
 export type DefaultListContainerBoxProps = typeof defaultProps
 
 const defaultProps = {
-  dir: 'y',
+  dir: "y",
 } as const satisfies Partial<ListContainerBoxProps>
 
 export type ListContainerBoxKitProps = KitProps<ListContainerBoxProps, ListContainerBoxController>
@@ -20,12 +20,12 @@ export type ListContainerBoxKitProps = KitProps<ListContainerBoxProps, ListConta
  * @deprecated , just use {@link List}
  */
 export function ListContainerBox(kitProps: ListContainerBoxKitProps) {
-  const { props, lazyLoadController } = useKitProps(kitProps, { defaultProps, name: 'ListContainerBox' })
+  const { props, lazyLoadController } = useKitProps(kitProps, { defaultProps, name: "ListContainerBox" })
   return (
     <Box
       shadowProps={props}
       icss={[
-        props.dir === 'x' ? { overflowY: 'hidden', overflowX: 'scroll' } : { overflowY: 'scroll', overflowX: 'hidden' },
+        props.dir === "x" ? { overflowY: "hidden", overflowX: "scroll" } : { overflowY: "scroll", overflowX: "hidden" },
       ]}
     >
       {props.children}

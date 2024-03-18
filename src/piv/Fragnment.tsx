@@ -1,5 +1,5 @@
-import { children } from 'solid-js'
-import { PivChild, parsePivChildren } from '.'
+import { children } from "solid-js"
+import { PivChild, parsePivChildren } from "."
 
 /**
  * let outside is JSXElement, inner is PivChild

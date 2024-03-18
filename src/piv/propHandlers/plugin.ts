@@ -1,10 +1,10 @@
-import { AnyObj, isFunction, overwriteFunctionName } from '@edsolater/fnkit'
-import { Accessor } from 'solid-js'
-import { ConfigableFunction, createConfigableFunction } from '../../fnkit/configableFunction'
-import { KitProps } from '../../createKit/KitProps'
-import { Accessify } from '../../utils'
-import { ValidController, ValidProps } from '../typeTools'
-import { PivProps } from '../Piv'
+import { AnyObj, isFunction, overwriteFunctionName } from "@edsolater/fnkit"
+import { Accessor } from "solid-js"
+import { ConfigableFunction, createConfigableFunction } from "../../fnkit/configableFunction"
+import { KitProps } from "../../createKit/KitProps"
+import { Accessify } from "../../utils"
+import { ValidController, ValidProps } from "../typeTools"
+import { PivProps } from "../Piv"
 
 export type GetPluginParams<T> =
   T extends Plugin<infer Px1>
@@ -53,11 +53,11 @@ export type PluginCoreFn<T extends ValidProps = any, C extends ValidController =
     /** only in component has controller, or will be an empty object*/
     controller: Accessor<C>
     dom: Accessor<HTMLElement | undefined>
-  }
+  },
 ) => Accessify<Partial<KitProps<T, { controller: C }>>> | undefined | void // TODO: should support 'plugin' and 'shadowProps' for easier compose
 
-export const plugin = Symbol('pluginCore')
-export const isPluginObjSymbol = Symbol('isPlugin')
+export const plugin = Symbol("pluginCore")
+export const isPluginObjSymbol = Symbol("isPlugin")
 
 /** plugin can only have one level */
 export function createPlugin<
@@ -77,7 +77,7 @@ export function createPlugin<
     priority?: number // NOTE -1:  it should be render after final prop has determine
     /** Fixme: why not work? */
     name?: string
-  }
+  },
 ): PluginObj<PluginOptions, PluginState, Props, Controller> {
   const pluginCoreFn = createConfigableFunction((params: PluginOptions) => {
     const mayPluginCore = createrFn(params)
@@ -95,7 +95,7 @@ export function createPlugin<
 
 export function extractPluginCore<T extends ValidProps, C extends ValidController>(
   plugin: Plugin<any, any, T, C>,
-  options?: any
+  options?: any,
 ): PluginCoreFn<T, C> {
   const pluginCoreFn = (isPluginObj(plugin) ? plugin(options ?? {}).plugin : plugin) as PluginCoreFn<T, C>
   return pluginCoreFn

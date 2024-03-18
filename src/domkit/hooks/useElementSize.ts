@@ -1,4 +1,4 @@
-import { Accessor, createSignal, batch, createEffect } from 'solid-js'
+import { Accessor, createSignal, batch, createEffect } from "solid-js"
 
 export function useElementSize(ref: Accessor<HTMLElement | undefined>): {
   width: Accessor<number | undefined>

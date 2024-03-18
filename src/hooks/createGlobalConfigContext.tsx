@@ -1,6 +1,6 @@
-import { AnyObj } from '@edsolater/fnkit'
-import { createContext, useContext } from 'solid-js'
-import { createStore, produce } from 'solid-js/store'
+import { AnyObj } from "@edsolater/fnkit"
+import { createContext, useContext } from "solid-js"
+import { createStore, produce } from "solid-js/store"
 
 export function createGlobalConfigContext<Config extends AnyObj>(defaultGlobalConfig: Config) {
   const [storedGlobalConfig, setStoredGlobalConfig] = createStore<Config>(defaultGlobalConfig as any)
@@ -26,6 +26,6 @@ export function createGlobalConfigContext<Config extends AnyObj>(defaultGlobalCo
     GlobalConfigProvider,
     useGlobalConfigContext,
     setStoredGlobalConfig,
-    storedGlobalConfig
+    storedGlobalConfig,
   }
 }

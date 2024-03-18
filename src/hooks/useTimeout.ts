@@ -1,4 +1,4 @@
-import { onCleanup, createEffect, onMount } from 'solid-js'
+import { onCleanup, createEffect, onMount } from "solid-js"
 
 /**
  * **DOM API (setTimeout)**

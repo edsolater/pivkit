@@ -24,13 +24,13 @@ export function getICSSFromProps<O extends object>(props: O) {
       ownKeys: () => getOwnKeys().arr,
       // for Object.keys to filter
       getOwnPropertyDescriptor: (_target, key) => Reflect.getOwnPropertyDescriptor(props, `icss:${String(key)}`),
-    }
+    },
   ) as GetStartWithICSS<O>
 }
 function getICSSKeys(props: object): string[] {
   return Object.keys(props)
-    .filter((key) => key.startsWith('icss:'))
-    .map((key) => key.slice('icss:'.length))
+    .filter((key) => key.startsWith("icss:"))
+    .map((key) => key.slice("icss:".length))
 }
 type GetStartWithICSS<T extends object> = {
   [K in keyof T as K extends `icss:${infer R}` ? R : never]: T[K]

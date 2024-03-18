@@ -1,4 +1,4 @@
-import { isArray, isObject } from '@edsolater/fnkit'
+import { isArray, isObject } from "@edsolater/fnkit"
 
 /**
  *

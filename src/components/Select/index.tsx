@@ -1,14 +1,14 @@
-import { isExist } from '@edsolater/fnkit'
-import { Accessor, createEffect } from 'solid-js'
-import { DeKitProps, KitProps, useKitProps } from '../../createKit'
-import { createDomRef, useClickOutside } from '../../hooks'
-import { AddDefaultPivProps, Piv, PivChild } from '../../piv'
-import { buildPopover, useKeyboardShortcut } from '../../plugins'
-import { cssVar, icssCardPanel, icssClickable, icssRow } from '../../styles'
-import { Box } from '../Boxes'
-import { ItemBox, ItemBoxKitProps } from '../ItemBox'
-import { Loop } from '../Loop'
-import { useItems } from './useItems'
+import { isExist } from "@edsolater/fnkit"
+import { Accessor, createEffect } from "solid-js"
+import { DeKitProps, KitProps, useKitProps } from "../../createKit"
+import { createDomRef, useClickOutside } from "../../hooks"
+import { AddDefaultPivProps, Piv, PivChild } from "../../piv"
+import { buildPopover, useKeyboardShortcut } from "../../plugins"
+import { cssVar, icssCardPanel, icssClickable, icssRow } from "../../styles"
+import { Box } from "../Boxes"
+import { ItemBox, ItemBoxKitProps } from "../ItemBox"
+import { Loop } from "../Loop"
+import { useItems } from "./useItems"
 
 type SelectableItem = unknown
 
@@ -67,26 +67,26 @@ export type SelectKitProps<T extends SelectableItem> = KitProps<SelectProps<T>>
  * if for layout , don't render important content in Box
  */
 export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
-  const { shadowProps, props, methods, lazyLoadController } = useKitProps(rawProps, { name: 'Select' })
+  const { shadowProps, props, methods, lazyLoadController } = useKitProps(rawProps, { name: "Select" })
 
   const { dom: selectFaceDom, setDom: setSelectFaceDom } = createDomRef()
   const { dom: selectListDom, setDom: setSelectListDom } = createDomRef()
 
   // controller
   const controller = {
-    name: () => props.name ?? ''
+    name: () => props.name ?? "",
   } satisfies SelectableController
   lazyLoadController(controller)
 
   // `<Select>`'s popover
-  const { plugins: popoverPlugins, state: popoverState } = buildPopover({ triggerBy: 'click', placement: 'bottom' }) // <-- run on define, not good
+  const { plugins: popoverPlugins, state: popoverState } = buildPopover({ triggerBy: "click", placement: "bottom" }) // <-- run on define, not good
 
   // items manager
   const { item, items, index, utils, setItem, focusItem, selectPrevItem, selectNextItem } = useItems<T>({
     items: props.items,
     defaultValue: props.defaultValue,
     getItemValue: methods.getItemValue,
-    onChange: methods.onChange
+    onChange: methods.onChange,
   })
 
   // compute render functions
@@ -96,26 +96,26 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
   useKeyboardShortcut(
     selectListDom,
     {
-      'close': {
+      close: {
         fn: () => popoverState.close(),
-        keyboardShortcut: 'Escape'
+        keyboardShortcut: "Escape",
       },
-      'select confirm': {
+      "select confirm": {
         fn: () => {
           //TODO: do with focusItem
         },
-        keyboardShortcut: 'Enter'
+        keyboardShortcut: "Enter",
       },
-      'select prev item': {
+      "select prev item": {
         fn: selectPrevItem,
-        keyboardShortcut: 'ArrowUp'
+        keyboardShortcut: "ArrowUp",
       },
-      'select next item': {
+      "select next item": {
         fn: selectNextItem,
-        keyboardShortcut: 'ArrowDown'
-      }
+        keyboardShortcut: "ArrowDown",
+      },
     },
-    { enabled: popoverState.isTriggerOn }
+    { enabled: popoverState.isTriggerOn },
   )
 
   // auto focus when open
@@ -134,7 +134,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
   // click outside to close popover
   useClickOutside(selectFaceDom, {
     enabled: popoverState.isTriggerOn,
-    onClickOutSide: () => popoverState.close()
+    onClickOutSide: () => popoverState.close(),
   })
 
   return (
@@ -146,22 +146,22 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
         shadowProps={[shadowProps, props.selectWrapperBoxProps]}
         plugin={popoverPlugins.trigger}
         icss={[
-          { background: '#000', minWidth: '3em', maxWidth: '12em', minHeight: '1lh', borderRadius: '8px' },
-          icssRow({}) //FIXME: 💩 why type is ANY?
+          { background: "#000", minWidth: "3em", maxWidth: "12em", minHeight: "1lh", borderRadius: "8px" },
+          icssRow({}), //FIXME: 💩 why type is ANY?
         ]}
       >
         {renderTriggerItem({
           item,
           index,
           value: () => utils.getItemValue(item()),
-          triggerIsOpen: popoverState.isTriggerOn
+          triggerIsOpen: popoverState.isTriggerOn,
         })}
       </Piv>
       <Box
         domRef={setSelectListDom}
         shadowProps={props.selectListBoxProps}
         plugin={popoverPlugins.panel}
-        icss={[icssCardPanel, { padding: 'revert', paddingBlock: '8px' }]}
+        icss={[icssCardPanel, { padding: "revert", paddingBlock: "8px" }]}
       >
         <Loop of={items}>
           {(i, idx) => {
@@ -174,20 +174,20 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
                 icss={[
                   icssClickable,
                   {
-                    padding: '4px 8px',
-                    margin: '4px 4px',
-                    borderRadius: '4px',
-                    background: isSelected() ? cssVar('--item-selected-bg', '#fff4') : undefined,
-                    boxShadow: isSelected() ? cssVar('--item-selected-shadow', '0 0 0 4px #fff4') : undefined,
-                    color: isSelected() ? cssVar('--select-active-item-text-color', '#c8d7e0') : undefined
-                  }
+                    padding: "4px 8px",
+                    margin: "4px 4px",
+                    borderRadius: "4px",
+                    background: isSelected() ? cssVar("--item-selected-bg", "#fff4") : undefined,
+                    boxShadow: isSelected() ? cssVar("--item-selected-shadow", "0 0 0 4px #fff4") : undefined,
+                    color: isSelected() ? cssVar("--select-active-item-text-color", "#c8d7e0") : undefined,
+                  },
                 ]}
               >
                 {renderItem({
                   item: () => i,
                   index: idx,
                   value: itemValue,
-                  isSelected
+                  isSelected,
                 })}
               </ItemBox>
             )
@@ -200,7 +200,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
 
 function buildRenderFunction<T extends SelectableItem>(
   methods: AddDefaultPivProps<SelectKitProps<T>, {}>,
-  props: DeKitProps<SelectKitProps<T>>
+  props: DeKitProps<SelectKitProps<T>>,
 ) {
   const renderItem = methods.renderItem ?? (({ value }) => <>{value()}</>)
   const renderTriggerItem =
@@ -212,7 +212,7 @@ function buildRenderFunction<T extends SelectableItem>(
       return isExist(i) && isExist(idx) && isExist(v)
         ? renderItem({ item: () => i, index: () => idx, value: () => v, isSelected: () => true })
         : props.placeholder
-    }) as NonNullable<SelectProps<T>['renderTriggerItem']>)
-  const renderTriggerItemArrow = methods.renderTriggerItemArrow ?? (() => <>{'>'}</>)
+    }) as NonNullable<SelectProps<T>["renderTriggerItem"]>)
+  const renderTriggerItemArrow = methods.renderTriggerItemArrow ?? (() => <>{">"}</>)
   return { renderTriggerItem, renderItem, renderTriggerItemArrow }
 }

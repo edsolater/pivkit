@@ -1,19 +1,19 @@
-import { Show, createContext, createEffect, createSignal, useContext } from 'solid-js'
-import { type KitProps, useKitProps } from '../createKit'
-import { createDomRef, useClickOutside } from '../hooks'
-import { createDisclosure } from '../hooks/createDisclosure'
-import { Fragnment, Piv, PivChild, PivProps } from '../piv'
-import { renderHTMLDOM } from '../piv/propHandlers/renderHTMLDOM'
-import { loadModuleCSSCollapse, type FeatureCSSCollapseOption } from '../plugins/useCSSTransition'
-import { createController } from '../utils/createController'
-import { Box } from './Boxes'
-import { shrinkFn, type MayFn } from '@edsolater/fnkit'
+import { Show, createContext, createEffect, createSignal, useContext } from "solid-js"
+import { type KitProps, useKitProps } from "../createKit"
+import { createDomRef, useClickOutside } from "../hooks"
+import { createDisclosure } from "../hooks/createDisclosure"
+import { Fragnment, Piv, PivChild, PivProps } from "../piv"
+import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
+import { loadModuleCSSCollapse, type FeatureCSSCollapseOption } from "../plugins/useCSSTransition"
+import { createController } from "../utils/createController"
+import { Box } from "./Boxes"
+import { shrinkFn, type MayFn } from "@edsolater/fnkit"
 
 export interface CollapseBoxProps {
   /** TODO: open still can't auto lock the trigger not controled component now */
   open?: boolean
   defaultOpen?: boolean
-  collapseDirection?: 'down' | 'up'
+  collapseDirection?: "down" | "up"
   canCloseByOutsideClick?: boolean
   optionsOfCSSCollapse?: FeatureCSSCollapseOption
   onOpen?(): void
@@ -37,7 +37,7 @@ export interface CollapseBoxController {
 }
 
 const CollapseContext = createContext<CollapseBoxController>({} as CollapseBoxController, {
-  name: 'CollapseController'
+  name: "CollapseController",
 })
 
 /**
@@ -49,12 +49,12 @@ const CollapseContext = createContext<CollapseBoxController>({} as CollapseBoxCo
  */
 export function CollapseBox(kitProps: CollapseBoxKitProps) {
   const { dom: boxDom, setDom: setBoxDom } = createDomRef()
-  const { props, shadowProps } = useKitProps(kitProps, { name: 'Collapse', controller: () => controller })
+  const { props, shadowProps } = useKitProps(kitProps, { name: "Collapse", controller: () => controller })
 
   const [innerOpen, { toggle, open, close, set }] = createDisclosure(() => props.open ?? props.defaultOpen ?? false, {
     onClose: props.onClose,
     onOpen: props.onOpen,
-    onToggle: props.onToggle
+    onToggle: props.onToggle,
   })
 
   const controller = createController<CollapseBoxController>({
@@ -63,12 +63,12 @@ export function CollapseBox(kitProps: CollapseBoxKitProps) {
     open: () => open,
     close: () => close,
     toggle: () => toggle,
-    set: () => set
+    set: () => set,
   })
 
   const {
     controller: { open: openCollapse, close: closeCollapse, toggle: toggleCollapse, opened: isCollapseOpened },
-    shadowProps: collapseShadowProps
+    shadowProps: collapseShadowProps,
   } = loadModuleCSSCollapse(props.optionsOfCSSCollapse)
 
   // only render content when opened, but don't open twice
@@ -89,21 +89,21 @@ export function CollapseBox(kitProps: CollapseBoxKitProps) {
   return (
     <Box shadowProps={shadowProps} domRef={setBoxDom}>
       {/* Face */}
-      <Show when={'renderFace' in props}>
+      <Show when={"renderFace" in props}>
         <Box
-          class='Face'
+          class="Face"
           onClick={() => {
             toggle()
           }}
         >
-          {shrinkFn(props['renderFace'])}
+          {shrinkFn(props["renderFace"])}
         </Box>
       </Show>
 
       {/* Content */}
-      <Piv class='Content' shadowProps={collapseShadowProps} icss={{ overflow: 'hidden' }}>
+      <Piv class="Content" shadowProps={collapseShadowProps} icss={{ overflow: "hidden" }}>
         <Show when={hasCollapseBeenOpened()}>
-          <Fragnment>{shrinkFn(props['renderContent'])}</Fragnment>
+          <Fragnment>{shrinkFn(props["renderContent"])}</Fragnment>
         </Show>
       </Piv>
     </Box>
@@ -117,17 +117,17 @@ export function CollapseFace(
     CollapseFaceProps,
     {
       controller: CollapseBoxController
-      htmlPropsTagName: 'summary'
+      htmlPropsTagName: "summary"
     }
-  >
+  >,
 ) {
   const controller = useContext(CollapseContext)
-  const { props } = useKitProps(rawProps, { name: 'CollapseFase', controller: () => controller })
+  const { props } = useKitProps(rawProps, { name: "CollapseFase", controller: () => controller })
   return (
-    <Piv<'summary', CollapseBoxController>
-      render:self={(selfProps) => renderHTMLDOM('summary', selfProps)}
+    <Piv<"summary", CollapseBoxController>
+      render:self={(selfProps) => renderHTMLDOM("summary", selfProps)}
       shadowProps={props}
-      icss={{ listStyle: 'none' }}
+      icss={{ listStyle: "none" }}
       innerController={controller}
     >
       {props.children}
@@ -139,7 +139,7 @@ interface CollapseContentProps extends PivProps {}
 
 export function CollapseContent(rawProps: CollapseContentProps) {
   const controller = useContext(CollapseContext)
-  const { props } = useKitProps(rawProps, { name: 'CollapseContent', controller: () => controller })
+  const { props } = useKitProps(rawProps, { name: "CollapseContent", controller: () => controller })
   return <Piv shadowProps={props} innerController={controller} />
 }
 

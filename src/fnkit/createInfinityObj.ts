@@ -1,5 +1,5 @@
-import { MayFn, isObject, isObjectLike, shrinkFn } from '@edsolater/fnkit'
-import { parseShallowKeyFromKeyArray } from './parseShallowKeyFromKeyArray'
+import { MayFn, isObject, isObjectLike, shrinkFn } from "@edsolater/fnkit"
+import { parseShallowKeyFromKeyArray } from "./parseShallowKeyFromKeyArray"
 
 type UserAttachedValue = any
 export type InfinityObjNode<V extends UserAttachedValue = any> = {
@@ -8,9 +8,9 @@ export type InfinityObjNode<V extends UserAttachedValue = any> = {
   [loadSelf]: (value: MayFn<V, [oldValue: V]>) => void
   [infinityNode]: true
 }
-const currentPathFromRoot = Symbol('currentPathFromRoot')
-const infinityNode = Symbol('isInfinityNode')
-const loadSelf = Symbol('load')
+const currentPathFromRoot = Symbol("currentPathFromRoot")
+const infinityNode = Symbol("isInfinityNode")
+const loadSelf = Symbol("load")
 
 /**
  * core part of createFakeTree, it's a common utils, no need to use it directly

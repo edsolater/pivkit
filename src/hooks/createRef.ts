@@ -1,6 +1,6 @@
-import { Accessor, createSignal, untrack } from 'solid-js'
-import { ValidController } from '../piv'
-import { isExist } from '@edsolater/fnkit'
+import { Accessor, createSignal, untrack } from "solid-js"
+import { ValidController } from "../piv"
+import { isExist } from "@edsolater/fnkit"
 
 export type CreateCallbackRefOptions<T> = {
   defaultValue?: T
@@ -18,15 +18,15 @@ export type CreateCallbackRefOptions2<T> = {
 
 /** for semantic API is like `createSignal()`  */
 export function createRef<T extends HTMLOrSVGElement | ValidController = any>(
-  options: CreateCallbackRefOptions2<T>
+  options: CreateCallbackRefOptions2<T>,
 ): [ref: Accessor<T>, setRef: (el: T) => void]
 
 export function createRef<T extends HTMLOrSVGElement | ValidController = any>(
-  options?: CreateCallbackRefOptions<T>
+  options?: CreateCallbackRefOptions<T>,
 ): [ref: Accessor<T | undefined>, setRef: (el: T) => void]
 
 export function createRef<T extends HTMLOrSVGElement | ValidController = any>(
-  options?: CreateCallbackRefOptions<T>
+  options?: CreateCallbackRefOptions<T>,
 ): [ref: Accessor<T | undefined>, setRef: (el: T) => void] {
   const [ref, _setRef] = createSignal(options?.defaultValue)
   function setRef(value: T) {

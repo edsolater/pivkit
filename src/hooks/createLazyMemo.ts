@@ -1,5 +1,5 @@
-import { Accessor } from 'solid-js'
-import { createLazySignal } from './createLazySignal'
+import { Accessor } from "solid-js"
+import { createLazySignal } from "./createLazySignal"
 
 /**
  * only load when access

@@ -1,10 +1,10 @@
-import { createEffect, createSignal } from 'solid-js'
-import { createRef } from '../hooks/createRef'
-import { AccessifyProps, accessifyProps } from '../utils/accessifyProps'
-import { useCSSTransition } from './useCSSTransition'
+import { createEffect, createSignal } from "solid-js"
+import { createRef } from "../hooks/createRef"
+import { AccessifyProps, accessifyProps } from "../utils/accessifyProps"
+import { useCSSTransition } from "./useCSSTransition"
 
 type UseFadeInOptions = AccessifyProps<{
-  type?: 'collapse-type'
+  type?: "collapse-type"
 
   show?: boolean
   appear?: boolean
@@ -23,16 +23,16 @@ export function useCSSFadeIn(additionalOpts: UseFadeInOptions) {
   const [innerContentRef, innerContentRefSetter] = createRef<HTMLElement>()
   const haveInitTransition = () => options.show && options.appear
 
-  const styleMethods = useFadeInPaddingEffect({ heightOrWidth: 'height' })
+  const styleMethods = useFadeInPaddingEffect({ heightOrWidth: "height" })
 
   const { setDom, transitionIcss } = useCSSTransition({
     show,
-    hideIcss: { icss: { position: 'absolute', opacity: 0, overflow: 'hidden' } },
+    hideIcss: { icss: { position: "absolute", opacity: 0, overflow: "hidden" } },
     onBeforeEnter({ el }) {
       if (!el) return
 
-      el.style.removeProperty('position')
-      el.style.removeProperty('opacity')
+      el.style.removeProperty("position")
+      el.style.removeProperty("opacity")
       // if (status.from === 'during-process') {
       //   styleMethods.toOriginalStyle(el)
       // } else {
@@ -48,15 +48,15 @@ export function useCSSFadeIn(additionalOpts: UseFadeInOptions) {
 
       // if (init && !haveInitTransition) {
       if (!haveInitTransition()) {
-        el.style.removeProperty('position')
-        el.style.removeProperty('opacity')
+        el.style.removeProperty("position")
+        el.style.removeProperty("opacity")
       }
       styleMethods.applyClearUselessStyle(el)
       // onAfterEnter?.()
     },
     onBeforeLeave({ el, from }) {
       if (!el) return
-      if (from === 'during-process') {
+      if (from === "during-process") {
         styleMethods.toGhostStyle(el)
       } else {
         styleMethods.toOriginalStyle(el, { recordValue: true })
@@ -65,7 +65,7 @@ export function useCSSFadeIn(additionalOpts: UseFadeInOptions) {
       }
     },
     onAfterLeave(status) {
-      console.log('3: ', 3)
+      console.log("3: ", 3)
       // const el = status.contentRef
       // if (!el) return
       // styleMethods.applyClearUselessStyle(el)
@@ -83,32 +83,32 @@ export function useCSSFadeIn(additionalOpts: UseFadeInOptions) {
   }
 }
 
-function useFadeInPaddingEffect({ heightOrWidth }: { heightOrWidth: 'height' | 'width' }) {
+function useFadeInPaddingEffect({ heightOrWidth }: { heightOrWidth: "height" | "width" }) {
   let contentCachedTrueHeightOrWidth: number | undefined
   let contentCachedTruePadding: string | undefined
   return {
     toGhostStyle: (el: HTMLElement, options?: { recordValue?: boolean }) => {
       if (options?.recordValue) {
-        contentCachedTrueHeightOrWidth = el[heightOrWidth === 'height' ? 'clientHeight' : 'clientWidth'] // cache for from 'during-process' fade in can't get true height
+        contentCachedTrueHeightOrWidth = el[heightOrWidth === "height" ? "clientHeight" : "clientWidth"] // cache for from 'during-process' fade in can't get true height
         // cache for from 'during-process' fade in can't get true padding
         contentCachedTruePadding = getComputedStyle(el).padding
       }
-      console.log('1: ', 1)
-      el.style.setProperty(heightOrWidth, '0')
-      el.style.setProperty('padding', '0')
+      console.log("1: ", 1)
+      el.style.setProperty(heightOrWidth, "0")
+      el.style.setProperty("padding", "0")
     },
     toOriginalStyle: (el: HTMLElement, options?: { recordValue?: boolean }) => {
       if (options?.recordValue) {
-        contentCachedTrueHeightOrWidth = el[heightOrWidth === 'height' ? 'clientHeight' : 'clientWidth'] // cache for from 'during-process' fade in can't get true height
+        contentCachedTrueHeightOrWidth = el[heightOrWidth === "height" ? "clientHeight" : "clientWidth"] // cache for from 'during-process' fade in can't get true height
         // cache for from 'during-process' fade in can't get true padding
         contentCachedTruePadding = getComputedStyle(el).padding
       }
       contentCachedTrueHeightOrWidth && el.style.setProperty(heightOrWidth, `${contentCachedTrueHeightOrWidth}px`)
-      contentCachedTruePadding && el.style.setProperty('padding', contentCachedTruePadding)
+      contentCachedTruePadding && el.style.setProperty("padding", contentCachedTruePadding)
     },
     applyClearUselessStyle: (el: HTMLElement) => {
       el.style.removeProperty(heightOrWidth)
-      el.style.removeProperty('padding')
+      el.style.removeProperty("padding")
     },
   }
 }

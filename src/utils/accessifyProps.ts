@@ -1,6 +1,6 @@
-import { AnyFn, AnyObj, isFunction, isObject, isString } from '@edsolater/fnkit'
-import { ValidController } from '../piv/typeTools'
-import { mutateObject } from '../fnkit/mutateObject'
+import { AnyFn, AnyObj, isFunction, isObject, isString } from "@edsolater/fnkit"
+import { ValidController } from "../piv/typeTools"
+import { mutateObject } from "../fnkit/mutateObject"
 
 export type Accessify<V, Controller extends ValidController | unknown = unknown> = V | ((controller: Controller) => V)
 export type DeAccessify<V> = V extends Accessify<infer T, any> ? T : V
@@ -15,11 +15,11 @@ export type AccessifyProps<P extends AnyObj, Controller extends ValidController 
     | `${string}:${string}` // any namespaced props should no auto-accessified
     | `domRef`
     | `controllerRef`
-    | 'children'
+    | "children"
     ? P[K]
     : P[K] extends AnyFn | undefined
-    ? P[K]
-    : Accessify<P[K], Controller>
+      ? P[K]
+      : Accessify<P[K], Controller>
 }
 
 export type DeAccessifyProps<P> = {
@@ -29,7 +29,7 @@ export type DeAccessifyProps<P> = {
     | `${string}:${string}` // any namespaced props should no auto-accessified
     | `domRef`
     | `controllerRef`
-    | 'children'
+    | "children"
     ? P[K]
     : Exclude<P[K], AnyFn> // <-- bug here, type error
 }
@@ -42,20 +42,20 @@ export function accessifyProps<P extends AnyObj, Controller extends ValidControl
   controller?: Controller,
   /** default is on* and domRef and controllerRef, but you can add more */
   needAccessifyProps?: string[],
-  debug?: boolean
+  debug?: boolean,
 ): DeAccessifyProps<P> {
   // why slower than just reduce? 🤔
   return mutateObject(props, ({ value, key }) => {
     const isPreferOriginalValue =
       isString(key) &&
       ((needAccessifyProps ? !needAccessifyProps?.includes(key) : false) ||
-        key.startsWith('on') ||
-        key.startsWith('render:') ||
-        key.startsWith('merge:') ||
-        key === 'domRef' ||
-        key === 'controllerRef' ||
-        key === 'plugin' ||
-        key === 'shadowProps')
+        key.startsWith("on") ||
+        key.startsWith("render:") ||
+        key.startsWith("merge:") ||
+        key === "domRef" ||
+        key === "controllerRef" ||
+        key === "plugin" ||
+        key === "shadowProps")
     const needAccessify = isFunction(value) && !isPreferOriginalValue
     return needAccessify ? value(controller) : value
   }) as DeAccessifyProps<P>

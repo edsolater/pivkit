@@ -1,11 +1,11 @@
-import { ViewTransitionSliderBox } from './ViewTransitionSliderBox'
-import { createEffect, createSignal } from 'solid-js'
+import { ViewTransitionSliderBox } from "./ViewTransitionSliderBox"
+import { createEffect, createSignal } from "solid-js"
 
 export type ViewTransitionSliderBoxExampleProps = {
   triggerIsOn?: boolean
 }
 export const defaultProps: ViewTransitionSliderBoxExampleProps = {
-  triggerIsOn: true
+  triggerIsOn: true,
 }
 export function ViewTransitionSliderBoxExample(props: ViewTransitionSliderBoxExampleProps) {
   const [contentIndex, setContentIndex] = createSignal(0)

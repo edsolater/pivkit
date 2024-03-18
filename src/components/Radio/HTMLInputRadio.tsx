@@ -1,6 +1,6 @@
-import { KitProps, useKitProps } from '../../createKit'
-import { Piv } from '../../piv'
-import { renderHTMLDOM } from '../../piv/propHandlers/renderHTMLDOM'
+import { KitProps, useKitProps } from "../../createKit"
+import { Piv } from "../../piv"
+import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
 
 export interface HTMLInputRadioProps {
   label?: string
@@ -8,15 +8,15 @@ export interface HTMLInputRadioProps {
 }
 export type HTMLInputRadioKitProps = KitProps<HTMLInputRadioProps>
 export function HTMLInputRadio(kitProps: HTMLInputRadioKitProps) {
-  const { props } = useKitProps(kitProps, { name: 'HTMLInputRadio' })
+  const { props } = useKitProps(kitProps, { name: "HTMLInputRadio" })
   return (
     <Piv
-      class='HTMLCheckbox'
-      render:self={(selfProps) => renderHTMLDOM('input', selfProps)}
+      class="HTMLCheckbox"
+      render:self={(selfProps) => renderHTMLDOM("input", selfProps)}
       htmlProps={{
-        type: 'radio',
+        type: "radio",
         checked: props.defaultChecked,
-        'aria-label': props.label ?? 'radio',
+        "aria-label": props.label ?? "radio",
       }}
       shadowProps={props}
     />

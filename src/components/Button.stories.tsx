@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from 'storybook-solidjs'
-import { Button } from '..'
+import type { Meta, StoryObj } from "storybook-solidjs"
+import { Button } from ".."
 
 // More on how to set up stories at: https://storybook.js.org/docs/7.0/solid/writing-stories/introduction
 const meta = {
-  title: 'Example/Button',
+  title: "Example/Button",
   component: Button,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
-    variant: ['solid', 'outline', 'text']
-  }
+    variant: ["solid", "outline", "text"],
+  },
 } satisfies Meta<typeof Button>
 
 export default meta
@@ -19,7 +19,7 @@ type Story = StoryObj<typeof meta>
 // see: https://storybook.js.org/docs/essentials/controls#annotation
 export const Primary: Story = {
   args: {
-    children: 'button',
-    variant: 'solid'
-  }
+    children: "button",
+    variant: "solid",
+  },
 }

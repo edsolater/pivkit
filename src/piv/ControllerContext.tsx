@@ -1,8 +1,8 @@
-import { Context, createContext, useContext } from 'solid-js'
-import { PivProps, ValidController, ValidProps, mergeProps } from '.'
-import { Fragnment } from './Fragnment'
-import { WeakerMap, WeakerSet } from '@edsolater/fnkit'
-import { contactIterableIterators } from '../fnkit/contactIterableIterators'
+import { Context, createContext, useContext } from "solid-js"
+import { PivProps, ValidController, ValidProps, mergeProps } from "."
+import { Fragnment } from "./Fragnment"
+import { WeakerMap, WeakerSet } from "@edsolater/fnkit"
+import { contactIterableIterators } from "../fnkit/contactIterableIterators"
 
 type ControllerContext = Context<ValidController | undefined>
 type ComponentName = string
@@ -34,7 +34,7 @@ function getControllerContext(name?: ComponentName) {
 const getAllControllerContext = () => {
   const allIterators = contactIterableIterators(
     controllerContextStore.values(),
-    anonymousComponentControllerContextStore.values()
+    anonymousComponentControllerContextStore.values(),
   )
   return Array.from(allIterators)
 }
@@ -53,13 +53,13 @@ export function getControllerObjFromControllerContext() {
  * 🤔 maybe it's a bad idea? for it will bring new complication
  */
 export function handlePropsInnerController(props: ValidProps, componentName?: string): ValidProps {
-  const inputController = props.innerController as PivProps['innerController']
+  const inputController = props.innerController as PivProps["innerController"]
   // only check props not props.shadowProps
   if (inputController && Object.keys(inputController).length) {
     const ControllerContext = getControllerContext(componentName)
     const newProps = mergeProps(props, {
-      'render:outWrapper': (originalNode) => {
-        console.log('parse outWrapper', 33)
+      "render:outWrapper": (originalNode) => {
+        console.log("parse outWrapper", 33)
         return (
           <ControllerContext.Provider value={inputController}>
             <Fragnment>{originalNode}</Fragnment>

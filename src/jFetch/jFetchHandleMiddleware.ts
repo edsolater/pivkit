@@ -1,5 +1,5 @@
-import { asyncReduce, getTime, MayPromise, shakeNil, tryCatch, areShallowEqual } from '@edsolater/fnkit'
-import { jFetchCoreWithCache, JFetchCoreOptions } from './jFetchCoreWithCache'
+import { asyncReduce, getTime, MayPromise, shakeNil, tryCatch, areShallowEqual } from "@edsolater/fnkit"
+import { jFetchCoreWithCache, JFetchCoreOptions } from "./jFetchCoreWithCache"
 
 export interface JFetchMiddlewareItem {
   /** usually it's for data rename  */
@@ -27,9 +27,9 @@ function storeInResultCache(
   input: RequestInfo,
   rawText: Promise<string | undefined>,
   options: JFetchOptions | undefined,
-  formattedData: any
+  formattedData: any,
 ) {
-  const key = typeof input === 'string' ? input : input.url
+  const key = typeof input === "string" ? input : input.url
   finalResultCache.set(key, {
     rawText,
     timeStamp: getTime(),
@@ -40,9 +40,9 @@ function storeInResultCache(
 function getCachedSuitableResult(
   input: RequestInfo,
   rawText: Promise<string | undefined>,
-  options: JFetchOptions | undefined
+  options: JFetchOptions | undefined,
 ) {
-  const key = typeof input === 'string' ? input : input.url
+  const key = typeof input === "string" ? input : input.url
   if (finalResultCache.has(key)) {
     const cached = finalResultCache.get(key)!
     if (rawText == cached?.rawText && options?.middlewares?.length === cached?.options?.middlewares?.length) {
@@ -63,22 +63,22 @@ export async function jFetch<Shape = any>(input: RequestInfo, options?: JFetchOp
   const renamedText = await asyncReduce(
     shakeNil(options?.middlewares?.map((m) => m.parseResponseRaw) ?? []),
     (rawText, parseResponseRaw) => rawText && parseResponseRaw(rawText),
-    rawText
+    rawText,
   )
   if (!renamedText) return undefined
   try {
     const rawJson = tryCatch(
-      () => JSON.parse(renamedText || '{}'),
+      () => JSON.parse(renamedText || "{}"),
       () =>
         tryCatch(
-          () => new Function('return ' + renamedText)(),
-          () => undefined
-        )
+          () => new Function("return " + renamedText)(),
+          () => undefined,
+        ),
     )
     const formattedData = await asyncReduce(
       shakeNil(options?.middlewares?.map((m) => m.parseResponseJson) ?? []),
       (rawJson, parseResponseJson) => parseResponseJson(rawJson),
-      rawJson
+      rawJson,
     )
 
     storeInResultCache(input, rawText, options, formattedData)

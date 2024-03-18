@@ -1,6 +1,6 @@
-import { MayArray } from '@edsolater/fnkit'
-import { CreateSmartStoreOptions_BasicOptions, SmartSetStore } from '../createSmartStore'
-import { createCallbacksStoreWithKeys } from '../utils/createCallbackStore'
+import { MayArray } from "@edsolater/fnkit"
+import { CreateSmartStoreOptions_BasicOptions, SmartSetStore } from "../createSmartStore"
+import { createCallbacksStoreWithKeys } from "../utils/createCallbackStore"
 
 type OnFirstAccessCallback<T extends Record<string, any>, K extends keyof T = any> = (payload: {
   value: T[K]
@@ -23,7 +23,7 @@ export type StoreCallbackRegisterer_OnFirstAccess<T extends Record<string, any>>
 }
 
 export function createSmartStore_onAccess<T extends Record<string, any>>(
-  options?: CreateSmartStoreOptions_BasicOptions<T> & CreateSmartStoreOptions_OnFirstAccess<T>
+  options?: CreateSmartStoreOptions_BasicOptions<T> & CreateSmartStoreOptions_OnFirstAccess<T>,
 ) {
   const keyedFirstAccessCallbackStore = createCallbacksStoreWithKeys<keyof T, OnFirstAccessCallback<T>>({
     initCallbacks: options?.onFirstAccess,

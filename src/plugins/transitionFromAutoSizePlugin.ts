@@ -1,9 +1,9 @@
-import { MayArray, MayFn, flap, shrinkFn } from '@edsolater/fnkit'
-import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from 'solid-js'
-import { addEventListener } from '../domkit'
-import { CSSObject, PivProps, createPlugin, mergeProps } from '../piv'
+import { MayArray, MayFn, flap, shrinkFn } from "@edsolater/fnkit"
+import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
+import { addEventListener } from "../domkit"
+import { CSSObject, PivProps, createPlugin, mergeProps } from "../piv"
 
-export type TransitionPhase = 'before-going' | 'on-going' | 'finish'
+export type TransitionPhase = "before-going" | "on-going" | "finish"
 
 export type TransitionController = {
   targetDom: Accessor<HTMLElement | undefined>
@@ -13,8 +13,8 @@ export type TransitionController = {
  * detect by JS, drive by JS
  */
 export interface TransitionOptions {
-  cssTransitionDuration?: CSSObject['transitionDuration']
-  cssTransitionTimingFunction?: CSSObject['transitionTimingFunction']
+  cssTransitionDuration?: CSSObject["transitionDuration"]
+  cssTransitionTimingFunction?: CSSObject["transitionTimingFunction"]
 
   /** will trigger props:onBeforeEnter() if init props:show  */
   appear?: boolean
@@ -29,12 +29,12 @@ export interface TransitionOptions {
   onBeforeTransition?: (payload: { from: TransitionPhase; to: TransitionPhase } & TransitionController) => void
   onAfterTransition?: (payload: { from: TransitionPhase; to: TransitionPhase } & TransitionController) => void
 
-  presets?: MayArray<MayFn<Omit<TransitionOptions, 'presets'>>>
+  presets?: MayArray<MayFn<Omit<TransitionOptions, "presets">>>
 }
 
 export const transitionFromAutoSizePlugin = createPlugin(
   ({
-    cssTransitionDuration = '300ms',
+    cssTransitionDuration = "300ms",
     cssTransitionTimingFunction,
 
     appear,
@@ -60,18 +60,18 @@ export const transitionFromAutoSizePlugin = createPlugin(
             flap(presets).map((i) => shrinkFn(i)?.fromProps), // not readable
             progressProps,
             fromProps,
-            { style: baseTransitionICSS } as PivProps
+            { style: baseTransitionICSS } as PivProps,
           ),
           to: mergeProps(
             flap(presets).map((i) => shrinkFn(i)?.toProps), // not readable
             progressProps,
             toProps,
-            { style: baseTransitionICSS } as PivProps
+            { style: baseTransitionICSS } as PivProps,
           ),
-        } as Record<'from' | 'to', PivProps>
+        } as Record<"from" | "to", PivProps>
       })
 
-      const [currentPhase, setCurrentPhase] = createSignal<TransitionPhase>(appear ? 'before-going' : 'finish')
+      const [currentPhase, setCurrentPhase] = createSignal<TransitionPhase>(appear ? "before-going" : "finish")
 
       const controller: TransitionController = {
         targetDom: dom,
@@ -82,13 +82,13 @@ export const transitionFromAutoSizePlugin = createPlugin(
       createEffect(() => {
         const el = dom()
         if (el) {
-          el.dataset['phase'] = currentPhase()
+          el.dataset["phase"] = currentPhase()
         }
       })
 
       // make inTransition during state sync with CSS event
       createEffect(() => {
-        const { abort } = addEventListener(dom(), 'transitionend', () => setCurrentPhase('finish'), {
+        const { abort } = addEventListener(dom(), "transitionend", () => setCurrentPhase("finish"), {
           onlyTargetIsSelf: true /* TODO - add feature: attach max one time  */,
         }) // not event fired by bubbled
         onCleanup(abort)
@@ -96,20 +96,20 @@ export const transitionFromAutoSizePlugin = createPlugin(
 
       // invoke callbacks
       createEffect(
-        on(currentPhase, (currentPhase, prevPhase = 'finish') => {
+        on(currentPhase, (currentPhase, prevPhase = "finish") => {
           const payload = Object.assign({ from: prevPhase, to: currentPhase }, controller)
-          if (prevPhase === 'on-going' && currentPhase === 'finish') {
+          if (prevPhase === "on-going" && currentPhase === "finish") {
             dom()?.clientHeight // force GPU render frame
             onAfterTransition?.(payload)
           }
 
-          if (prevPhase === 'finish' && currentPhase === 'before-going') {
+          if (prevPhase === "finish" && currentPhase === "before-going") {
             dom()?.clientHeight // force GPU render frame
             onBeforeTransition?.(payload)
           }
-        })
+        }),
       )
 
-      return createMemo(() => transitionPhaseProps()[currentPhase() === 'before-going' ? 'from' : 'to'])
-    }
+      return createMemo(() => transitionPhaseProps()[currentPhase() === "before-going" ? "from" : "to"])
+    },
 )

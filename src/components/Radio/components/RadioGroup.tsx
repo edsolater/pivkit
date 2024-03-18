@@ -1,9 +1,9 @@
-import { createSignal } from 'solid-js'
-import { useKitProps } from '../../../createKit/useKitProps'
-import { KitProps } from '../../../createKit/KitProps'
-import { ValidController } from '../../../piv/typeTools'
-import { icssCol } from '../../../styles/icssRules'
-import { Box } from '../../Boxes/Box'
+import { createSignal } from "solid-js"
+import { useKitProps } from "../../../createKit/useKitProps"
+import { KitProps } from "../../../createKit/KitProps"
+import { ValidController } from "../../../piv/typeTools"
+import { icssCol } from "../../../styles/icssRules"
+import { Box } from "../../Boxes/Box"
 
 export interface RadioGroupController {
   name: string
@@ -25,10 +25,10 @@ export type RadioGroupKitProps<Controller extends ValidController = RadioGroupCo
   { controller: Controller }
 >
 
-const selfProps = ['name', 'option', 'defaultOption', 'onChange'] satisfies (keyof RadioGroupKitProps)[]
+const selfProps = ["name", "option", "defaultOption", "onChange"] satisfies (keyof RadioGroupKitProps)[]
 
 const defaultProps = {
-  name: 'unknown radio group',
+  name: "unknown radio group",
 } satisfies Partial<RadioGroupKitProps>
 
 /**
@@ -36,7 +36,7 @@ const defaultProps = {
  */
 export function RadioGroup(kitProps: RadioGroupKitProps) {
   const { props, shadowProps, lazyLoadController } = useKitProps(kitProps, {
-    name: 'RadioGroup',
+    name: "RadioGroup",
     defaultProps,
     selfProps: selfProps,
   })
@@ -51,5 +51,5 @@ export function RadioGroup(kitProps: RadioGroupKitProps) {
 
   lazyLoadController(radioGroupController)
 
-  return <Box class='RadioGroup' shadowProps={shadowProps} icss={icssCol()} />
+  return <Box class="RadioGroup" shadowProps={shadowProps} icss={icssCol()} />
 }

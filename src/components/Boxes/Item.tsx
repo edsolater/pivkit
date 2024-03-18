@@ -1,5 +1,5 @@
-import { KitProps, useKitProps } from '../../createKit'
-import { Box, BoxProps } from './Box'
+import { KitProps, useKitProps } from "../../createKit"
+import { Box, BoxProps } from "./Box"
 
 export type ItemProps = BoxProps
 
@@ -10,6 +10,6 @@ export type ItemKitProps = KitProps<ItemProps>
  */
 
 export function Item(rawProps: ItemKitProps) {
-  const { shadowProps, props } = useKitProps(rawProps, { name: 'Item' })
+  const { shadowProps, props } = useKitProps(rawProps, { name: "Item" })
   return <Box shadowProps={shadowProps} />
 }

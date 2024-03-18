@@ -1,4 +1,4 @@
-import { MayFn, shrinkFn, toList } from '@edsolater/fnkit'
+import { MayFn, shrinkFn, toList } from "@edsolater/fnkit"
 import {
   Accessor,
   For,
@@ -9,15 +9,15 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  on
-} from 'solid-js'
-import { KitProps, useKitProps } from '../../createKit'
-import { ObserveFn, useIntersectionObserver } from '../../domkit/hooks/useIntersectionObserver'
-import { useScrollDegreeDetector } from '../../domkit/hooks/useScrollDegreeDetector'
-import { createAsyncMemo } from '../../hooks/createAsyncMemo'
-import { createRef } from '../../hooks/createRef'
-import { Piv } from '../../piv'
-import { ListItem } from './ListItem'
+  on,
+} from "solid-js"
+import { KitProps, useKitProps } from "../../createKit"
+import { ObserveFn, useIntersectionObserver } from "../../domkit/hooks/useIntersectionObserver"
+import { useScrollDegreeDetector } from "../../domkit/hooks/useScrollDegreeDetector"
+import { createAsyncMemo } from "../../hooks/createAsyncMemo"
+import { createRef } from "../../hooks/createRef"
+import { Piv } from "../../piv"
+import { ListItem } from "./ListItem"
 
 export type ItemList<T> =
   | Map<any, T>
@@ -60,18 +60,18 @@ export interface InnerListContext {
   renderItemLength?: Accessor<number>
 }
 
-export const ListContext = createContext<InnerListContext>({} as InnerListContext, { name: 'ListController' })
+export const ListContext = createContext<InnerListContext>({} as InnerListContext, { name: "ListController" })
 
 /**
  * if for layout , don't render important content in Box
  */
 export function List<T>(kitProps: ListKitProps<T>) {
   const { props, lazyLoadController } = useKitProps(kitProps, {
-    name: 'List',
+    name: "List",
     noNeedDeAccessifyChildren: true,
     defaultProps: {
-      reachBottomMargin: 50
-    }
+      reachBottomMargin: 50,
+    },
   })
 
   // [configs]
@@ -81,7 +81,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
     : createMemo(() => toList(shrinkFn(props.items ?? [])))
   const allItems = createDeferred(_allItems) // ⚡ to smoother the render
   const increaseRenderCount = createMemo(
-    () => props.increaseRenderCount ?? Math.min(Math.floor(allItems().length / 10), 30)
+    () => props.increaseRenderCount ?? Math.min(Math.floor(allItems().length / 10), 30),
   )
   const initRenderCount = createMemo(() => props.initRenderCount ?? Math.min(allItems().length, 50))
 
@@ -91,7 +91,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
   // [add to context, this observer can make listItem can auto render or not]
   const { observe } = useIntersectionObserver({
     rootRef: listRef,
-    options: { rootMargin: '100%' }
+    options: { rootMargin: "100%" },
   })
 
   // [actually showed item count]
@@ -102,7 +102,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
     onReachBottom: () => {
       setRenderItemLength((n) => n + increaseRenderCount())
     },
-    reachBottomMargin: props.reachBottomMargin
+    reachBottomMargin: props.reachBottomMargin,
   })
 
   // reset when items.length changed
@@ -112,11 +112,11 @@ export function List<T>(kitProps: ListKitProps<T>) {
       () => {
         setRenderItemLength(initRenderCount())
         forceCalculate()
-      }
-    )
+      },
+    ),
   )
 
-  const resetRenderCount: ListController['resetRenderCount'] = () => {
+  const resetRenderCount: ListController["resetRenderCount"] = () => {
     setRenderItemLength(initRenderCount())
   }
 
@@ -133,7 +133,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
 
   return (
     <ListContext.Provider value={{ observeFunction: observe, renderItemLength }}>
-      <Piv domRef={setRef} shadowProps={props} icss={{ overflow: 'auto', contain: 'paint' }}>
+      <Piv domRef={setRef} shadowProps={props} icss={{ overflow: "auto", contain: "paint" }}>
         <For each={allItems()}>{renderListItems}</For>
       </Piv>
     </ListContext.Provider>

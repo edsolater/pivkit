@@ -14,6 +14,6 @@ export function inNextMainLoop<T, U>(fn: (result: T) => U): (r: T) => Promise<U 
         } catch (err) {
           reject(err)
         }
-      }, 0)
+      }, 0),
     )
 }

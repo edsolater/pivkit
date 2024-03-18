@@ -1,4 +1,4 @@
-import { isObjectLike } from '@edsolater/fnkit'
+import { isObjectLike } from "@edsolater/fnkit"
 
 /** shortcut of multi Reflect.set
  * @example
@@ -50,7 +50,7 @@ const simpleObectAssign = ({
 export function assignObjectWithConfigs<T extends object>(
   originalObject: T,
   patchObject: object,
-  attachRule: AttachFn = simpleObectAssign
+  attachRule: AttachFn = simpleObectAssign,
 ): T {
   Reflect.ownKeys(patchObject).forEach((key) => {
     const originalValueDescriptor = Object.getOwnPropertyDescriptor(originalObject, key)
@@ -66,5 +66,5 @@ export function assignObjectWithConfigs<T extends object>(
 }
 
 function isObjectLikeDiscriptor(value: any): value is PropertyDescriptor {
-  return isObjectLike(value) && isObjectLike(value['value'])
+  return isObjectLike(value) && isObjectLike(value["value"])
 }

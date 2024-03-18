@@ -1,11 +1,11 @@
-import { isNumber } from '@edsolater/fnkit'
-import { Accessor, createEffect, createMemo, createSignal, useContext } from 'solid-js'
-import { useKitProps } from '../../createKit/useKitProps'
-import { KitProps } from '../../createKit/KitProps'
-import { createDomRef } from '../../hooks'
-import { Piv } from '../../piv/Piv'
-import { ValidController } from '../../piv/typeTools'
-import { TabsControllerContext } from './Tabs'
+import { isNumber } from "@edsolater/fnkit"
+import { Accessor, createEffect, createMemo, createSignal, useContext } from "solid-js"
+import { useKitProps } from "../../createKit/useKitProps"
+import { KitProps } from "../../createKit/KitProps"
+import { createDomRef } from "../../hooks"
+import { Piv } from "../../piv/Piv"
+import { ValidController } from "../../piv/typeTools"
+import { TabsControllerContext } from "./Tabs"
 
 export interface TabController {
   value: Accessor<string | undefined>
@@ -33,7 +33,7 @@ export type TabKitProps<Controller extends ValidController = TabController> = Ki
 export function Tab(rawProps: TabKitProps) {
   const [currentIndex, setCurrentIndex] = createSignal<number>()
   const { dom, setDom } = createDomRef()
-  const { props, shadowProps, lazyLoadController } = useKitProps(rawProps, { name: 'Tab' })
+  const { props, shadowProps, lazyLoadController } = useKitProps(rawProps, { name: "Tab" })
   const tabsController = useContext(TabsControllerContext)
   const selected = createMemo(() => tabsController.selectedIndex() === currentIndex())
 
@@ -49,7 +49,7 @@ export function Tab(rawProps: TabKitProps) {
   createEffect(() => {
     const el = dom()
     if (!el) return
-    el.setAttribute('aria-selected', String(selected()))
+    el.setAttribute("aria-selected", String(selected()))
     const siblings = el.parentElement?.children
     if (!siblings) return
     const currentIndexOfParentNode = Array.from(siblings).indexOf(el)
@@ -75,10 +75,10 @@ export function Tab(rawProps: TabKitProps) {
   lazyLoadController(tabController)
   return (
     <Piv
-      class='Tabs-Tab'
+      class="Tabs-Tab"
       shadowProps={shadowProps}
       onClick={selectThisTab}
-      icss={{ cursor: 'pointer' }}
+      icss={{ cursor: "pointer" }}
       domRef={setDom}
     >
       {props.children}

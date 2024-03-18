@@ -1,5 +1,5 @@
-import { KitProps, useKitProps } from '../../createKit'
-import { Box, BoxProps } from './Box'
+import { KitProps, useKitProps } from "../../createKit"
+import { Box, BoxProps } from "./Box"
 
 export type GroupProps = BoxProps & {
   name: string
@@ -9,7 +9,7 @@ export type GroupProps = BoxProps & {
  * just render nothing
  */
 export function Group(kitProps: KitProps<GroupProps>) {
-  const { props, shadowProps } = useKitProps(kitProps, { name: 'Group' })
+  const { props, shadowProps } = useKitProps(kitProps, { name: "Group" })
   /* ---------------------------------- props --------------------------------- */
-  return <Box class={props.name} shadowProps={shadowProps} icss={{ display: 'contents' }} />
+  return <Box class={props.name} shadowProps={shadowProps} icss={{ display: "contents" }} />
 }

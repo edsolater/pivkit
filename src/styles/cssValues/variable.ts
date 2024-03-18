@@ -8,7 +8,7 @@
  */
 
 export function cssVar(...values: string[]) {
-  if (values.length === 0) return ''
-  if (values.length === 1) return values[0]!.startsWith('--') ? `var(${values[0]})` : values[0]
+  if (values.length === 0) return ""
+  if (values.length === 1) return values[0]!.startsWith("--") ? `var(${values[0]})` : values[0]
   return `var(${values[0]}, ${cssVar(...values.slice(1))})`
 }

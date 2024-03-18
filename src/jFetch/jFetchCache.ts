@@ -1,5 +1,5 @@
-import { isFunction, forEachEntry } from '@edsolater/fnkit'
-import { getLocalStorageItem, setLocalStorageItem } from './utils/localStorage'
+import { isFunction, forEachEntry } from "@edsolater/fnkit"
+import { getLocalStorageItem, setLocalStorageItem } from "./utils/localStorage"
 
 type ResourceUrl = string
 export interface JFetchCacheItem {
@@ -12,7 +12,7 @@ export interface JFetchCacheItem {
   paload?: Record<string, any> // POST's payload when fetching
   timeStamp: number
 }
-type JFetchCacheLocalStorageItem = Omit<JFetchCacheItem, 'response' | 'rawText'> & { rawText: string }
+type JFetchCacheLocalStorageItem = Omit<JFetchCacheItem, "response" | "rawText"> & { rawText: string }
 
 export const resultCache = new Map<ResourceUrl, JFetchCacheItem>()
 // weborker can't have localStorage
@@ -20,7 +20,7 @@ export const resultCache = new Map<ResourceUrl, JFetchCacheItem>()
 
 function syncWithLocalStorage(map: Map<ResourceUrl, JFetchCacheItem>) {
   // initly get data from localStorage
-  const cache = getLocalStorageItem<Record<string, JFetchCacheLocalStorageItem>>('raydium-controller-jFetch-cache')
+  const cache = getLocalStorageItem<Record<string, JFetchCacheLocalStorageItem>>("raydium-controller-jFetch-cache")
   if (cache) {
     forEachEntry(cache, ([key, value]) => {
       map.set(key, { ...value, rawText: Promise.resolve(value.rawText) } as JFetchCacheItem)
@@ -32,18 +32,18 @@ function syncWithLocalStorage(map: Map<ResourceUrl, JFetchCacheItem>) {
     get(target, propertyKey, receiver) {
       const original = Reflect.get(target, propertyKey, receiver)
       const bindedOriginal = isFunction(original) ? original.bind(target) : original
-      if (propertyKey === ('set' as keyof Map<any, any>)) {
+      if (propertyKey === ("set" as keyof Map<any, any>)) {
         return async (...args: any[]) => {
           const [key, cacheItem] = args as [ResourceUrl, JFetchCacheItem]
           const plainRawText = await cacheItem.rawText
           if (!plainRawText) return
           cacheItem.response?.then(() => {
             setLocalStorageItem<Record<string, JFetchCacheLocalStorageItem>>(
-              'raydium-controller-jFetch-cache',
+              "raydium-controller-jFetch-cache",
               (s) => ({
                 ...s,
                 [key]: { ...cacheItem, rawText: plainRawText, response: null },
-              })
+              }),
             )
           })
           return bindedOriginal(...args)

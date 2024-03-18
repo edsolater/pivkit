@@ -1,4 +1,4 @@
-import { AnyFn } from '@edsolater/fnkit'
+import { AnyFn } from "@edsolater/fnkit"
 
 let eventId = 1
 
@@ -21,7 +21,7 @@ const eventIdMap = new Map<
 
 export type EventCallback<
   K extends keyof HTMLElementEventMap,
-  El extends HTMLElement | Document | Window | undefined | null
+  El extends HTMLElement | Document | Window | undefined | null,
 > = {
   ev: HTMLElementEventMap[K]
   el: El
@@ -36,13 +36,13 @@ export type EventCallback<
 // TODO: !!! move to domkit
 export function addEventListener<
   El extends HTMLElement | Document | Window | undefined | null,
-  K extends keyof HTMLElementEventMap
+  K extends keyof HTMLElementEventMap,
 >(
   el: El,
   eventName: K,
   fn: (payload: EventCallback<K, El>) => void,
   /** default is `{ passive: true }` */
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ): EventListenerController {
   const defaultedOptions = { passive: true, ...options }
   const targetEventId = eventId++
@@ -50,7 +50,7 @@ export function addEventListener<
     eventId: targetEventId,
     abort() {
       abortEvent(targetEventId, options)
-    }
+    },
   } as EventListenerController
   const newEventCallback = (ev: Event) => {
     if (options?.stopPropergation) ev.stopPropagation()
@@ -63,7 +63,7 @@ export function addEventListener<
       isBubbled: () => el !== ev.target,
       stopPropagation: () => ev.stopPropagation(),
       preventDefault: () => ev.preventDefault(),
-      eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[]
+      eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
     })
   }
   el?.addEventListener(eventName as unknown as string, newEventCallback, defaultedOptions)

@@ -1,5 +1,5 @@
-import { PivChild, Piv } from '../../../piv'
-import { RadioController, RadioKitProps } from '..'
+import { PivChild, Piv } from "../../../piv"
+import { RadioController, RadioKitProps } from ".."
 
 /**
  * component plugin
@@ -10,19 +10,19 @@ export function renderRadioThumb(
   renderContent: PivChild<RadioController> = ({ isChecked }) => (
     <Piv
       icss={{
-        color: isChecked() ? 'dodgerblue' : 'crimson',
-        width: '0.5em',
-        height: '0.5em',
-        backgroundColor: 'currentcolor',
-        transition: '600ms',
-        borderRadius: '999px',
+        color: isChecked() ? "dodgerblue" : "crimson",
+        width: "0.5em",
+        height: "0.5em",
+        backgroundColor: "currentcolor",
+        transition: "600ms",
+        borderRadius: "999px",
       }}
     />
-  )
-): RadioKitProps['shadowProps'] {
+  ),
+): RadioKitProps["shadowProps"] {
   return {
-    'anatomy:Thumb': {
-      'render:lastChild': renderContent,
+    "anatomy:Thumb": {
+      "render:lastChild": renderContent,
     },
   }
 }

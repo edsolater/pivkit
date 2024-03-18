@@ -1,2 +1,2 @@
-export * from './LazyLoadObj'
-export * from './IndexAccessList'
+export * from "./LazyLoadObj"
+export * from "./IndexAccessList"

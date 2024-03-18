@@ -1,24 +1,24 @@
-import { Accessor, createEffect, createMemo, createSignal, onCleanup } from 'solid-js'
-import { IStyle } from '../../piv/propHandlers'
-import { runInNextLoop } from '../../utils/runInNextLoop'
-import { PopupLocationInfo, calcPopupPanelLocation } from './calcPopupPanelLocation'
-import { getScrollParents } from './getScrollParents'
-import { PopoverPlacement } from './type'
+import { Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js"
+import { IStyle } from "../../piv/propHandlers"
+import { runInNextLoop } from "../../utils/runInNextLoop"
+import { PopupLocationInfo, calcPopupPanelLocation } from "./calcPopupPanelLocation"
+import { getScrollParents } from "./getScrollParents"
+import { PopoverPlacement } from "./type"
 
 // for fade in effect (fade-in is caused by )
 const popupOrigins = {
-  top: 'bottom',
-  'top-left': 'bottom-left',
-  'top-right': 'bottom-right',
-  right: 'left',
-  'right-top': 'top-left',
-  'right-bottom': 'bottom-left',
-  left: 'right',
-  'left-top': 'top-right',
-  'left-bottom': 'bottom-right',
-  bottom: 'top',
-  'bottom-left': 'top-left',
-  'bottom-right': 'top-right',
+  top: "bottom",
+  "top-left": "bottom-left",
+  "top-right": "bottom-right",
+  right: "left",
+  "right-top": "top-left",
+  "right-bottom": "bottom-left",
+  left: "right",
+  "left-top": "top-right",
+  "left-bottom": "bottom-right",
+  bottom: "top",
+  "bottom-left": "top-left",
+  "bottom-right": "top-right",
 }
 
 export type PopoverLocationHookOptions = {
@@ -87,13 +87,13 @@ export function usePopoverLocation({
     const buttonScrollParents = buttonElement ? getScrollParents(buttonElement) : []
     const parents = [...buttonScrollParents]
     parents.forEach((parent) => {
-      parent.addEventListener('scroll', update, { passive: true })
-      globalThis.addEventListener?.('resize', update, { passive: true })
+      parent.addEventListener("scroll", update, { passive: true })
+      globalThis.addEventListener?.("resize", update, { passive: true })
     })
     onCleanup(() => {
       parents.forEach((parent) => {
-        parent.removeEventListener('scroll', update)
-        globalThis.removeEventListener?.('resize', update)
+        parent.removeEventListener("scroll", update)
+        globalThis.removeEventListener?.("resize", update)
       })
     })
   })
@@ -108,8 +108,8 @@ export function usePopoverLocation({
   const panelStyle = createMemo(() => {
     const coor = panelCoordinates()
     const style = {
-      left: coor?.panelLeft + 'px',
-      top: coor?.panelTop + 'px',
+      left: coor?.panelLeft + "px",
+      top: coor?.panelTop + "px",
     } as IStyle
     return style
   })

@@ -1,9 +1,9 @@
-import { AnyFn, mergeObjects } from '@edsolater/fnkit'
-import { Accessor, createMemo, createSignal } from 'solid-js'
-import { DeAccessorObject, deAccessorObject } from '../utils/parseAccessorWithoutTrack'
+import { AnyFn, mergeObjects } from "@edsolater/fnkit"
+import { Accessor, createMemo, createSignal } from "solid-js"
+import { DeAccessorObject, deAccessorObject } from "../utils/parseAccessorWithoutTrack"
 
 /** inner state to help to judge lifecycle phase */
-type ActionPhase = 'before-init' | 'running' | 'paused' | 'end' | 'idle' /* (after-run) */
+type ActionPhase = "before-init" | "running" | "paused" | "end" | "idle" /* (after-run) */
 
 type ActionHookStates<T> = {
   /** store fulfilled */
@@ -92,7 +92,7 @@ type ActionParamSettings<T> = {
  * @returns
  */
 export function createAction<T>(settings: ActionParamSettings<T>): ActionSignals<T> {
-  const [currentPhase, setCurrentPhase] = createSignal<ActionPhase>('before-init')
+  const [currentPhase, setCurrentPhase] = createSignal<ActionPhase>("before-init")
   const [result, setResult] = createSignal<T>()
   const [error, setError] = createSignal<unknown>()
   //--- run count
@@ -138,7 +138,7 @@ export function createAction<T>(settings: ActionParamSettings<T>): ActionSignals
   const invokeEndCleanUps = (...args: any[]) => endCleanUpFunctions.forEach((cb) => cb(...args))
 
   function pause() {
-    setCurrentPhase((p) => (p === 'running' ? 'paused' : p))
+    setCurrentPhase((p) => (p === "running" ? "paused" : p))
     settings.onActionPause?.(deAcessoredAll)
     // run cleanUp
     invokeAbortCleanUps()
@@ -153,7 +153,7 @@ export function createAction<T>(settings: ActionParamSettings<T>): ActionSignals
   function loadResult(result: T | ((prev?: T) => T)) {
     setResult((prev) => {
       // @ts-expect-error T should not be a function
-      const newResult = typeof result === 'function' ? result(prev) : result
+      const newResult = typeof result === "function" ? result(prev) : result
       resolvePromiseResult?.(newResult)
       return newResult
     })
@@ -175,7 +175,7 @@ export function createAction<T>(settings: ActionParamSettings<T>): ActionSignals
       if (count === 1) {
         settings.onActionBegin?.(deAcessoredAll)
       }
-      if (currentPhase() === 'paused') {
+      if (currentPhase() === "paused") {
         settings.onActionResume?.(deAcessoredAll)
       }
 
@@ -199,7 +199,7 @@ export function createAction<T>(settings: ActionParamSettings<T>): ActionSignals
           resolvePromiseResult = resolve
           rejectPromiseError = reject
         })
-      setCurrentPhase('running')
+      setCurrentPhase("running")
       const returnedResult = await promisedResult
 
       setError(undefined)
@@ -210,14 +210,14 @@ export function createAction<T>(settings: ActionParamSettings<T>): ActionSignals
       setError(err)
       throw err
     } finally {
-      setCurrentPhase('idle')
+      setCurrentPhase("idle")
       setIsCalculating(false)
     }
   }
   function end() {
     invokeEndCleanUps()
     clearRegistedEndCleanUps()
-    setCurrentPhase('end')
+    setCurrentPhase("end")
     settings.onActionEnd?.(deAcessoredAll)
   }
   const innerStatus = {
@@ -248,8 +248,8 @@ function isEmpty(v: unknown) {
   return (
     v === undefined ||
     v === null ||
-    v === '' ||
+    v === "" ||
     (Array.isArray(v) && v.length === 0) ||
-    (typeof v === 'object' && Object.getOwnPropertyNames(v).length === 0)
+    (typeof v === "object" && Object.getOwnPropertyNames(v).length === 0)
   )
 }

@@ -1,7 +1,7 @@
-import { AnyFn, AnyObj, flap, mergeFunction, shakeNil } from '@edsolater/fnkit'
-import { ValidProps } from '../typeTools'
-import { getKeys } from './getKeys'
-import { mergeRefs } from './mergeRefs'
+import { AnyFn, AnyObj, flap, mergeFunction, shakeNil } from "@edsolater/fnkit"
+import { ValidProps } from "../typeTools"
+import { getKeys } from "./getKeys"
+import { mergeRefs } from "./mergeRefs"
 
 /**
  * invoke only once, return the cached result when invoke again
@@ -58,7 +58,7 @@ export function mergeProps<P extends ValidProps | undefined>(...propsObjs: P[]):
           return getPivPropsValue(props, key)
         },
       }),
-    }
+    },
   ) as any
 }
 
@@ -69,7 +69,7 @@ export function getPivPropsValue(objs: AnyObj[], key: keyof any) {
   switch (key) {
     // -------- specific --------
     // inside define's  children's priority is higher than outside define's
-    case 'children':
+    case "children":
       for (let i = 0; i < objs.length; i++) {
         const obj = objs[i]
         const v = obj?.[key]
@@ -77,18 +77,18 @@ export function getPivPropsValue(objs: AnyObj[], key: keyof any) {
       }
 
     // -------- pivprops --------
-    case 'domRef':
+    case "domRef":
       return objs.reduce((finalValue, objB) => {
         const valueB = objB[key]
         return valueB && finalValue ? mergeRefs(finalValue as any, valueB as any) : valueB ?? finalValue
       }, undefined as unknown)
-    case 'class':
-    case 'style':
-    case 'icss':
-    case 'htmlProps':
-    case 'shadowProps':
-    case 'plugin':
-    case 'render:outWrapper':
+    case "class":
+    case "style":
+    case "icss":
+    case "htmlProps":
+    case "shadowProps":
+    case "plugin":
+    case "render:outWrapper":
       return objs.reduce((finalValue, objB) => {
         const valueB = objB[key]
         return valueB && finalValue ? [finalValue, valueB].flat() : valueB ?? finalValue
@@ -96,7 +96,7 @@ export function getPivPropsValue(objs: AnyObj[], key: keyof any) {
     // -------- normal props --------
     default: {
       // -------- 'merge:on' callback function --------
-      if (key.toString().startsWith('merge:')) {
+      if (key.toString().startsWith("merge:")) {
         return objs.reduce((finalValue, objB) => {
           const valueB = objB[key]
           return valueB && finalValue ? mergeFunction(finalValue, valueB) : valueB ?? finalValue

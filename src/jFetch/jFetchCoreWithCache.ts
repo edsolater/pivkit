@@ -1,5 +1,5 @@
-import { MayPromise } from '@edsolater/fnkit'
-import { JFetchCacheItem, resultCache } from './jFetchCache'
+import { MayPromise } from "@edsolater/fnkit"
+import { JFetchCacheItem, resultCache } from "./jFetchCache"
 
 export type JFetchCoreOptions = RequestInit & {
   /** if still within cache fresh time, use cache. */
@@ -23,7 +23,7 @@ function canJFetchUseCache({ key, cacheFreshDuraction }: { key: string; cacheFre
  * same interface as original fetch, but, customized version have cache
  */
 export async function jFetchCoreWithCache(input: RequestInfo, options?: JFetchCoreOptions): Promise<string> {
-  const key = typeof input === 'string' ? input : input.url
+  const key = typeof input === "string" ? input : input.url
 
   const shouldUseCache = canJFetchUseCache({
     key,
@@ -38,7 +38,7 @@ export async function jFetchCoreWithCache(input: RequestInfo, options?: JFetchCo
       .then((r) => {
         if (r.ok) return r.clone()
         else {
-          throw new Error('not ok')
+          throw new Error("not ok")
         }
       })
       .then((r) => r.text())
@@ -82,11 +82,11 @@ export async function jFetchCoreWithCache(input: RequestInfo, options?: JFetchCo
     }
   } catch {
     const jFetchItem = {
-      rawText: Promise.reject('jFetch failed2'),
+      rawText: Promise.reject("jFetch failed2"),
       timeStamp: Date.now(),
       ok: false,
     } satisfies JFetchCacheItem
     resultCache.set(key, jFetchItem)
-    return Promise.reject('jFetch failed3')
+    return Promise.reject("jFetch failed3")
   }
 }

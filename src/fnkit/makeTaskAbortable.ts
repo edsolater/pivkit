@@ -1,4 +1,4 @@
-import { assert } from '@edsolater/fnkit'
+import { assert } from "@edsolater/fnkit"
 
 /**
  * result will be undefined if aborted
@@ -24,13 +24,13 @@ export function makeTaskAbortable<T>(task: (canContinue: () => boolean) => T | P
     (r) => {
       finished = true
       if (hasAbort) {
-        throw new Error('input task aborted')
+        throw new Error("input task aborted")
       }
       return r
     },
     () => {
       hasAbort = true
-    }
+    },
   ) as Promise<Awaited<T | undefined>> // typescript v4.8.3 isn't very cleaver
-  return { abort, result, hasFinished, hasAborted, assertNotAborted: () => assert(!hasAbort, 'has aborted') }
+  return { abort, result, hasFinished, hasAborted, assertNotAborted: () => assert(!hasAbort, "has aborted") }
 }

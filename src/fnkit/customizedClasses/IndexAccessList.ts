@@ -3,7 +3,7 @@
  * it's inner use JS Map
  */
 
-import { assert } from '@edsolater/fnkit'
+import { assert } from "@edsolater/fnkit"
 // import { createEncodedObject } from '../../../app/raydium-s2/utils/structure-clone/createEncodedObject'
 
 export class IndexAccessList<V extends object = object, BK extends keyof V = any> {
@@ -16,7 +16,7 @@ export class IndexAccessList<V extends object = object, BK extends keyof V = any
 
   static fromJSMap<V extends object, BK extends keyof V>(
     basicKeyPropertyName: BK,
-    jsMap: Map<V[BK], V>
+    jsMap: Map<V[BK], V>,
   ): IndexAccessList<V, BK> {
     const indexAccessMap = new IndexAccessList<V, BK>([], basicKeyPropertyName)
     indexAccessMap.#innerMap = jsMap
@@ -27,7 +27,7 @@ export class IndexAccessList<V extends object = object, BK extends keyof V = any
     const source = [...iterable]
     // @ts-ignore
     this.#innerMap = new Map(
-      iterable && basicKeyPropertyName ? source.map((i) => [i[basicKeyPropertyName], i]) : undefined
+      iterable && basicKeyPropertyName ? source.map((i) => [i[basicKeyPropertyName], i]) : undefined,
     )
     if (iterable) {
       const first = source[0]
@@ -44,7 +44,7 @@ export class IndexAccessList<V extends object = object, BK extends keyof V = any
         this.#keyIndexAccessMap[keyPropertyName] ||
         (() => {
           const newAccessMap = new Map<any, V[BK]>(
-            [...this.#innerMap.values()].map((v) => [v[keyPropertyName], v[this.#basicKeyIndexAccessMap]])
+            [...this.#innerMap.values()].map((v) => [v[keyPropertyName], v[this.#basicKeyIndexAccessMap]]),
           )
           this.#keyIndexAccessMap[keyPropertyName] = newAccessMap
           return newAccessMap

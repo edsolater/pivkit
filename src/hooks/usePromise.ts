@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createSignal } from 'solid-js'
+import { Accessor, createEffect, createSignal } from "solid-js"
 
 /** accept promise return an accessor  */
 export function usePromise<T, F = undefined>(promise: Accessor<Promise<T>>, fallbackValue?: F): Accessor<T | F> {

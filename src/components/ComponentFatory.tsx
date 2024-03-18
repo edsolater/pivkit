@@ -1,7 +1,7 @@
-import { isFunction, isObject } from '@edsolater/fnkit'
-import { JSX } from 'solid-js'
-import { unwrap } from 'solid-js/store'
-import { Box } from './Boxes'
+import { isFunction, isObject } from "@edsolater/fnkit"
+import { JSX } from "solid-js"
+import { unwrap } from "solid-js/store"
+import { Box } from "./Boxes"
 
 /** a special component for creating element tree by pure js data
  *
@@ -16,14 +16,14 @@ export function RenderFactory(props: {
    */
   widgetCreateRule: (
     value: any,
-    key: string | number | symbol | undefined
+    key: string | number | symbol | undefined,
   ) => JSX.Element | any /* value */ | undefined | void
 }) {
   const store = props.data
   const unwrapedStore = unwrap(store)
   function parseData(
     mapFn: (value: any, key: string | number | symbol | undefined) => JSX.Element | any /* value */ | undefined | void,
-    currentPath: (string | number | symbol)[] = []
+    currentPath: (string | number | symbol)[] = [],
   ) {
     const currentTarget = getByPath(unwrapedStore, currentPath)
     const currentKey = currentPath.at(-1)
@@ -51,5 +51,5 @@ function getByPath(obj: object, path: (string | number | symbol)[]) {
 }
 
 function isJSXElement(v: any): v is JSX.Element {
-  return isObject(v) && 'type' in v && v.type !== undefined
+  return isObject(v) && "type" in v && v.type !== undefined
 }

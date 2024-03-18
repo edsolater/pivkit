@@ -1,4 +1,4 @@
-import { createEffect, onCleanup } from 'solid-js'
+import { createEffect, onCleanup } from "solid-js"
 
 /**
  * DOM: IntervalAPI effect hook

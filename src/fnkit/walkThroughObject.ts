@@ -1,4 +1,4 @@
-import { isObject, isObjectLike } from '@edsolater/fnkit'
+import { isObject, isObjectLike } from "@edsolater/fnkit"
 
 /**
  * only walk through string enumtable object key (not symbol)
@@ -16,7 +16,7 @@ export function walkThroughObject(
     canDeepWalk: boolean
     /** only useful when canDeepWalk is true */
     needDeepWalk(needTo: boolean): void
-  }) => void
+  }) => void,
 ) {
   function walk(obj: object, keyPaths: (keyof any)[] = []) {
     Object.keys(obj).forEach((key) => {
@@ -31,7 +31,7 @@ export function walkThroughObject(
         canDeepWalk: isObjectValue,
         needDeepWalk(needTo: boolean) {
           needDeepWalk = needTo
-        }
+        },
       })
       if (needDeepWalk) {
         walk(value, keyPaths.concat(key)) // go deep
@@ -72,7 +72,7 @@ export function setByPath(
   obj: object,
   path: (keyof any)[],
   value: any,
-  mergeRule: (prev: any, input: any) => any = () => value
+  mergeRule: (prev: any, input: any) => any = () => value,
 ): boolean {
   if (path.length === 0) return false
   if (path.length === 1) {

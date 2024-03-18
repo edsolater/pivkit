@@ -1,5 +1,5 @@
-import { createRoot } from 'solid-js'
-import { tryOnCleanup } from './utils/tryOnCleanup'
+import { createRoot } from "solid-js"
+import { tryOnCleanup } from "./utils/tryOnCleanup"
 
 /**
  * @see https://solidjs-use.github.io/solidjs-use/shared/createSharedComposable
@@ -17,7 +17,7 @@ import { tryOnCleanup } from './utils/tryOnCleanup'
  */
 export function createGlobalHook<Fn extends (...args: any[]) => any>(
   composable: Fn,
-  options?: { cacheStateWithoutClean?: boolean }
+  options?: { cacheStateWithoutClean?: boolean },
 ): Fn {
   let subscribers = 0
   let state: ReturnType<Fn> | undefined

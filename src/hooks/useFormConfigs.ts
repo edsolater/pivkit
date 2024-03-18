@@ -4,7 +4,7 @@ type FormWidgetBoolean =
       isDisabled?: boolean
       required?: boolean
       /** default is switch */
-      kit?: 'switch' | 'checkbox' | 'auto'
+      kit?: "switch" | "checkbox" | "auto"
       value: boolean
       label?: string
     }
@@ -22,7 +22,7 @@ type FormWidgetEnum =
       isDisabled?: boolean
       required?: boolean
       /** if less than 4 items, default is radio; else, default is select  */
-      kit?: 'radios' | 'select' | 'auto'
+      kit?: "radios" | "select" | "auto"
       options: FormWidgetEnumOptionItem[]
     }
   | FormWidgetEnumOptionItem[]
@@ -34,11 +34,11 @@ type FormWidgetText =
       required?: boolean
       pattern?: RegExp
       /** if less than 3 placeholder words, default is input; else, default is select  */
-      kit?: 'input' | 'textarea' | 'auto'
+      kit?: "input" | "textarea" | "auto"
       placeholder?: string
     }
   | string
-  | ''
+  | ""
 
 type FormWidgetNumber =
   | {
@@ -46,7 +46,7 @@ type FormWidgetNumber =
       isDisabled?: boolean
       required?: boolean
       /** default is number-input */
-      kit?: 'number-input' | 'slider' | 'auto'
+      kit?: "number-input" | "slider" | "auto"
       n: number
       max?: number
       min?: number
@@ -60,7 +60,7 @@ type FormWidgetRange =
       isDisabled?: boolean
       required?: boolean
       /** default is number-input */
-      kit?: 'number-input' | 'range-slider' | 'auto'
+      kit?: "number-input" | "range-slider" | "auto"
       n1: number
       n2: number
     }

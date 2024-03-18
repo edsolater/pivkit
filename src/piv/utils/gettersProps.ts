@@ -1,4 +1,4 @@
-import { isFunction } from '@edsolater/fnkit'
+import { isFunction } from "@edsolater/fnkit"
 
 export type GettersProps<T extends object> = {
   [K in keyof T]: T[K] extends () => infer F ? F : undefined
@@ -21,6 +21,6 @@ export function createByGetters<T extends object>(props: T): GettersProps<T> {
         },
       }
       return acc
-    }, {} as PropertyDescriptorMap)
+    }, {} as PropertyDescriptorMap),
   ) as GettersProps<T>
 }

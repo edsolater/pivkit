@@ -1,4 +1,4 @@
-import { AnyFn } from '@edsolater/fnkit'
+import { AnyFn } from "@edsolater/fnkit"
 
 /**for readibility, {@link invoke} will run function  */
 export async function invoke<F extends AnyFn>(fn: F, ...params: Parameters<F>): Promise<ReturnType<F>> {

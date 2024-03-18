@@ -1,4 +1,4 @@
-import { isArray, isFunction, isObject, isPrimitive, shrinkFn } from '@edsolater/fnkit'
+import { isArray, isFunction, isObject, isPrimitive, shrinkFn } from "@edsolater/fnkit"
 
 type ObserveRule<T> =
   | {

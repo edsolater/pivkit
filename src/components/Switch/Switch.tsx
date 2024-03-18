@@ -1,13 +1,13 @@
-import { Accessor } from 'solid-js'
-import { KitProps, useKitProps } from '../../createKit'
-import { makeElementMoveSmooth } from '../../domkit/utils/makeElementMoveSmooth'
-import { createSyncSignal } from '../../hooks/createSyncSignal'
-import { Piv } from '../../piv'
-import { LabelKitProps } from '../Label'
-import { LabelBox } from '../LabelBox'
-import { HTMLCheckbox, HTMLCheckboxProps } from './HTMLCheckbox'
-import { useSwitchStyle } from './hooks/useSwitchStyle'
-import { Box } from '../Boxes'
+import { Accessor } from "solid-js"
+import { KitProps, useKitProps } from "../../createKit"
+import { makeElementMoveSmooth } from "../../domkit/utils/makeElementMoveSmooth"
+import { createSyncSignal } from "../../hooks/createSyncSignal"
+import { Piv } from "../../piv"
+import { LabelKitProps } from "../Label"
+import { LabelBox } from "../LabelBox"
+import { HTMLCheckbox, HTMLCheckboxProps } from "./HTMLCheckbox"
+import { useSwitchStyle } from "./hooks/useSwitchStyle"
+import { Box } from "../Boxes"
 
 export interface SwitchController {
   isChecked: Accessor<boolean>
@@ -19,24 +19,24 @@ export type SwitchProps = KitProps<{
   isDefaultChecked?: boolean
   onChange?(utils: { isChecked: boolean }): void
   /** for Chakra has, so i has */
-  'anatomy:ContainerBox'?: LabelKitProps
+  "anatomy:ContainerBox"?: LabelKitProps
   /** hidden HTML input(type=checkbox) for aria readbility */
-  'anatomy:HTMLCheckbox'?: HTMLCheckboxProps
+  "anatomy:HTMLCheckbox"?: HTMLCheckboxProps
   /** SwitchThumb */
-  'anatomy:Thumb'?: any
+  "anatomy:Thumb"?: any
 }>
 
 const selfProps = [
-  'isChecked',
-  'name',
-  'isDefaultChecked',
-  'onChange',
-  'anatomy:ContainerBox',
-  'anatomy:HTMLCheckbox',
-  'anatomy:Thumb',
+  "isChecked",
+  "name",
+  "isDefaultChecked",
+  "onChange",
+  "anatomy:ContainerBox",
+  "anatomy:HTMLCheckbox",
+  "anatomy:Thumb",
 ] satisfies (keyof SwitchProps)[]
 
-const accessifyPropNames = ['isChecked', 'isDefaultChecked'] satisfies (keyof SwitchProps)[]
+const accessifyPropNames = ["isChecked", "isDefaultChecked"] satisfies (keyof SwitchProps)[]
 
 export type SwitchDefaultSwitchProps = typeof defaultProps
 
@@ -49,7 +49,7 @@ const defaultProps = {
  */
 export function Switch(rawProps: SwitchProps) {
   const { props, shadowProps, lazyLoadController } = useKitProps(rawProps, {
-    name: 'Switch',
+    name: "Switch",
     defaultProps,
     needAccessify: accessifyPropNames,
     selfProps: selfProps,
@@ -74,12 +74,12 @@ export function Switch(rawProps: SwitchProps) {
 
   return (
     <Box
-      debugLog={['icss']}
+      debugLog={["icss"]}
       innerController={switchController}
-      shadowProps={[wrapperLabelStyleProps, shadowProps, props['anatomy:ContainerBox']]}
+      shadowProps={[wrapperLabelStyleProps, shadowProps, props["anatomy:ContainerBox"]]}
     >
       <HTMLCheckbox
-        shadowProps={[htmlCheckboxStyleProps, props['anatomy:HTMLCheckbox']]}
+        shadowProps={[htmlCheckboxStyleProps, props["anatomy:HTMLCheckbox"]]}
         innerController={switchController}
         label={props.name}
         defaultChecked={props.isDefaultChecked}
@@ -90,11 +90,11 @@ export function Switch(rawProps: SwitchProps) {
 
       {/* SwitchThumb */}
       <Piv
-        shadowProps={[switchThumbStyleProps, props['anatomy:Thumb']]}
+        shadowProps={[switchThumbStyleProps, props["anatomy:Thumb"]]}
         innerController={switchController}
-        class='SwitchThumb'
+        class="SwitchThumb"
         domRef={setMotionTargetRef}
-        icss={[{ display: 'grid', placeContent: 'center' }]}
+        icss={[{ display: "grid", placeContent: "center" }]}
         // render:lastChild={({ isChecked }) => {
         //   console.count('rerun thumb child')
         //   return (

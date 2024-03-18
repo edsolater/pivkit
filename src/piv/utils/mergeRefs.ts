@@ -1,4 +1,4 @@
-import { CallbackRef } from '../Piv'
+import { CallbackRef } from "../Piv"
 
 export function mergeRefs<T = any>(...refs: (CallbackRef<T> | null | undefined)[]): CallbackRef<T> {
   return ((el) => {

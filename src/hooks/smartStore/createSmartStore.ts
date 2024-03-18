@@ -1,22 +1,22 @@
-import { isFunction, shrinkFn } from '@edsolater/fnkit'
-import { Accessor, createEffect, createMemo, untrack } from 'solid-js'
-import { createStore, unwrap, type SetStoreFunction } from 'solid-js/store'
+import { isFunction, shrinkFn } from "@edsolater/fnkit"
+import { Accessor, createEffect, createMemo, untrack } from "solid-js"
+import { createStore, unwrap, type SetStoreFunction } from "solid-js/store"
 import {
   StoreCallbackRegisterer_OnFirstAccess,
   createSmartStore_onAccess,
   type CreateSmartStoreOptions_OnFirstAccess,
-} from './features/onFirstAccess'
+} from "./features/onFirstAccess"
 import {
   createSmartStore_onPropertyChange,
   type CreateSmartStoreOptions_OnPropertyChange,
   type StoreCallbackRegisterer_OnPropertyChange,
-} from './features/onPropertyChange'
+} from "./features/onPropertyChange"
 import {
   createSmartStore_onStoreInit,
   type CreateSmartStoreOptions_OnStoreInit,
   type StoreCallbackRegisterer_OnStoreInit,
-} from './features/onStoreInit'
-import { createStoreSetter } from './utils/setStoreByObject'
+} from "./features/onStoreInit"
+import { createStoreSetter } from "./utils/setStoreByObject"
 
 export type CreateSmartStoreOptions_BasicOptions<T extends Record<string, any>> = {}
 export type CreateSmartStoreOptions<T extends Record<string, any>> = CreateSmartStoreOptions_BasicOptions<T> &
@@ -25,7 +25,7 @@ export type CreateSmartStoreOptions<T extends Record<string, any>> = CreateSmart
   CreateSmartStoreOptions_OnStoreInit<T>
 
 export type SmartSetStore<T extends Record<string, any>> = (
-  dispatch: ((prevStore?: T) => Partial<T>) | Partial<T>
+  dispatch: ((prevStore?: T) => Partial<T>) | Partial<T>,
 ) => void
 
 export type SmartStore<T extends Record<string, any>> = {
@@ -59,7 +59,7 @@ export type SmartStore<T extends Record<string, any>> = {
  */
 export function createSmartStore<T extends Record<string, any>>(
   defaultValue: T | Accessor<T>,
-  options?: CreateSmartStoreOptions<T>
+  options?: CreateSmartStoreOptions<T>,
 ): SmartStore<T> {
   const de = shrinkFn(defaultValue)
   const [rawStore, rawSetStore] = createStore<T>(de)
@@ -141,7 +141,7 @@ export function createSmartStore<T extends Record<string, any>>(
             propertyName = p as string
             return Reflect.get(target, p, receiver)
           },
-        })
+        }),
       )
       const newValue = isFunction(dispatcher) ? dispatcher(prevValue) : dispatcher
       if (propertyName) {

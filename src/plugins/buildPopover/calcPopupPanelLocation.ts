@@ -1,5 +1,5 @@
-import { IStyle } from '../../piv'
-import { PopoverPlacement } from './type'
+import { IStyle } from "../../piv"
+import { PopoverPlacement } from "./type"
 export type PopupLocationInfo = {
   // relative to viewport
   panelLeft: number
@@ -21,7 +21,7 @@ const POPOVER_VIEWPORT_BOUNDARY_INSET = 6
 export const calcPopupPanelLocation = ({
   buttonElement,
   panelElement,
-  placement = 'top',
+  placement = "top",
   cornerOffset = 0,
   popoverGap = POPOVER_GAP,
   viewportBoundaryInset = POPOVER_VIEWPORT_BOUNDARY_INSET,
@@ -64,17 +64,17 @@ export const calcPopupPanelLocation = ({
   const calcPanel = (placement: PopoverPlacement): [left: number, top: number] | undefined => {
     const rules: Record<PopoverPlacement, () => [panelLeft: number, panelTop: number]> = {
       left: () => [buttonLeft - popoverGap - panelWidth, buttonCenterY - panelHeight / 2],
-      'left-top': () => [buttonLeft - popoverGap - panelWidth, buttonTop - cornerOffset],
-      'left-bottom': () => [buttonLeft - popoverGap - panelWidth, buttonBottom - panelHeight + cornerOffset],
+      "left-top": () => [buttonLeft - popoverGap - panelWidth, buttonTop - cornerOffset],
+      "left-bottom": () => [buttonLeft - popoverGap - panelWidth, buttonBottom - panelHeight + cornerOffset],
       right: () => [buttonRight + popoverGap, buttonCenterY - panelHeight / 2],
-      'right-top': () => [buttonRight + popoverGap, buttonTop - cornerOffset],
-      'right-bottom': () => [buttonRight + popoverGap, buttonBottom - panelHeight + cornerOffset],
+      "right-top": () => [buttonRight + popoverGap, buttonTop - cornerOffset],
+      "right-bottom": () => [buttonRight + popoverGap, buttonBottom - panelHeight + cornerOffset],
       top: () => [buttonCenterX - panelWidth / 2, buttonTop - popoverGap - panelHeight],
-      'top-left': () => [buttonLeft - cornerOffset, buttonTop - popoverGap - panelHeight],
-      'top-right': () => [buttonRight - panelWidth + cornerOffset, buttonTop - popoverGap - panelHeight],
+      "top-left": () => [buttonLeft - cornerOffset, buttonTop - popoverGap - panelHeight],
+      "top-right": () => [buttonRight - panelWidth + cornerOffset, buttonTop - popoverGap - panelHeight],
       bottom: () => [buttonCenterX - panelWidth / 2, buttonBottom + popoverGap],
-      'bottom-left': () => [buttonLeft - cornerOffset, buttonBottom + popoverGap],
-      'bottom-right': () => [buttonRight - panelWidth + cornerOffset, buttonBottom + popoverGap],
+      "bottom-left": () => [buttonLeft - cornerOffset, buttonBottom + popoverGap],
+      "bottom-right": () => [buttonRight - panelWidth + cornerOffset, buttonBottom + popoverGap],
     }
     return rules[placement]?.()
   }

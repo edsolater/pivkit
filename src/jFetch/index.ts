@@ -1,1 +1,1 @@
-export { jFetch } from './jFetchHandleMiddleware'
+export { jFetch } from "./jFetchHandleMiddleware"

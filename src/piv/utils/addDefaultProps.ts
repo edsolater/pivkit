@@ -1,11 +1,11 @@
-import { mergeProps as solidjsMergeProps } from 'solid-js'
-import { ValidProps } from '../typeTools'
-import { mergeProps } from './mergeProps'
+import { mergeProps as solidjsMergeProps } from "solid-js"
+import { ValidProps } from "../typeTools"
+import { mergeProps } from "./mergeProps"
 
 /** use solidjs's mergeProps */
 export function addDefaultProps<T extends ValidProps, const D>(
   props: T,
-  defaultProps: D
+  defaultProps: D,
 ): Omit<T, keyof D> & Pick<Required<T>, keyof D & string> {
   return solidjsMergeProps(defaultProps, props) as any
 }

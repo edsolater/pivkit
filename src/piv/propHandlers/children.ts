@@ -1,20 +1,20 @@
-import { AnyFn, hasProperty, isArray, isFunction } from '@edsolater/fnkit'
-import { JSXElement } from 'solid-js'
-import { KitProps } from '../../createKit/KitProps'
-import { ValidController } from '../typeTools'
+import { AnyFn, hasProperty, isArray, isFunction } from "@edsolater/fnkit"
+import { JSXElement } from "solid-js"
+import { KitProps } from "../../createKit/KitProps"
+import { ValidController } from "../typeTools"
 
 export function loadPropsControllerRef<Controller extends ValidController | unknown>(
   props: Partial<KitProps<{ controllerRef?: (getController: Controller) => void }>>,
-  providedController: Controller
+  providedController: Controller,
 ) {
-  if (hasProperty(props, 'controllerRef')) {
+  if (hasProperty(props, "controllerRef")) {
     props.controllerRef?.(providedController)
   }
 }
 
 export function parsePivChildren<
   P extends unknown | ((controller: Controller) => unknown),
-  Controller extends ValidController | unknown
+  Controller extends ValidController | unknown,
 >(originalChildren: P, controller: Controller = {} as Controller): JSXElement {
   return isArray(originalChildren)
     ? originalChildren.map((i) => parsePivChildren(i, controller))
@@ -29,5 +29,5 @@ export function parsePivChildren<
  * @returns
  */
 function isNormalControllerChildren(node: unknown): node is AnyFn {
-  return isFunction(node) && !node.name.includes('readSignal' /*  learn by window console.log */)
+  return isFunction(node) && !node.name.includes("readSignal" /*  learn by window console.log */)
 }

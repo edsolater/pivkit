@@ -1,3 +1,2 @@
-import { omit } from '@edsolater/fnkit'
+import { omit } from "@edsolater/fnkit"
 export const omitProps = omit
-

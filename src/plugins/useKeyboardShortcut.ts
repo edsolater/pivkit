@@ -11,17 +11,17 @@ import {
   mergeObjects,
   shakeFalsy,
   shrinkFn,
-} from '@edsolater/fnkit'
-import { Accessor, createEffect, createMemo, createSignal, onCleanup } from 'solid-js'
+} from "@edsolater/fnkit"
+import { Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import {
   KeyboardShortcutFn,
   KeyboardShortcutSettings,
   KeybordShortcutKeys,
   bindKeyboardShortcutEventListener,
-} from '../domkit'
-import { createSharedSignal } from '../hooks/createSharedSignal'
-import { Accessify, ElementRefs, getElementFromRefs } from '../utils'
-import useResizeObserver from '../domkit/hooks/useResizeObserver'
+} from "../domkit"
+import { createSharedSignal } from "../hooks/createSharedSignal"
+import { Accessify, ElementRefs, getElementFromRefs } from "../utils"
+import useResizeObserver from "../domkit/hooks/useResizeObserver"
 
 type Description = string
 
@@ -35,7 +35,7 @@ export type DetailKeyboardShortcutSetting = Record<
 
 // hook info store, store registered keyboard shortcuts
 const [registeredKeyboardShortcut, registeredKeyboardShortcutSubscribable] = makeSubscriable(
-  new WeakerMap<HTMLElement, DetailKeyboardShortcutSetting>()
+  new WeakerMap<HTMLElement, DetailKeyboardShortcutSetting>(),
 )
 
 function registerLocalKeyboardShortcut(el: HTMLElement, settings: DetailKeyboardShortcutSetting): { remove(): void } {
@@ -76,7 +76,7 @@ export function useKeyboardShortcut(
     when?: MayFn<boolean>
     disabled?: MayFn<boolean>
     enabled?: Accessify<boolean>
-  }
+  },
 ) {
   const [currentSettings, setCurrentSettings] = createSignal(settings ?? {})
   const isFeatureEnabled = () => {
@@ -131,7 +131,7 @@ export function useKeyboardGlobalShortcut(settings?: DetailKeyboardShortcutSetti
     setNewSettings(
       newSettings:
         | DetailKeyboardShortcutSetting
-        | ((prev: DetailKeyboardShortcutSetting) => DetailKeyboardShortcutSetting)
+        | ((prev: DetailKeyboardShortcutSetting) => DetailKeyboardShortcutSetting),
     ) {
       setCurrentSettings(newSettings)
     },
@@ -148,7 +148,7 @@ function parseShortcutConfigFromSettings(settings: DetailKeyboardShortcutSetting
       return isArray(keyboardShortcut)
         ? keyboardShortcut.map((key) => (key ? [key, fn] : undefined))
         : [[keyboardShortcut, fn]]
-    })
+    }),
   )
   return Object.fromEntries(configLists) as KeyboardShortcutSettings
 }
@@ -156,7 +156,7 @@ function parseShortcutConfigFromSettings(settings: DetailKeyboardShortcutSetting
 // TODO: should move to /fnkit
 function mapObjectEntry<T extends AnyObj, NK extends keyof any, NV>(
   o: T,
-  fn: (value: T[keyof T], key: keyof T) => [NK, NV]
+  fn: (value: T[keyof T], key: keyof T) => [NK, NV],
 ): Record<NK, NV> {
   return Object.fromEntries(Object.entries(o).map(([key, value]) => fn(value, key as keyof T))) as Record<NK, NV>
 }
@@ -198,15 +198,15 @@ export function useSubscribable<T>(subscribable: Subscribable<T>, defaultValue?:
  * @returns [proxiedObject, subscribable]
  */
 export function makeSubscriable<T extends AnyObj>(
-  originalObject: T
+  originalObject: T,
 ): [proxiedObject: T, subscribable: Subscribable<T>] {
   const mayCauseChangeKeys =
     originalObject instanceof Array
-      ? ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse']
+      ? ["push", "pop", "shift", "unshift", "splice", "sort", "reverse"]
       : originalObject instanceof Set || originalObject instanceof WeakSet || originalObject instanceof WeakerSet
-        ? ['add', 'delete']
+        ? ["add", "delete"]
         : originalObject instanceof Map || originalObject instanceof WeakMap || originalObject instanceof WeakerMap
-          ? ['set', 'delete']
+          ? ["set", "delete"]
           : Object.getOwnPropertyNames(originalObject)
   const subscribable = createSubscribable<T>() as Subscribable<T>
   const proxiedValue = new Proxy(originalObject, {

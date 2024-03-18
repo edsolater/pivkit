@@ -1,6 +1,6 @@
-import { createEffect, onCleanup } from 'solid-js'
-import { EventListenerController, addEventListener } from '..'
-import { ElementRefs, GetElementsFromElementRefs, getElementFromRefs } from '../../utils/getElementsFromRefs'
+import { createEffect, onCleanup } from "solid-js"
+import { EventListenerController, addEventListener } from ".."
+import { ElementRefs, GetElementsFromElementRefs, getElementFromRefs } from "../../utils/getElementsFromRefs"
 
 /**
  * register DOM Event Listener
@@ -15,7 +15,7 @@ export function useDOMEventListener<El extends ElementRefs, K extends keyof HTML
     eventListenerController: EventListenerController
   }) => void,
   /** default is `{ passive: true }` */
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ) {
   createEffect(() => {
     const els = getElementFromRefs(el)
@@ -35,7 +35,7 @@ export function useDocumentEventListener<K extends keyof HTMLElementEventMap>(
   eventName: K,
   fn: (payload: { ev: HTMLElementEventMap[K]; el: Document; eventListenerController: EventListenerController }) => void,
   /** default is `{ passive: true }` */
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ) {
   createEffect(() => {
     const { abort: cancel } = addEventListener(globalThis.document, eventName, fn, options)
@@ -51,7 +51,7 @@ export function useWindowEventListener<K extends keyof HTMLElementEventMap>(
   eventName: K,
   fn: (payload: { ev: HTMLElementEventMap[K]; el: Window; eventListenerController: EventListenerController }) => void,
   /** default is `{ passive: true }` */
-  options?: EventListenerOptions
+  options?: EventListenerOptions,
 ) {
   createEffect(() => {
     const { abort: cancel } = addEventListener(globalThis.window, eventName, fn, options)

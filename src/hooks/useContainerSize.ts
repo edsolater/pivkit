@@ -1,5 +1,5 @@
-import { createEffect, createSignal } from 'solid-js'
-import { createDomRef } from '..'
+import { createEffect, createSignal } from "solid-js"
+import { createDomRef } from ".."
 
 /** detect container's size so inner layout can change according to it's context */
 export function useContainerSize(options?: { initWidth?: number; initHeight?: number }) {

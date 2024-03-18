@@ -1,5 +1,5 @@
-import { AnyObj } from '@edsolater/fnkit'
-import { NativeProps } from '..'
+import { AnyObj } from "@edsolater/fnkit"
+import { NativeProps } from ".."
 
 export const domMap = {
   div: (props: NativeProps, additionalProps: AnyObj | undefined) => (
@@ -389,5 +389,5 @@ export const domMap = {
     >
       {props.children}
     </dialog>
-  )
+  ),
 }

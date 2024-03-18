@@ -1,6 +1,6 @@
-import { MayFn, shrinkFn } from '@edsolater/fnkit'
-import { Accessor, createEffect, createSignal } from 'solid-js'
-import { addDefaultProps } from '../piv'
+import { MayFn, shrinkFn } from "@edsolater/fnkit"
+import { Accessor, createEffect, createSignal } from "solid-js"
+import { addDefaultProps } from "../piv"
 
 interface DisclosureController {
   open(options?: { delay?: number }): void
@@ -25,7 +25,7 @@ export function createDisclosure(
     onOpen?(): void
     /* usually it is for debug */
     onToggle?(isOn: boolean): void
-  } = {}
+  } = {},
 ): CreateDisclosureReturn {
   const defaultOptions = { delay: 24 }
   const opts = addDefaultProps(options, defaultOptions)
@@ -69,19 +69,19 @@ export function createDisclosure(
     opts.onToggle?.(isOn())
   }
 
-  const open: DisclosureController['open'] = (options) => {
+  const open: DisclosureController["open"] = (options) => {
     cancelDelayAction()
     delayActionId = globalThis.setTimeout(coreOn, options?.delay ?? opts.delay)
   }
-  const close: DisclosureController['close'] = (options) => {
+  const close: DisclosureController["close"] = (options) => {
     cancelDelayAction()
     delayActionId = globalThis.setTimeout(coreOff, options?.delay ?? opts.delay)
   }
-  const toggle: DisclosureController['toggle'] = (options) => {
+  const toggle: DisclosureController["toggle"] = (options) => {
     cancelDelayAction()
     delayActionId = globalThis.setTimeout(coreToggle, options?.delay ?? opts.delay)
   }
-  const set: DisclosureController['set'] = (v, options) => {
+  const set: DisclosureController["set"] = (v, options) => {
     cancelDelayAction()
     delayActionId = globalThis.setTimeout(() => setIsOn(v), options?.delay ?? opts.delay)
   }
@@ -90,7 +90,7 @@ export function createDisclosure(
     open,
     close,
     toggle,
-    set
+    set,
   }
   return [isOn, controller]
 }

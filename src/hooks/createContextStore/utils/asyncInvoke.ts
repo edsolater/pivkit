@@ -1,4 +1,4 @@
-import { AnyFn, WeakerMap } from '@edsolater/fnkit'
+import { AnyFn, WeakerMap } from "@edsolater/fnkit"
 
 // hold fn in map, so can cover if input the same key
 const queueTask = new WeakerMap<any, AnyFn>()
@@ -19,7 +19,7 @@ export async function asyncInvoke<T>(
      * by default, it is the function itself
      */
     key?: unknown
-  }
+  },
 ): Promise<T> {
   const key = options?.key ?? fn
   queueTask.set(key, fn)

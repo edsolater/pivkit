@@ -1,4 +1,4 @@
-import { createEventCenter } from '@edsolater/fnkit'
+import { createEventCenter } from "@edsolater/fnkit"
 
 type Subscribable<T> = {
   /**
@@ -20,7 +20,7 @@ type Subscribable<T> = {
   /** used by provider */
   emitValue(newValue: T | ((prev: T) => T)): void
 
-  [Symbol.toPrimitive](hint: 'number' | 'string' | 'default'): T | null
+  [Symbol.toPrimitive](hint: "number" | "string" | "default"): T | null
 }
 
 /**
@@ -35,18 +35,18 @@ export function subscribable<T>(defaultValue?: T): Subscribable<any> {
   }>()
   const state = Object.assign(() => innerValue, {
     subscribe(cb: (newValue: T) => void) {
-      return eventCenter.on('value', cb)
+      return eventCenter.on("value", cb)
     },
     clear() {
-      eventCenter.clear('value')
+      eventCenter.clear("value")
     },
     emitValue(newValue: T | ((prev: T) => T)) {
-      if (typeof newValue === 'function') {
+      if (typeof newValue === "function") {
         innerValue = (newValue as (prev: T) => T)(innerValue as T)
       } else {
         innerValue = newValue
       }
-      eventCenter.emit('value', [innerValue])
+      eventCenter.emit("value", [innerValue])
     },
     get value() {
       return innerValue

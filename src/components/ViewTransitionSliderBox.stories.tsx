@@ -1,21 +1,21 @@
-import type { Meta, StoryObj } from 'storybook-solidjs'
+import type { Meta, StoryObj } from "storybook-solidjs"
 import {
   ViewTransitionSliderBoxExample,
   type ViewTransitionSliderBoxExampleProps,
-  defaultProps
-} from './ViewTransitionSliderBoxExample'
+  defaultProps,
+} from "./ViewTransitionSliderBoxExample"
 
 const meta: Meta = {
-  title: 'Example/ViewTransitionSliderBox',
+  title: "Example/ViewTransitionSliderBox",
   component: ViewTransitionSliderBoxExample,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     // variant: ['solid', 'outline', 'text']
-  }
+  },
 }
 
 const primary: StoryObj<ViewTransitionSliderBoxExampleProps> = {
-  args: defaultProps
+  args: defaultProps,
 }
 
 // More on how to set up stories at: https://storybook.js.org/docs/7.0/solid/writing-stories/introduction

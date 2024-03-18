@@ -1,4 +1,4 @@
-import { unifyItem } from '@edsolater/fnkit'
+import { unifyItem } from "@edsolater/fnkit"
 
 /**
  * unique keys from objects
@@ -11,6 +11,6 @@ export function getKeys<T extends object | undefined>(objs: T[]) {
       if (!obj) return []
       const descriptors = Object.getOwnPropertyDescriptors(obj) // 🤔 necessary?
       return Reflect.ownKeys(descriptors)
-    })
+    }),
   )
 }

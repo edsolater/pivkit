@@ -1,4 +1,4 @@
-import { AnyFn, isFunction } from '@edsolater/fnkit'
+import { AnyFn, isFunction } from "@edsolater/fnkit"
 
 /**
  *

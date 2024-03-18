@@ -1,10 +1,10 @@
-import { createEffect, createSignal, on, onCleanup } from 'solid-js'
-import { createSubscribable } from '@edsolater/fnkit'
-import { KeybordShortcutKeys, getShorcutStringFromKeyboardEvent, addEventListener } from '../../../domkit'
-import { createControllerRef } from '../../../hooks/createControllerRef'
-import { createRef } from '../../../hooks/createRef'
-import { createPlugin } from '../../../piv'
-import { InputController, InputKitProps } from '../Input'
+import { createEffect, createSignal, on, onCleanup } from "solid-js"
+import { createSubscribable } from "@edsolater/fnkit"
+import { KeybordShortcutKeys, getShorcutStringFromKeyboardEvent, addEventListener } from "../../../domkit"
+import { createControllerRef } from "../../../hooks/createControllerRef"
+import { createRef } from "../../../hooks/createRef"
+import { createPlugin } from "../../../piv"
+import { InputController, InputKitProps } from "../Input"
 
 // NOTE: plugin is a function accept props and return additional props
 // TODO: apply `createConfigableFunction((options) => (props) => {...})`
@@ -28,7 +28,7 @@ export const keyboardShortcutObserverPlugin = (options: {
     createEffect(
       on(recordedShortcut, () => {
         intputController.setText?.(recordedShortcut())
-      })
+      }),
     )
 
     const handleKeydownKeyboardShortcut = (text: string) => {
@@ -42,7 +42,7 @@ export const keyboardShortcutObserverPlugin = (options: {
 
 function subscribeKeyboardShortcut(el: HTMLElement) {
   const subscribable = createSubscribable<string>()
-  addEventListener(el, 'keydown', ({ ev }) => {
+  addEventListener(el, "keydown", ({ ev }) => {
     ev.stopPropagation()
     const shortcut = getShorcutStringFromKeyboardEvent(ev)
     if (isValidShortcut(ev)) subscribable.set(shortcut)
@@ -51,7 +51,7 @@ function subscribeKeyboardShortcut(el: HTMLElement) {
 }
 
 function isValidShortcut(ev: KeyboardEvent, options?: { banedKeywords?: string[] }): boolean {
-  return ['control', 'alt', 'shift', 'meta', 'backspace', 'enter', ...(options?.banedKeywords ?? [])].every(
-    (key) => !ev.key.toLowerCase().includes(key.toLowerCase())
+  return ["control", "alt", "shift", "meta", "backspace", "enter", ...(options?.banedKeywords ?? [])].every(
+    (key) => !ev.key.toLowerCase().includes(key.toLowerCase()),
   )
 }

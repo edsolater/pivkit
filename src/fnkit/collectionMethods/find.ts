@@ -1,4 +1,4 @@
-import { AnyObj, isArray } from '@edsolater/fnkit'
+import { AnyObj, isArray } from "@edsolater/fnkit"
 
 /**
  * simliar to `array.prototype.find()`
@@ -13,12 +13,12 @@ export function find<S extends Map<any, any>>(
   set: S | undefined,
   predicate: (
     item: S extends Map<any, infer F> ? F : unknown,
-    index: S extends Map<infer K, any> ? K : unknown
-  ) => boolean
+    index: S extends Map<infer K, any> ? K : unknown,
+  ) => boolean,
 ): (S extends Map<any, infer F> ? F : unknown) | undefined
 export function find<O extends Record<any, any>>(
   obj: O | undefined,
-  predicate: (value: O[keyof O], key: keyof O) => boolean
+  predicate: (value: O[keyof O], key: keyof O) => boolean,
 ): O[keyof O] | undefined
 export function find(collection: any, predicate: any) {
   if (!collection) return
@@ -29,7 +29,7 @@ export function find(collection: any, predicate: any) {
 
 export function findEntry<O extends AnyObj>(
   obj: O,
-  predicate: (entry: [key: keyof O, value: O[keyof O]], obj: O) => boolean
+  predicate: (entry: [key: keyof O, value: O[keyof O]], obj: O) => boolean,
 ): [key: O[keyof O], value: O[keyof O]] | undefined {
   return Object.entries(obj).find(([k, v]) => predicate([k, v], obj)) as
     | [key: O[keyof O], value: O[keyof O]]
@@ -38,7 +38,7 @@ export function findEntry<O extends AnyObj>(
 
 export function findKey<O extends AnyObj>(
   obj: O,
-  predicate: (key: keyof O, value: O[keyof O], obj: O) => boolean
+  predicate: (key: keyof O, value: O[keyof O], obj: O) => boolean,
 ): keyof O | undefined {
   return findEntry(obj, ([k, v], idx) => predicate(k, v, idx))?.[0]
 }

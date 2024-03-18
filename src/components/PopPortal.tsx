@@ -1,15 +1,15 @@
-import { createEffect } from 'solid-js'
-import { Portal } from 'solid-js/web'
-import { createRef } from '..'
-import isClientSide from '../jFetch/utils/isSSR'
-import { RawChild } from '../piv/typeTools'
+import { createEffect } from "solid-js"
+import { Portal } from "solid-js/web"
+import { createRef } from ".."
+import isClientSide from "../jFetch/utils/isSSR"
+import { RawChild } from "../piv/typeTools"
 
 /** with the same id, new top-element will be created only-once  */
 export function PopPortal(props: { name: string; children?: RawChild }) {
   const element = createPopStackHTMLElement(props.name)
   const [ref, setRef] = createRef()
   createEffect(() => {
-    ref()?.classList.add('self-pointer-events-none')
+    ref()?.classList.add("self-pointer-events-none")
   })
   return (
     <Portal mount={element} ref={setRef}>
@@ -21,13 +21,13 @@ export function PopPortal(props: { name: string; children?: RawChild }) {
 function createPopStackHTMLElement(name: string) {
   if (!isClientSide()) return
   const el = document.querySelector(`#${name}`)
-  if ('document' in globalThis && !el) {
-    const div = document.createElement('div')
+  if ("document" in globalThis && !el) {
+    const div = document.createElement("div")
     div.id = name
     document.body.appendChild(div)
-    div.style.position = 'fixed'
-    div.style.inset = '0'
-    div.classList.add('self-pointer-events-none')
+    div.style.position = "fixed"
+    div.style.inset = "0"
+    div.classList.add("self-pointer-events-none")
     insertCSSPointerEventNone()
     return div
   } else {
@@ -40,7 +40,7 @@ function insertCSSPointerEventNone() {
   if (!isClientSide()) return
   if (haveSetPointerStyle) return
   haveSetPointerStyle = true
-  const styleEl = document.createElement('style')
+  const styleEl = document.createElement("style")
 
   // Append <style> element to <head>
   document.head.appendChild(styleEl)

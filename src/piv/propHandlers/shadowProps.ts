@@ -1,9 +1,9 @@
-import { AnyFn, MayArray, isArray, isObject, shakeNil } from '@edsolater/fnkit'
-import { PivProps } from '../Piv'
-import { omitProps } from '../utils'
-import { getPivPropsValue } from '../utils/mergeProps'
+import { AnyFn, MayArray, isArray, isObject, shakeNil } from "@edsolater/fnkit"
+import { PivProps } from "../Piv"
+import { omitProps } from "../utils"
+import { getPivPropsValue } from "../utils/mergeProps"
 
-export type PivShadowProps<OriginalProps> = MayArray<Partial<Omit<OriginalProps, 'as' | 'children'>>>
+export type PivShadowProps<OriginalProps> = MayArray<Partial<Omit<OriginalProps, "as" | "children">>>
 
 /**
  * invoke only once, return the cached result when invoke again
@@ -24,9 +24,9 @@ function createCachedFunction<F extends AnyFn>(fn: F): F {
 export function handleShadowProps<P extends Partial<PivProps<any>>>(
   props: P,
   /** @deprecated no need,  */
-  additionalShadowPropNames?: string[]
-): Omit<P, 'shadowProps'> {
-  if (!('shadowProps' in props)) return props
+  additionalShadowPropNames?: string[],
+): Omit<P, "shadowProps"> {
+  if (!("shadowProps" in props)) return props
 
   const candidates = () => shakeNil([props].concat(props.shadowProps)) // 🚧 use cache will breake the solidjs's getter logic
   const getOwnKeys = createCachedFunction(() => {
@@ -47,9 +47,9 @@ export function handleShadowProps<P extends Partial<PivProps<any>>>(
       getOwnPropertyDescriptor: (_target, key) => ({
         enumerable: true,
         configurable: true,
-        get: () => getPivPropsValue(candidates(), key)
-      })
-    }
+        get: () => getPivPropsValue(candidates(), key),
+      }),
+    },
   ) as any
 }
 
@@ -65,6 +65,6 @@ function getNeedToMergeKeys(props: Partial<PivProps<any>>) {
         : []
   }
   const shadowKeys = getShadowPropKeys(props)
-  const selfProps = Object.getOwnPropertyNames(omitProps(props, ['shadowProps']))
+  const selfProps = Object.getOwnPropertyNames(omitProps(props, ["shadowProps"]))
   return selfProps.concat(shadowKeys)
 }

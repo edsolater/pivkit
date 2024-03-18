@@ -1,12 +1,12 @@
-import { Accessor } from 'solid-js'
-import { KitProps, useKitProps } from '../../createKit'
-import { createSyncSignal } from '../../hooks/createSyncSignal'
-import { Piv, PivProps } from '../../piv/Piv'
-import { ValidController } from '../../piv/typeTools'
-import { Label, LabelKitProps } from '../Label'
-import { LabelBox, LabelBoxKitProps } from '../LabelBox'
-import { HTMLInputRadio, HTMLInputRadioProps } from './HTMLInputRadio'
-import { createRadioStyle } from './hooks/createRadioStyle'
+import { Accessor } from "solid-js"
+import { KitProps, useKitProps } from "../../createKit"
+import { createSyncSignal } from "../../hooks/createSyncSignal"
+import { Piv, PivProps } from "../../piv/Piv"
+import { ValidController } from "../../piv/typeTools"
+import { Label, LabelKitProps } from "../Label"
+import { LabelBox, LabelBoxKitProps } from "../LabelBox"
+import { HTMLInputRadio, HTMLInputRadioProps } from "./HTMLInputRadio"
+import { createRadioStyle } from "./hooks/createRadioStyle"
 
 export interface RadioController {
   option: string
@@ -19,10 +19,10 @@ type RadioProps<Controller extends ValidController> = {
   option: string
   isChecked?: boolean
   onChange?(utils: { option: string; isChecked: boolean }): void
-  'anatomy:ContainerBox'?: LabelBoxKitProps
-  'anatomy:HTMLRadio'?: HTMLInputRadioProps
-  'anatomy:Checkbox'?: PivProps<'div', Controller>
-  'anatomy:Option'?: LabelKitProps
+  "anatomy:ContainerBox"?: LabelBoxKitProps
+  "anatomy:HTMLRadio"?: HTMLInputRadioProps
+  "anatomy:Checkbox"?: PivProps<"div", Controller>
+  "anatomy:Option"?: LabelKitProps
 }
 
 export type RadioKitProps<Controller extends ValidController = RadioController> = KitProps<
@@ -30,7 +30,7 @@ export type RadioKitProps<Controller extends ValidController = RadioController> 
   { controller: Controller }
 >
 
-const selfProps = ['isChecked', 'option', 'onChange'] satisfies (keyof RadioKitProps)[]
+const selfProps = ["isChecked", "option", "onChange"] satisfies (keyof RadioKitProps)[]
 
 export type RadioDefaultRadioProps = typeof defaultProps
 
@@ -43,7 +43,7 @@ const defaultProps = {
  */
 export function Radio(kitProps: RadioKitProps) {
   const { props, shadowProps, lazyLoadController } = useKitProps(kitProps, {
-    name: 'Radio',
+    name: "Radio",
     defaultProps,
     selfProps: selfProps,
   })
@@ -51,7 +51,7 @@ export function Radio(kitProps: RadioKitProps) {
   const [isChecked, setIsChecked] = createSyncSignal({
     getValueFromOutside: () => props.isChecked,
     onInvokeSetter(value) {
-      props.onChange?.({ isChecked: value, option: props.option ?? '' })
+      props.onChange?.({ isChecked: value, option: props.option ?? "" })
     },
   })
 
@@ -73,9 +73,9 @@ export function Radio(kitProps: RadioKitProps) {
   lazyLoadController(radioController)
 
   return (
-    <LabelBox shadowProps={[containerBoxStyleProps, shadowProps, props['anatomy:ContainerBox']]}>
+    <LabelBox shadowProps={[containerBoxStyleProps, shadowProps, props["anatomy:ContainerBox"]]}>
       <HTMLInputRadio
-        shadowProps={[htmlCheckboxStyleProps, props['anatomy:HTMLRadio']]}
+        shadowProps={[htmlCheckboxStyleProps, props["anatomy:HTMLRadio"]]}
         innerController={radioController}
         label={props.option}
         defaultChecked={props.isChecked}
@@ -86,14 +86,14 @@ export function Radio(kitProps: RadioKitProps) {
 
       {/* Radio Checkbox */}
       <Piv
-        shadowProps={[radioCheckboxStyleProps, props['anatomy:Checkbox']]}
+        shadowProps={[radioCheckboxStyleProps, props["anatomy:Checkbox"]]}
         innerController={radioController}
-        class='RadioCheckbox'
-        icss={[{ display: 'grid', placeContent: 'center' }]}
+        class="RadioCheckbox"
+        icss={[{ display: "grid", placeContent: "center" }]}
       />
 
       {/* Radio Label */}
-      <Label shadowProps={[radioLabelStyleProps, props['anatomy:Option']]}>{props.option}</Label>
+      <Label shadowProps={[radioLabelStyleProps, props["anatomy:Option"]]}>{props.option}</Label>
     </LabelBox>
   )
 }

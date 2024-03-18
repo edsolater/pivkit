@@ -1,4 +1,4 @@
-import { Accessor, createEffect, onCleanup } from 'solid-js'
+import { Accessor, createEffect, onCleanup } from "solid-js"
 
 type InterSectionObserverCallback<Item extends HTMLElement> = (utils: {
   el: Item
@@ -7,7 +7,7 @@ type InterSectionObserverCallback<Item extends HTMLElement> = (utils: {
 
 export type ObserveFn<Item extends HTMLElement> = (
   item: Item,
-  callback: InterSectionObserverCallback<Item>
+  callback: InterSectionObserverCallback<Item>,
 ) => { abort(): void }
 
 /** **DOM API** */
@@ -35,7 +35,7 @@ export function useIntersectionObserver<Item extends HTMLElement>(input: {
           registedCallback?.({ el, entry })
         })
       },
-      { ...input.options, root: rootEl, rootMargin: input.options?.rootMargin ?? '500px' }
+      { ...input.options, root: rootEl, rootMargin: input.options?.rootMargin ?? "500px" },
     )
     intersectionObserver = observer
     onCleanup(() => observer.disconnect())

@@ -1,9 +1,9 @@
-import { WeakerMap, createSubscribable } from '@edsolater/fnkit'
-import { createEffect, onCleanup } from 'solid-js'
-import { ValidController } from '../typeTools'
-import { createStore } from 'solid-js/store'
-import { createStoreSetter } from '../../hooks/smartStore/utils/setStoreByObject'
-import { createSmartStore } from '../../hooks'
+import { WeakerMap, createSubscribable } from "@edsolater/fnkit"
+import { createEffect, onCleanup } from "solid-js"
+import { ValidController } from "../typeTools"
+import { createStore } from "solid-js/store"
+import { createStoreSetter } from "../../hooks/smartStore/utils/setStoreByObject"
+import { createSmartStore } from "../../hooks"
 
 const recordedControllers = createSubscribable<WeakerMap<string, ValidController | unknown>>()
 
@@ -14,7 +14,7 @@ const recordedControllers = createSubscribable<WeakerMap<string, ValidController
  */
 export function registerControllerInCreateKit(
   proxyController: ValidController | unknown | undefined,
-  id: string | undefined
+  id: string | undefined,
 ) {
   if (!proxyController) return
   if (!id) return
@@ -28,7 +28,7 @@ export function registerControllerInCreateKit(
 
 export function recordController<Controller extends ValidController | unknown>(
   id: string,
-  proxyController: Controller
+  proxyController: Controller,
 ) {
   recordedControllers.set((m) => (m ?? new WeakerMap()).set(id, proxyController))
 }
@@ -57,7 +57,7 @@ export function useControllerByID<Controller extends ValidController | unknown>(
       try {
         setController(newController)
       } catch (error) {
-        console.error('use controller set controller error', error, '| controller: ', newController)
+        console.error("use controller set controller error", error, "| controller: ", newController)
       }
     }
   })

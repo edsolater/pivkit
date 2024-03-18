@@ -1,5 +1,5 @@
-import { Accessor, createEffect, createMemo, createSignal } from 'solid-js'
-import { isNumber, isObject, isString, shrinkFn } from '@edsolater/fnkit'
+import { Accessor, createEffect, createMemo, createSignal } from "solid-js"
+import { isNumber, isObject, isString, shrinkFn } from "@edsolater/fnkit"
 
 /**
  * used in {@link useItems}
@@ -8,7 +8,7 @@ function defaultGetItemValue(item: any): string | number {
   return isString(item) || isNumber(item)
     ? item
     : isObject(item)
-      ? item['value'] ?? item['id'] ?? item['key'] ?? String(item)
+      ? item["value"] ?? item["id"] ?? item["key"] ?? String(item)
       : String(item)
 }
 

@@ -1,4 +1,4 @@
-import { Signal, SignalOptions, createSignal } from 'solid-js'
+import { Signal, SignalOptions, createSignal } from "solid-js"
 
 const innerSharedSignalStore = new Map<string | number | symbol, Signal<any>>()
 /** can share accross different component */

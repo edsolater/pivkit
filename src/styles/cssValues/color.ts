@@ -1,4 +1,4 @@
-import { isNumber, isObjectLiteral, isString, toPercentString } from '@edsolater/fnkit'
+import { isNumber, isObjectLiteral, isString, toPercentString } from "@edsolater/fnkit"
 
 type ColorString = string
 
@@ -15,9 +15,9 @@ type ColorItem = { /** ='currentColor' */ color?: ColorString; percent?: ColorPe
 export function cssColorMix(...colors: (ColorString | ColorPercent | ColorItem)[]) {
   const colorItems = getColorItems(colors)
   const colorInfoList = colorItems.map(({ color, percent }) =>
-    isColorPercent(percent) ? `${color} ${isNumber(percent) ? toPercentString(percent) : percent}` : color
+    isColorPercent(percent) ? `${color} ${isNumber(percent) ? toPercentString(percent) : percent}` : color,
   )
-  return `color-mix(in srgb, ${colorInfoList.join(', ')})`
+  return `color-mix(in srgb, ${colorInfoList.join(", ")})`
 }
 
 /**
@@ -61,7 +61,7 @@ function isColorString(c: ColorPercent | ColorString | ColorItem | undefined): c
 }
 
 function isColorPercent(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorPercent {
-  return typeof c === 'number' || (typeof c === 'string' && c.endsWith('%'))
+  return typeof c === "number" || (typeof c === "string" && c.endsWith("%"))
 }
 
 function isColorItem(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorItem {
@@ -76,17 +76,17 @@ function isColorItem(c: ColorPercent | ColorString | ColorItem | undefined): c i
  * @returns color-mix() string
  */
 export function cssOpacity(color: string, alpha: number) {
-  return cssColorMix(color, 'transparent', 1 - alpha)
+  return cssColorMix(color, "transparent", 1 - alpha)
 }
 
 export function cssLighten(color: string, depth: number) {
-  return cssColorMix(color, 'white', depth)
+  return cssColorMix(color, "white", depth)
 }
 
 export function cssDarken(color: string, depth: number) {
-  return cssColorMix(color, 'black', depth)
+  return cssColorMix(color, "black", depth)
 }
 
 export function cssGrayscale(color: string, depth: number) {
-  return cssColorMix(color, 'gray', depth)
+  return cssColorMix(color, "gray", depth)
 }

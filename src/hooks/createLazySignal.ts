@@ -1,4 +1,4 @@
-import { Signal, createEffect, createSignal, untrack } from 'solid-js'
+import { Signal, createEffect, createSignal, untrack } from "solid-js"
 
 /**
  * signal's action will only load when first access the acessor

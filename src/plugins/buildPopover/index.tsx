@@ -1,15 +1,15 @@
-import { Accessor, createEffect, onCleanup } from 'solid-js'
-import { createRef } from '../..'
-import { addEventListener } from '../../domkit'
-import { useGestureHover } from '../../domkit/hooks/useGestureHover'
-import { createTrigger } from '../../hooks/utils/createTrigger'
-import { ICSS, PivProps, createPlugin } from '../../piv'
-import { PopoverLocationHookOptions, usePopoverLocation } from './usePopoverLocation'
-import { PopPortal } from '../../components/PopPortal'
+import { Accessor, createEffect, onCleanup } from "solid-js"
+import { createRef } from "../.."
+import { addEventListener } from "../../domkit"
+import { useGestureHover } from "../../domkit/hooks/useGestureHover"
+import { createTrigger } from "../../hooks/utils/createTrigger"
+import { ICSS, PivProps, createPlugin } from "../../piv"
+import { PopoverLocationHookOptions, usePopoverLocation } from "./usePopoverLocation"
+import { PopPortal } from "../../components/PopPortal"
 
-export type PopoverPluginOptions = Omit<PopoverLocationHookOptions, 'isTriggerOn' | 'buttonDom' | 'panelDom'> & {
+export type PopoverPluginOptions = Omit<PopoverLocationHookOptions, "isTriggerOn" | "buttonDom" | "panelDom"> & {
   /** @default 'hover' */
-  triggerBy?: 'hover' | 'click'
+  triggerBy?: "hover" | "click"
   defaultOpen?: boolean | Accessor<boolean>
 }
 
@@ -29,7 +29,7 @@ export function buildPopover(options?: PopoverPluginOptions) {
   const [panelDom, setPanelDom] = createRef<HTMLElement>()
 
   // invoke trigger
-  if (options?.triggerBy === 'hover') {
+  if (options?.triggerBy === "hover") {
     useGestureHover({
       el: buttonDom,
       onHoverStart: open,
@@ -62,10 +62,10 @@ export function buildPopover(options?: PopoverPluginOptions) {
       createEffect(() => {
         const el = panelDom()
         if (!el) return
-        const { abort } = addEventListener(el, 'toggle', ({ ev }) => {
+        const { abort } = addEventListener(el, "toggle", ({ ev }) => {
           // @ts-expect-error force
-          const { newState } = ev as { newState: 'open' | 'closed' }
-          if (newState === 'open') {
+          const { newState } = ev as { newState: "open" | "closed" }
+          if (newState === "open") {
             open()
           } else {
             close()
@@ -80,11 +80,11 @@ export function buildPopover(options?: PopoverPluginOptions) {
         ...options,
       })
       return {
-        get ['render:outWrapper']() {
-          console.log('✅ pick popover plugin')
+        get ["render:outWrapper"]() {
+          console.log("✅ pick popover plugin")
           return (originalNode) => {
-            console.log('✅ load popover plugin')
-            return <PopPortal name='popovers'>{originalNode}</PopPortal>
+            console.log("✅ load popover plugin")
+            return <PopPortal name="popovers">{originalNode}</PopPortal>
           }
         },
         domRef: setPanelDom,
@@ -96,18 +96,18 @@ export function buildPopover(options?: PopoverPluginOptions) {
         },
         get icss() {
           return {
-            display: isTriggerOn() ? undefined : 'none',
-            position: 'fixed',
+            display: isTriggerOn() ? undefined : "none",
+            position: "fixed",
             /** https://semi.design/zh-CN/basic/tokens#z-index */
             zIndex: 1000,
-            '@starting-style &': { scale: 0 },
-            transition: '500ms',
+            "@starting-style &": { scale: 0 },
+            transition: "500ms",
           } satisfies ICSS
         },
         // htmlProps: { popover: 'manual' } as any, //  lack of correct html type,
       } satisfies Partial<PivProps>
     },
-    { name: 'popoverPanel' }
+    { name: "popoverPanel" },
   )
 
   /**

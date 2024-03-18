@@ -1,6 +1,6 @@
-import { useKitProps } from '../../createKit/useKitProps'
-import { KitProps } from '../../createKit/KitProps'
-import { Piv } from '../../piv'
+import { useKitProps } from "../../createKit/useKitProps"
+import { KitProps } from "../../createKit/KitProps"
+import { Piv } from "../../piv"
 
 export interface ContainerProps {
   /** it's size can't base on inner content's size */
@@ -12,7 +12,7 @@ export interface ContainerProps {
  * a alias of `<Box>`, often used as a Root of Component
  */
 export function Container(kitProps: KitProps<ContainerProps>) {
-  const { shadowProps, props } = useKitProps(kitProps, { name: 'Container' })
+  const { shadowProps, props } = useKitProps(kitProps, { name: "Container" })
   /* ---------------------------------- props --------------------------------- */
-  return <Piv icss={props.canContainQuery ? { container: 'anonymous / size' } : undefined} shadowProps={shadowProps} />
+  return <Piv icss={props.canContainQuery ? { container: "anonymous / size" } : undefined} shadowProps={shadowProps} />
 }

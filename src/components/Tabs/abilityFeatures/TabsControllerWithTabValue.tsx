@@ -1,6 +1,6 @@
-import { Accessor, createMemo, createSignal } from 'solid-js'
-import { TabProps } from '../Tabs'
-import { isNumber } from '@edsolater/fnkit'
+import { Accessor, createMemo, createSignal } from "solid-js"
+import { TabProps } from "../Tabs"
+import { isNumber } from "@edsolater/fnkit"
 
 export type TabsPropsWithTabValue = {
   /** only works when target tab name can match */

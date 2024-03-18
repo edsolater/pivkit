@@ -7,7 +7,7 @@ export function requestLoopAnimationFrame(
     /** if ture, cancel the frame loop */
     endUntil?: () => boolean
     eachMS?: number
-  }
+  },
 ) {
   let rAFId: number
   const frameCallback = (...args: Parameters<FrameRequestCallback>) => {

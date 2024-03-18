@@ -1,5 +1,5 @@
-import { expect, test } from 'vitest'
-import { wrapLeaves } from './wrapLeaves'
+import { expect, test } from "vitest"
+import { wrapLeaves } from "./wrapLeaves"
 
 test(`wrapLeaves.name() basic usage `, () => {
   const raw = { a: 1, b: { c: 2 } }

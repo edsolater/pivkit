@@ -1,5 +1,5 @@
-import { Subscribable, createSubscribable } from '@edsolater/fnkit'
-import { invoke } from './invoke'
+import { Subscribable, createSubscribable } from "@edsolater/fnkit"
+import { invoke } from "./invoke"
 
 export type AbortableTask<T> = {
   abort(): void
@@ -11,7 +11,7 @@ export type AbortableTask<T> = {
  * inner use basic subscribable
  */
 export function abortableAsyncTask<T>(
-  task: (utils: { resolve: (value: T | PromiseLike<T>) => void; aborted: () => boolean }) => void
+  task: (utils: { resolve: (value: T | PromiseLike<T>) => void; aborted: () => boolean }) => void,
 ): AbortableTask<T> {
   let isTaskAborted = false
   const innerResolve: (value: T | PromiseLike<T>) => void = async (asyncValue) => {

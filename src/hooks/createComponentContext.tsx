@@ -5,15 +5,15 @@
  *
  ***/
 
-import { AnyObj, omit } from '@edsolater/fnkit'
-import { Context, JSXElement, createContext, untrack, useContext } from 'solid-js'
-import { SetStoreFunction, createStore } from 'solid-js/store'
+import { AnyObj, omit } from "@edsolater/fnkit"
+import { Context, JSXElement, createContext, untrack, useContext } from "solid-js"
+import { SetStoreFunction, createStore } from "solid-js/store"
 
 type ComponentContext<O extends AnyObj> = Context<{ store: O; set: SetStoreFunction<O> }>
 
 type ComponentContextSetter<O extends AnyObj> = SetStoreFunction<O>
 
-const contextSetter = Symbol('contextSetter')
+const contextSetter = Symbol("contextSetter")
 
 /**
  * default solidjs's createContext is readonly
@@ -24,7 +24,7 @@ export function createComponentContext<O extends AnyObj>(): ComponentContext<O> 
   const BuildInContextProvider = BuildInContext.Provider
   const ContextProvider = (props: { value: O; children?: JSXElement }) => {
     const [contextValue, setContextValue] = createStore(
-      untrack(() => ({ ...props.value })) /* it value without symbol(solid-proxy) */
+      untrack(() => ({ ...props.value })) /* it value without symbol(solid-proxy) */,
     )
     return (
       <BuildInContextProvider value={{ store: contextValue, set: setContextValue }}>
@@ -41,7 +41,7 @@ export function createComponentContext<O extends AnyObj>(): ComponentContext<O> 
  * {@link useContext} with set() method
  */
 export function useComponentContext<O extends AnyObj>(
-  context: ComponentContext<O>
+  context: ComponentContext<O>,
 ): [contextValue: O, setContext: ComponentContextSetter<O>] {
   const { store: contextValue, set: setContext } = useContext(context)
   return [contextValue, setContext]

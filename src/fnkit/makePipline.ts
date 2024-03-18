@@ -1,4 +1,4 @@
-import { AnyFn, shrinkFn } from '@edsolater/fnkit'
+import { AnyFn, shrinkFn } from "@edsolater/fnkit"
 
 type PipelineMachine<T> = {
   pipe<F extends AnyFn>(fn: F): PipelineMachine<ReturnType<F>>

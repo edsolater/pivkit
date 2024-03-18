@@ -1,4 +1,4 @@
-import { SetStoreFunction } from 'solid-js/store'
+import { SetStoreFunction } from "solid-js/store"
 
 export type Store<T extends Record<string, any>> = T & {
   _setStore: SetStoreFunction<T>

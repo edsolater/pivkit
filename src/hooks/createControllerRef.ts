@@ -1,5 +1,5 @@
-import { createEffect, createSignal, on } from 'solid-js'
-import { createSmartStore } from './createContextStore'
+import { createEffect, createSignal, on } from "solid-js"
+import { createSmartStore } from "./createContextStore"
 
 /**
  * faster for using controller
@@ -16,7 +16,7 @@ export function createControllerRef<T extends Record<string, any> = Record<strin
       if (controllerRef) {
         setStore(controllerRef)
       }
-    })
+    }),
   )
   return [controller, setRef]
 }

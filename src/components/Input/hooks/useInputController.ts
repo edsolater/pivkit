@@ -1,5 +1,5 @@
-import { useControllerByID } from '../../../piv'
-import { InputController } from '../Input'
+import { useControllerByID } from "../../../piv"
+import { InputController } from "../Input"
 
 /** a shortcut of {@link useControllerByID} with correct type */
 

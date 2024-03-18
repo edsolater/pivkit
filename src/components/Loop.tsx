@@ -1,8 +1,8 @@
-import { MayFn, shrinkFn } from '@edsolater/fnkit'
-import { For, JSXElement, createMemo } from 'solid-js'
-import { KitProps, useKitProps } from '../createKit'
-import { createRef } from '../hooks/createRef'
-import { AddProps, PivChild, parsePivChildren } from '../piv'
+import { MayFn, shrinkFn } from "@edsolater/fnkit"
+import { For, JSXElement, createMemo } from "solid-js"
+import { KitProps, useKitProps } from "../createKit"
+import { createRef } from "../hooks/createRef"
+import { AddProps, PivChild, parsePivChildren } from "../piv"
 
 export interface LoopController {}
 
@@ -22,8 +22,8 @@ export type LoopKitProps<T> = KitProps<LoopProps<T>, { controller: LoopControlle
  */
 export function Loop<T>(kitProps: LoopKitProps<T>) {
   const { props, shadowProps } = useKitProps(kitProps, {
-    name: 'Loop',
-    noNeedDeAccessifyChildren: true
+    name: "Loop",
+    noNeedDeAccessifyChildren: true,
   })
   const Wrapper = kitProps.wrapper ?? AddProps //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
 

@@ -1,5 +1,5 @@
-import { JSX } from 'solid-js/jsx-runtime'
-import { ValidProps } from '../piv'
+import { JSX } from "solid-js/jsx-runtime"
+import { ValidProps } from "../piv"
 
 /**
  * all specific <Kit> will have same additional props

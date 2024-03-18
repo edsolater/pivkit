@@ -38,6 +38,6 @@ export function runtimeObjectFromAccess<T extends object>(onAccess: () => T): T 
         }
         return Reflect.set(loadedTargetObject!, p, value)
       },
-    }
+    },
   ) as T
 }

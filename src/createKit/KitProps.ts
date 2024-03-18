@@ -1,10 +1,10 @@
-import { AnyFn, MayArray, MayDeepArray } from '@edsolater/fnkit'
-import { AccessifyProps } from '..'
-import { CallbackRef, PivProps } from '../piv/Piv'
-import { MergifyProps } from '../piv/propHandlers/mergifyProps'
-import { GetPluginParams, Plugin } from '../piv/propHandlers/plugin'
-import { HTMLTag, ValidController, ValidProps } from '../piv/typeTools'
-import { OmitItem } from './utils'
+import { AnyFn, MayArray, MayDeepArray } from "@edsolater/fnkit"
+import { AccessifyProps } from ".."
+import { CallbackRef, PivProps } from "../piv/Piv"
+import { MergifyProps } from "../piv/propHandlers/mergifyProps"
+import { GetPluginParams, Plugin } from "../piv/propHandlers/plugin"
+import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
+import { OmitItem } from "./utils"
 
 /**
  * - auto add `plugin` `shadowProps` `_promisePropsConfig` `controller` props
@@ -20,12 +20,12 @@ type KitPropsInstance<
   NeedAccessifyProps extends keyof RawProps,
 > = AccessifyProps<Pick<RawProps, NeedAccessifyProps>, Controller> &
   Omit<RawProps, NeedAccessifyProps> &
-  Omit<PivProps<TagName, Controller>, keyof RawProps | 'plugin' | 'shadowProps'> &
-  Omit<GetPluginParams<Plugins>, keyof RawProps | 'plugin' | 'shadowProps'> &
+  Omit<PivProps<TagName, Controller>, keyof RawProps | "plugin" | "shadowProps"> &
+  Omit<GetPluginParams<Plugins>, keyof RawProps | "plugin" | "shadowProps"> &
   Omit<
     {
-      plugin?: PivProps['plugin']
-      shadowProps?: PivProps['shadowProps'] // component must merged before `<Div>`
+      plugin?: PivProps["plugin"]
+      shadowProps?: PivProps["shadowProps"] // component must merged before `<Div>`
 
       // shadowProps?: MayArray<KitPropsInstance<RawProps, Controller, Plugins, TagName, NeedAccessifyProps> | undefined> // component must merged before `<Div>`
       // -------- additional --------
@@ -50,13 +50,13 @@ export type KitProps<
   } = {},
 > = KitPropsInstance<
   MergifyProps<RawProps>,
-  NonNullable<O['controller']>,
-  NonNullable<O['plugin']>,
-  NonNullable<O['htmlPropsTagName']>,
+  NonNullable<O["controller"]>,
+  NonNullable<O["plugin"]>,
+  NonNullable<O["htmlPropsTagName"]>,
   NonNullable<
     OmitItem<
-      O['needAccessifyProps'] extends string[] ? O['needAccessifyProps'][number] : keyof RawProps,
-      O['noNeedDeAccessifyProps'] extends string[] ? O['noNeedDeAccessifyProps'][number] : undefined
+      O["needAccessifyProps"] extends string[] ? O["needAccessifyProps"][number] : keyof RawProps,
+      O["noNeedDeAccessifyProps"] extends string[] ? O["noNeedDeAccessifyProps"][number] : undefined
     >
   >
 >

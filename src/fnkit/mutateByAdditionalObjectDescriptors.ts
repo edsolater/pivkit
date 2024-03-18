@@ -1,4 +1,4 @@
-import { map } from '@edsolater/fnkit'
+import { map } from "@edsolater/fnkit"
 
 /**
  * create an object by adding new descriptor getters and (optional) deleting properties.
@@ -14,7 +14,7 @@ export function mutateByAdditionalObjectDescriptors<T>(
       [K in keyof T]?: (obj: T) => any
     }
     deletePropertyNames?: (keyof T)[]
-  }
+  },
 ): T {
   const newDescriptors: PropertyDescriptorMap = {
     ...Object.getOwnPropertyDescriptors(obj),

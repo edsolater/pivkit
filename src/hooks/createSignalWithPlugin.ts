@@ -1,5 +1,5 @@
-import { shrinkFn } from '@edsolater/fnkit'
-import { Accessor, Setter, createSignal } from 'solid-js'
+import { shrinkFn } from "@edsolater/fnkit"
+import { Accessor, Setter, createSignal } from "solid-js"
 
 export type SignalPlugin<V> = () => {
   defaultSignalValue?: (getOriginalValue: () => V | Accessor<V>) => () => V | Accessor<V>
@@ -25,7 +25,7 @@ export function createSignalWithPlugin<V>(defaultValue: V | (() => V), options?:
   }
   const wrappedDefaultSignalValue = defaultSignalValueWrappers.reduce(
     (acc, wrapper) => wrapper(acc),
-    () => defaultValue
+    () => defaultValue,
   )
   const [get, set] = createSignal<V>(shrinkFn(wrappedDefaultSignalValue()))
   const wrappedGet = getWrappers.reduce((acc, wrapper) => wrapper(acc), get)

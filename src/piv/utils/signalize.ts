@@ -1,5 +1,5 @@
-import { isFunction } from '@edsolater/fnkit'
-import { SignalizeProps } from '../typeTools'
+import { isFunction } from "@edsolater/fnkit"
+import { SignalizeProps } from "../typeTools"
 
 /** convert volue to accessor */
 export function signalize<T extends object | undefined>(props: T): SignalizeProps<NonNullable<T>> {

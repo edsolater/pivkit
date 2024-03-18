@@ -1,6 +1,6 @@
-import { AnyFn, flap, mergeObjectsWithConfigs, switchCase, shakeNil } from '@edsolater/fnkit'
-import { SignalizeProps, ValidProps } from '../typeTools'
-import { mergeRefs } from './mergeRefs'
+import { AnyFn, flap, mergeObjectsWithConfigs, switchCase, shakeNil } from "@edsolater/fnkit"
+import { SignalizeProps, ValidProps } from "../typeTools"
+import { mergeRefs } from "./mergeRefs"
 
 // TODO: mergeSignalProps should have right type tools, current is wrong
 
@@ -42,21 +42,21 @@ export function mergeSignalProps<P extends SignalizeProps<ValidProps> | undefine
       key,
       [
         // special div props
-        ['domRef', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['class', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['style', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['icss', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['htmlProps', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['shadowProps', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['plugin', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['debugLog', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['render:outWrapper', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['render:firstChild', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['render:lastChild', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-        ['controller', () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["domRef", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["class", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["style", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["icss", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["htmlProps", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["shadowProps", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["plugin", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["debugLog", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["render:outWrapper", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["render:firstChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["render:lastChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["controller", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
       ],
-      v1 && v2 ? () => v2() ?? v1() : v2 ?? v1
-    )
+      v1 && v2 ? () => v2() ?? v1() : v2 ?? v1,
+    ),
   )
   // @ts-ignore
   return mergedResult

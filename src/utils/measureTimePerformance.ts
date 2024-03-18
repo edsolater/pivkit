@@ -1,4 +1,4 @@
-import { AnyFn } from '@edsolater/fnkit'
+import { AnyFn } from "@edsolater/fnkit"
 
 export function measureTimePerformance() {
   const allMeasuredTime = new Map<string, { t: number }>()

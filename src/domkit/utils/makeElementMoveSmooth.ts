@@ -1,6 +1,6 @@
-import { addDefault } from '@edsolater/fnkit'
-import { Accessor, AccessorArray, createEffect, on, onCleanup } from 'solid-js'
-import { createRef } from '../../hooks/createRef'
+import { addDefault } from "@edsolater/fnkit"
+import { Accessor, AccessorArray, createEffect, on, onCleanup } from "solid-js"
+import { createRef } from "../../hooks/createRef"
 
 /**
  * Animates an element's movement when its position changes.
@@ -16,12 +16,12 @@ export function makeElementMoveSmooth(options: {
 }) {
   // TODO: addDefault should also accept undefined
   // TODO: addDefault should also be solid-js friendly, that means it should not access object property
-  const animateOptions = addDefault(options.animateOptions ?? {}, { duration: 200, easing: 'linear' })
+  const animateOptions = addDefault(options.animateOptions ?? {}, { duration: 200, easing: "linear" })
 
   const [squareRef, setSquareRef] = createRef<HTMLElement>()
 
-  let fromX: DOMRect['x'] | undefined = undefined
-  let fromY: DOMRect['y'] | undefined = undefined
+  let fromX: DOMRect["x"] | undefined = undefined
+  let fromY: DOMRect["y"] | undefined = undefined
 
   // position change
   createEffect(
@@ -35,12 +35,12 @@ export function makeElementMoveSmooth(options: {
         deltaX != null &&
         deltaY != null &&
         el.animate(
-          [{ transform: `translate(${-deltaX}px, ${-deltaY}px)` }, { transform: '', offset: 1 }],
-          animateOptions // iteration 1 can use to moke transition
+          [{ transform: `translate(${-deltaX}px, ${-deltaY}px)` }, { transform: "", offset: 1 }],
+          animateOptions, // iteration 1 can use to moke transition
         )
 
       onCleanup(() => {
-        if (!animationControl || animationControl.playState === 'finished') {
+        if (!animationControl || animationControl.playState === "finished") {
           // record for next frame
           fromX = to.x
           fromY = to.y
@@ -54,7 +54,7 @@ export function makeElementMoveSmooth(options: {
           animationControl?.cancel()
         }
       })
-    })
+    }),
   )
 
   return { setMotionTargetRef: setSquareRef }

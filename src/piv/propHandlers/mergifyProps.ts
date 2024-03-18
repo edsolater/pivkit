@@ -1,5 +1,5 @@
-import { AnyFn, isFunction, isSymbol, mergeFunction } from '@edsolater/fnkit'
-import { PivProps } from '../Piv'
+import { AnyFn, isFunction, isSymbol, mergeFunction } from "@edsolater/fnkit"
+import { PivProps } from "../Piv"
 
 /**
  * invoke only once, return the cached result when invoke again
@@ -8,7 +8,7 @@ import { PivProps } from '../Piv'
 // // TEMP fnkit already have this function
 function createCachedFunction<F extends AnyFn>(
   fn: F,
-  getCacheIdByParams: (...args: Parameters<F>) => any = ((p1) => p1) as any
+  getCacheIdByParams: (...args: Parameters<F>) => any = ((p1) => p1) as any,
 ): F {
   let cachedResult: Map<any, ReturnType<F>> = new Map()
   return function (...args: Parameters<F>) {
@@ -22,9 +22,9 @@ function createCachedFunction<F extends AnyFn>(
 }
 /** as will only calculate props when access, so, return verbose big object is ok */
 export function handleMergifyOnCallbackProps<P extends Partial<PivProps<any>>>(
-  props: P
+  props: P,
 ): P /* no need type too accurately */ {
-  const hasAnyMergeProp = Object.getOwnPropertyNames(props).some((key) => key.startsWith('merge:'))
+  const hasAnyMergeProp = Object.getOwnPropertyNames(props).some((key) => key.startsWith("merge:"))
   if (!hasAnyMergeProp) return props
 
   const getProps = createCachedFunction((key: keyof any) => {
@@ -39,7 +39,7 @@ export function handleMergifyOnCallbackProps<P extends Partial<PivProps<any>>>(
     }
   })
   const getOwnKeys = createCachedFunction(() => {
-    const keysArray = Object.getOwnPropertyNames(props).map((key) => (key.startsWith('merge:') ? key.slice(6) : key))
+    const keysArray = Object.getOwnPropertyNames(props).map((key) => (key.startsWith("merge:") ? key.slice(6) : key))
     const keys = new Set(keysArray)
     const uniqueKeys = Array.from(keys)
     return { set: keys, arr: uniqueKeys }

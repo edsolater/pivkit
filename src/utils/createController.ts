@@ -1,7 +1,7 @@
-import { MayFn, isObject } from '@edsolater/fnkit'
-import { runtimeObjectFromAccess } from '../fnkit'
-import { ValidController } from '../piv'
-import { RuntimeObjectOption, runtimeObject } from '../fnkit/runtimeObject'
+import { MayFn, isObject } from "@edsolater/fnkit"
+import { runtimeObjectFromAccess } from "../fnkit"
+import { ValidController } from "../piv"
+import { RuntimeObjectOption, runtimeObject } from "../fnkit/runtimeObject"
 
 /** even input () => Controller / Controller, it will always return Controller without invoke
  * just a wrapper of {@link runtimeObjectFromAccess}
@@ -16,7 +16,7 @@ export function createController<C extends ValidController>(
   creator: {
     [K in keyof C]?: C[K] | (() => C[K] | undefined)
   },
-  options?: RuntimeObjectOption<C>
+  options?: RuntimeObjectOption<C>,
 ): C {
   return runtimeObject(creator, options) as C
 }

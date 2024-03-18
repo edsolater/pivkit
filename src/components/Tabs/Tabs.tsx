@@ -1,18 +1,18 @@
-import { mergeObjects } from '@edsolater/fnkit'
-import { Accessor, createContext } from 'solid-js'
-import { callbackManager } from '../../fnkit/callbackManager'
-import { useKitProps } from '../../createKit/useKitProps'
-import { KitProps } from '../../createKit/KitProps'
-import { createSyncSignal } from '../../hooks/createSyncSignal'
-import { Piv } from '../../piv/Piv'
-import { ValidController } from '../../piv/typeTools'
-import { Tab } from './Tab'
-import { TabList } from './TabList'
+import { mergeObjects } from "@edsolater/fnkit"
+import { Accessor, createContext } from "solid-js"
+import { callbackManager } from "../../fnkit/callbackManager"
+import { useKitProps } from "../../createKit/useKitProps"
+import { KitProps } from "../../createKit/KitProps"
+import { createSyncSignal } from "../../hooks/createSyncSignal"
+import { Piv } from "../../piv/Piv"
+import { ValidController } from "../../piv/typeTools"
+import { Tab } from "./Tab"
+import { TabList } from "./TabList"
 import {
   TabsControllerWithTabValue,
   TabsPropsWithTabValue,
   useAbilityFeature_TabValue_Tabs,
-} from './abilityFeatures/TabsControllerWithTabValue'
+} from "./abilityFeatures/TabsControllerWithTabValue"
 
 type OnChangeCallback = (controller: TabsController) => void
 
@@ -79,7 +79,7 @@ export const TabsControllerContext = createContext<TabsController>(TabsControlle
 export function Tabs(rawProps: TabsKitProps) {
   const { registerCallback, invokeCallbacks } = callbackManager<OnChangeCallback>()
 
-  const { props, shadowProps, lazyLoadController } = useKitProps(rawProps, { name: 'Tabs' })
+  const { props, shadowProps, lazyLoadController } = useKitProps(rawProps, { name: "Tabs" })
 
   const {
     calculateVariables: { defaultIndex: getDefaultIndexByValue, index: getIndexByValue },
@@ -91,8 +91,8 @@ export function Tabs(rawProps: TabsKitProps) {
   })
 
   const getDefaultIndex = () =>
-    'defaultSelectedIndex' in props && props.defaultSelectedIndex != null ? props.defaultSelectedIndex : undefined
-  const getIndex = () => ('selectedIndex' in props ? props.selectedIndex : undefined)
+    "defaultSelectedIndex" in props && props.defaultSelectedIndex != null ? props.defaultSelectedIndex : undefined
+  const getIndex = () => ("selectedIndex" in props ? props.selectedIndex : undefined)
 
   const [selectedIndex, selectTabByIndex] = createSyncSignal({
     defaultValue: () => getDefaultIndex() ?? getDefaultIndexByValue() ?? 0 /* defaultly focus on first one */,
@@ -113,7 +113,7 @@ export function Tabs(rawProps: TabsKitProps) {
   lazyLoadController(tabsController)
   return (
     <TabsControllerContext.Provider value={tabsController}>
-      <Piv class='Tabs' shadowProps={shadowProps}>
+      <Piv class="Tabs" shadowProps={shadowProps}>
         {props.children}
       </Piv>
     </TabsControllerContext.Provider>

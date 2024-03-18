@@ -1,4 +1,4 @@
-import { AnyFn, AnyObj, createEmptyObjectByOlds, isObject, mergeObjects } from '@edsolater/fnkit'
+import { AnyFn, AnyObj, createEmptyObjectByOlds, isObject, mergeObjects } from "@edsolater/fnkit"
 
 type DeepFunctionFunctionPart<F extends AnyFn = AnyFn> = {
   (): DeepFunctionFunctionPart<F>
@@ -21,7 +21,7 @@ export type DeepFunction<F extends AnyFn = AnyFn, P extends object | undefined =
 export type MayDeepFunction<F extends AnyFn = AnyFn, P extends object | undefined = undefined> = DeepFunction<F, P> | F
 
 // use symbol so user can assign any symbol he like
-const execSymbol = Symbol('exec')
+const execSymbol = Symbol("exec")
 
 /**
  * creator
@@ -29,7 +29,7 @@ const execSymbol = Symbol('exec')
  */
 export function deepFunction<F extends AnyFn, P extends object | undefined>(
   coreFn: F,
-  obj?: P
+  obj?: P,
 ): P extends undefined ? DeepFunction<F> : DeepFunction<F> & P {
   let innerParameters = [] as unknown as Parameters<F>
   const fnWithObj = obj ? Object.assign(coreFn, createEmptyObjectByOlds(obj)) : coreFn
@@ -64,7 +64,7 @@ export function isDeepFunction(v: any): v is DeepFunction {
  */
 export function invokeDeepFunction<F extends AnyFn>(
   coreFn: DeepFunction<F>,
-  parameters?: Parameters<F>
+  parameters?: Parameters<F>,
 ): ReturnType<F> {
   return parameters ? Reflect.get(coreFn, execSymbol)(...parameters) : Reflect.get(coreFn, execSymbol)()
 }
@@ -74,7 +74,7 @@ export function invokeDeepFunction<F extends AnyFn>(
  */
 export function invoke<T extends DeepFunction | AnyFn>(
   fn: T,
-  parameters?: Parameters<T>
+  parameters?: Parameters<T>,
 ): T extends DeepFunction ? ReturnType<T[typeof execSymbol]> : ReturnType<T> {
   return isDeepFunction(fn) ? invokeDeepFunction(fn, parameters) : parameters ? fn(...parameters) : fn()
 }

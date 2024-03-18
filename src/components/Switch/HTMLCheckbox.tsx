@@ -1,6 +1,6 @@
-import { KitProps, useKitProps } from '../../createKit'
-import { Piv } from '../../piv'
-import { renderHTMLDOM } from '../../piv/propHandlers/renderHTMLDOM'
+import { KitProps, useKitProps } from "../../createKit"
+import { Piv } from "../../piv"
+import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
 
 export interface HTMLCheckboxProps {
   label?: string
@@ -8,15 +8,15 @@ export interface HTMLCheckboxProps {
 }
 export type HTMLCheckboxKitProps = KitProps<HTMLCheckboxProps>
 export function HTMLCheckbox(kitProps: HTMLCheckboxKitProps) {
-  const { props } = useKitProps(kitProps, { name: 'HTMLCheckbox' })
+  const { props } = useKitProps(kitProps, { name: "HTMLCheckbox" })
   return (
     <Piv
-      class='HTMLCheckbox'
-      render:self={(selfProps) => renderHTMLDOM('input', selfProps)}
+      class="HTMLCheckbox"
+      render:self={(selfProps) => renderHTMLDOM("input", selfProps)}
       htmlProps={{
-        type: 'checkbox',
+        type: "checkbox",
         checked: props.defaultChecked,
-        'aria-label': props.label ?? 'checkbox',
+        "aria-label": props.label ?? "checkbox",
       }}
       shadowProps={props}
     />

@@ -1,5 +1,5 @@
-import { isFunction, isNullish, isObject, isPrimitive, type AnyObj } from '@edsolater/fnkit'
-import { produce } from 'solid-js/store'
+import { isFunction, isNullish, isObject, isPrimitive, type AnyObj } from "@edsolater/fnkit"
+import { produce } from "solid-js/store"
 
 /**
  * it pass returned function to  setStore
@@ -32,7 +32,7 @@ function assignNewValue(oldValue: unknown, newValue: unknown): unknown {
 function mutateTwoObj<T extends object>(
   oldObj: T,
   newObj: Partial<T>,
-  mutateFn?: (oldItem: unknown, newItem: unknown) => unknown
+  mutateFn?: (oldItem: unknown, newItem: unknown) => unknown,
 ): T {
   const result = oldObj
   Object.entries(newObj).forEach(([key, newValue]) => {

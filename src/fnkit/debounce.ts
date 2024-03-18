@@ -1,4 +1,4 @@
-import { AnyFn, createCurrentTimestamp, mergeFunction } from '@edsolater/fnkit'
+import { AnyFn, createCurrentTimestamp, mergeFunction } from "@edsolater/fnkit"
 
 const defaultDebouneDelay = 400
 const defaultThrottleDelay = 400
@@ -35,7 +35,7 @@ export function debounce<F extends (...args: any[]) => any>(fn: F, options?: Deb
       try {
         promiseController.resolve(fn())
       } catch {
-        promiseController.reject('debounce task failed')
+        promiseController.reject("debounce task failed")
       }
     }, options?.delay ?? defaultDebouneDelay)
     return promiseController.result
@@ -133,7 +133,7 @@ function empolyPromise<T = any>(): {
 
 function promisedSetTimeout<T>(
   fn: () => T | Promise<T>,
-  delay: number
+  delay: number,
 ): { timer: Promise<ReturnType<typeof setTimeout>>; result: Promise<Awaited<T>> } {
   let timerPromiseResolve: (value: ReturnType<typeof setTimeout>) => void
   const timer = new Promise<ReturnType<typeof setTimeout>>((resolve, reject) => {

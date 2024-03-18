@@ -1,1 +1,1 @@
-export * from './useComponentController'
+export * from "./useComponentController"

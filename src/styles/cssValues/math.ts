@@ -1,4 +1,4 @@
-import { isNumber, notNullish } from '@edsolater/fnkit'
+import { isNumber, notNullish } from "@edsolater/fnkit"
 
 /**
  * **CSS Utility Function**

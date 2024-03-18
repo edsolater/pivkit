@@ -1,5 +1,5 @@
-import { AnyFn, MayArray, MayPromise, flap, shakeUndefinedItem } from '@edsolater/fnkit'
-import { delayDo } from './invokeInMicroTaskLoop'
+import { AnyFn, MayArray, MayPromise, flap, shakeUndefinedItem } from "@edsolater/fnkit"
+import { delayDo } from "./invokeInMicroTaskLoop"
 
 interface CallbackStore<Callback extends AnyFn> {
   invoke(...params: Parameters<Callback>): void
@@ -65,7 +65,7 @@ export function createCallbacksStoreWithKeys<Key extends keyof any, Callback ext
           Object.entries(options.initCallbacks).map(([k, mcb]) => [
             k as Key,
             createCallbacksStore({ initCallbacks: mcb as MayArray<Callback | undefined> }),
-          ])
+          ]),
         )
       : new Map()
   ) as Map<Key, CallbackStore<Callback>>

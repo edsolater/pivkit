@@ -1,4 +1,4 @@
-import { MayFn, shrinkFn } from '@edsolater/fnkit'
+import { MayFn, shrinkFn } from "@edsolater/fnkit"
 
 /**
  * just like js:`??` operator

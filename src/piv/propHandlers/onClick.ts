@@ -1,6 +1,6 @@
-import { AnyFn } from '@edsolater/fnkit'
-import { objectMerge } from '../../fnkit'
-import { ValidController } from '../typeTools'
+import { AnyFn } from "@edsolater/fnkit"
+import { objectMerge } from "../../fnkit"
+import { ValidController } from "../typeTools"
 export type OnClickPayloads<C extends ValidController> = C & {
   ev: MouseEvent & {
     currentTarget: HTMLElement
@@ -24,7 +24,7 @@ export function parseOnClick(onClick: AnyFn, controller: ValidController) {
         isBubbled: () => ev.currentTarget !== ev.target,
         stopPropagation: () => ev.stopPropagation(),
         preventDefault: () => ev.preventDefault(),
-        eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[]
-      }) as OnClickPayloads<ValidController>
+        eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
+      }) as OnClickPayloads<ValidController>,
     )
 }

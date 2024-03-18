@@ -1,4 +1,4 @@
-import { AnyObj, unifyItem } from '@edsolater/fnkit'
+import { AnyObj, unifyItem } from "@edsolater/fnkit"
 
 /**
  * will return a proxy to access only in runtime
@@ -48,7 +48,7 @@ function getKeys(objs: AnyObj[]) {
     objs.flatMap((obj) => {
       const descriptors = Object.getOwnPropertyDescriptors(obj) // 🤔 necessary?
       return Reflect.ownKeys(descriptors)
-    })
+    }),
   )
 }
 

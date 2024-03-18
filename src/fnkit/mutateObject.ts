@@ -1,4 +1,4 @@
-import { AnyFn } from '@edsolater/fnkit'
+import { AnyFn } from "@edsolater/fnkit"
 
 /** will create a new proxy obj,  */
 export function mutateObject(obj: object, mutateFn: (payload: { value: any; key: keyof any }) => any): object {

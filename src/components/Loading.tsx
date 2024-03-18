@@ -1,7 +1,7 @@
-import { createMemo } from 'solid-js'
-import { Fragnment, PivChild } from '../piv'
-import { Accessify } from '../utils'
-import { shrinkFn } from '@edsolater/fnkit'
+import { createMemo } from "solid-js"
+import { Fragnment, PivChild } from "../piv"
+import { Accessify } from "../utils"
+import { shrinkFn } from "@edsolater/fnkit"
 
 export function Loading(props: {
   isLoading?: Accessify<boolean | undefined>

@@ -1,6 +1,6 @@
-import { isUndefined } from '@edsolater/fnkit'
-import { Accessify, createSyncSignal, deAccessify } from '..'
-import { Accessor } from 'solid-js'
+import { isUndefined } from "@edsolater/fnkit"
+import { Accessify, createSyncSignal, deAccessify } from ".."
+import { Accessor } from "solid-js"
 
 export type FormField<T> = {
   value: Accessor<T>
@@ -22,8 +22,8 @@ export type UseFormFieldOptions<T> = {
  * hold form value
  * @param opts init confit
  */
-export function createFormField<T>(opts: Omit<UseFormFieldOptions<T | undefined>, 'value'>): FormField<T | undefined>
-export function createFormField<T>(opts: Omit<UseFormFieldOptions<T>, 'value'> & { value: Accessify<T> }): FormField<T>
+export function createFormField<T>(opts: Omit<UseFormFieldOptions<T | undefined>, "value">): FormField<T | undefined>
+export function createFormField<T>(opts: Omit<UseFormFieldOptions<T>, "value"> & { value: Accessify<T> }): FormField<T>
 export function createFormField(opts: UseFormFieldOptions<any>): FormField<any> {
   const [value, setValue] = createSyncSignal({
     getValueFromOutside: () => deAccessify(opts.value),
@@ -33,7 +33,7 @@ export function createFormField(opts: UseFormFieldOptions<any>): FormField<any> 
   })
   const isEmpty = () => {
     const v = value()
-    return isUndefined(v) || v === ''
+    return isUndefined(v) || v === ""
   }
   const isValid = () => (opts.validRule ? opts.validRule(value()) : true)
 

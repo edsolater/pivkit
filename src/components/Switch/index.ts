@@ -1,2 +1,2 @@
-export * from './Switch'
-export * from './plugins/renderSwitchThumb'
+export * from "./Switch"
+export * from "./plugins/renderSwitchThumb"

@@ -1,4 +1,4 @@
-import { Signal, createEffect, createSignal, on } from 'solid-js'
+import { Signal, createEffect, createSignal, on } from "solid-js"
 
 /**
  * a shortcut
@@ -19,9 +19,9 @@ export function createSyncSignal<T>(options: {
   onInvokeSetter?: (value: T) => void
 }): Signal<T | undefined> {
   const [accessor, setAccessor] = createSignal(
-    'defaultValue' in options
+    "defaultValue" in options
       ? options.defaultValue?.() ?? options.getValueFromOutside()
-      : options.getValueFromOutside()
+      : options.getValueFromOutside(),
   )
 
   // invoke `get`
@@ -36,8 +36,8 @@ export function createSyncSignal<T>(options: {
         if (newValue === options.getValueFromOutside()) return
         options.onInvokeSetter?.(newValue as T)
       },
-      { defer: true }
-    )
+      { defer: true },
+    ),
   )
 
   return [accessor, setAccessor]
