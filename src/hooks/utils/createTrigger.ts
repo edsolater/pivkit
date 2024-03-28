@@ -47,9 +47,9 @@ export function createTrigger({
 
   //TODO: createEventCenter is weird, right?
   const eventCenter = createEventCenter<{
-    on(): void
-    off(): void
-    toggle(): void
+    on: []
+    off: []
+    toggle: []
   }>()
   eventCenter.on("on", () => {
     setIsTriggerOn(true)

@@ -31,7 +31,7 @@ export function subscribable<T>(defaultValue: T): Subscribable<T>
 export function subscribable<T>(defaultValue?: T): Subscribable<any> {
   let innerValue = defaultValue
   const eventCenter = createEventCenter<{
-    value(v: T): void
+    value: [v: T]
   }>()
   const state = Object.assign(() => innerValue, {
     subscribe(cb: (newValue: T) => void) {
