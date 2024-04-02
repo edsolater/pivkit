@@ -3,7 +3,7 @@ import { createICSS, CSSObject } from "../../piv"
 import { cssColors } from "../cssColors"
 import { ICSSFontSize, icssFontSize } from "./fondation"
 
-export type ICSSRowOption = {
+export interface ICSSRowOption {
   gap?: CSSObject["gap"]
 
   /** css: alignItems */
@@ -45,7 +45,7 @@ export const icssRow = createICSS(
   }),
 )
 
-export type ICSSColOption = {
+export interface ICSSColOption {
   gap?: CSSObject["gap"]
   /** css: alignItems */
   align?: CSSObject["alignItems"]
@@ -83,7 +83,7 @@ export const icssCol = createICSS(
 )
 
 //#region ------------------- grid -------------------
-export type ICSSGridOption = {
+export interface ICSSGridOption {
   gap?: CSSObject["gap"]
   /** css: placeItems */
   items?: CSSObject["placeItems"]
@@ -103,7 +103,7 @@ export const icssGrid = createICSS(({ items, template, templateColumn, templateR
   gap: gap,
 }))
 
-export type ICSSGridItemOption = {
+export interface ICSSGridItemOption {
   area?: CSSObject["gridArea"]
 }
 
@@ -113,7 +113,7 @@ export const icssGridItem = createICSS((opts: ICSSGridItemOption = {}) => ({
 
 //#endregion
 
-export type ICSSCardOption = {
+export interface ICSSCardOption {
   styleType?: "big-card" | "ghost"
   gap?: CSSObject["gap"]
   items?: CSSObject["alignItems"]
@@ -135,7 +135,7 @@ export const icssCard = createICSS((options?: ICSSCardOption) => ({
   borderRadius: "16px",
 }))
 
-export type ICSSClickableOption = {}
+export interface ICSSClickableOption {}
 
 /**
  * build-in icss for make element looks clickable
@@ -148,6 +148,7 @@ export const icssClickable = createICSS((options?: ICSSClickableOption) => ({
   "&:is(:hover,:active,:focus)": { backdropFilter: "brightness(0.95)", filter: "brightness(0.95)" },
   "&:active": { transform: "scale(0.95)" },
 }))
+
 export const icssFocusDetector = createICSS(() => ({
   outline: "solid 1px",
   "&:focus": { outlineStyle: "solid", outlineWidth: "2px" },

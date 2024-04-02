@@ -30,27 +30,28 @@ export type ICSS<Controller extends ValidController | unknown = unknown> = MayDe
   LoadController<boolean | string | number | null | undefined, Controller> | ICSSObject<Controller>
 >
 
-const isTaggedICSSSybol = Symbol("isTaggedICSS")
+const isTaggedICSSSymbol = Symbol("isTaggedICSS")
 const toICSSSymbol = Symbol("toICSS") // 🤔 is it necessary?
 
 type RuleCreatorFn = (settings?: AnyObj) => ICSS
 type TaggedICSS<T extends AnyFn> = ConfigableFunction<T> & {
-  [isTaggedICSSSybol]: true | string
+  [isTaggedICSSSymbol]: true | string
   [toICSSSymbol](): ICSS
   [toICSSSymbol](...additionalSettings: Parameters<T>): ICSS
 }
 
 // TODO: imply it !!!
 export function injectRuleToGlobal(rule: ICSS) {}
+
 export function createICSS<T extends RuleCreatorFn>(
   rule: T,
   options?: { name?: string; defaultSettings?: Partial<AnyObj>; globalSyle?: ICSS },
-): TaggedICSS<any> {
+): TaggedICSS<T> {
   const factory = createConfigableFunction(
     (settings?: AnyObj) => rule(settings),
     options?.defaultSettings,
   ) as unknown as TaggedICSS<T>
-  Reflect.set(factory, isTaggedICSSSybol, true)
+  Reflect.set(factory, isTaggedICSSSymbol, true)
   Reflect.set(factory, toICSSSymbol, (...args: any[]) => invokeTaggedICSS(factory, ...args))
   // add global
   // rename
@@ -59,15 +60,15 @@ export function createICSS<T extends RuleCreatorFn>(
 }
 
 export function isTaggedICSS(v: any): v is TaggedICSS<any> {
-  return isObject(v) && Reflect.has(v, isTaggedICSSSybol)
+  return isObject(v) && Reflect.has(v, isTaggedICSSSymbol)
 }
 
 function invokeTaggedICSS<T extends RuleCreatorFn>(v: TaggedICSS<T>, params?: AnyObj): ICSS {
   return v.config(params as any)()
 }
 
-/** for piv to parse icss props */
-export function handleICSSProps<Controller extends ValidController | unknown = unknown>(
+/** for piv to parse icss props to String */
+export function parseICSSProps<Controller extends ValidController | unknown = unknown>(
   cssProp: ICSS<Controller>,
   controller: Controller = {} as Controller,
 ) {

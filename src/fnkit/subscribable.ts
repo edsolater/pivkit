@@ -38,7 +38,7 @@ export function subscribable<T>(defaultValue?: T): Subscribable<any> {
       return eventCenter.on("value", cb)
     },
     clear() {
-      eventCenter.clear("value")
+      eventCenter.clear()
     },
     emitValue(newValue: T | ((prev: T) => T)) {
       if (typeof newValue === "function") {
