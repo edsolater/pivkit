@@ -2,6 +2,8 @@ import { addDefault, shrinkFn } from "@edsolater/fnkit"
 import { createICSS, CSSObject, type ICSSObject } from "../../piv"
 import { cssColors } from "../cssColors"
 import { ICSSFontSize, icssFontSize } from "./fondation"
+import type { C } from "vitest/dist/reporters-MmQN-57K"
+import { cssOpacity } from "../cssValues"
 
 export interface ICSSRowOption {
   gap?: CSSObject["gap"]
@@ -99,8 +101,11 @@ export interface ICSSGridOption {
   dir?: "x" | "y"
 
   // divider
-  /** only use in one row */
-  dividerCSS?: CSSObject | ((dir: "x" | "y") => CSSObject)
+  dividerBackground?: CSSObject["background"] | [CSSObject["background"], CSSObject["background"]]
+  dividerWidth?: CSSObject["width"]
+  dividerHeight?: CSSObject["height"]
+  dividerPadding?: string | [string, string]
+
   //#region ---------------- feature fixed slot ----------------
   slot?: number
 
@@ -125,7 +130,10 @@ export const icssGrid = createICSS(
     slot,
     autoTrim = true,
     dir = "x",
-    dividerCSS,
+    dividerBackground = cssOpacity("currentColor", .5),
+    dividerWidth,
+    dividerHeight,
+    dividerPadding,
   }: ICSSGridOption = {}) => {
     const rules = {
       display: "grid",
@@ -160,8 +168,7 @@ export const icssGrid = createICSS(
     }
 
     // divider
-    if (dividerCSS) {
-      const dividerCSSRaw = shrinkFn(dividerCSS, [dir])
+    if (dividerWidth || dividerHeight) {
       if (dir === "x") {
         Object.assign(rules, {
           "> *": {
@@ -173,7 +180,9 @@ export const icssGrid = createICSS(
               top: "0",
               bottom: "0",
               transform: "translateX(50%)",
-              ...dividerCSSRaw,
+              background: dividerBackground,
+              width: dividerWidth,
+              marginBlock: dividerPadding,
             },
           },
         })
@@ -188,11 +197,12 @@ export const icssGrid = createICSS(
               left: "0",
               right: "0",
               transform: "translateY(50%)",
-              ...dividerCSSRaw,
+              background: dividerBackground,
+              height: dividerHeight,
+              marginInline: dividerPadding,
             },
           },
         })
-      
       }
     }
     return rules
