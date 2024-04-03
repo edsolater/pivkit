@@ -14,6 +14,8 @@ import {
   shrinkFn,
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
+// just for type, just use goober is not enough
+import type _ from 'csstype'
 import { ConfigableFunction, createConfigableFunction } from "../../fnkit/configableFunction"
 
 type ValidController = AnyObj
@@ -34,7 +36,7 @@ const isTaggedICSSSymbol = Symbol("isTaggedICSS")
 const toICSSSymbol = Symbol("toICSS") // 🤔 is it necessary?
 
 type RuleCreatorFn = (settings?: AnyObj) => ICSS
-type TaggedICSS<T extends AnyFn> = ConfigableFunction<T> & {
+export type TaggedICSS<T extends AnyFn> = ConfigableFunction<T> & {
   [isTaggedICSSSymbol]: true | string
   [toICSSSymbol](): ICSS
   [toICSSSymbol](...additionalSettings: Parameters<T>): ICSS
