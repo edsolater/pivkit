@@ -66,7 +66,7 @@ export function isTaggedICSS(v: any): v is TaggedICSS<any> {
 }
 
 function invokeTaggedICSS<T extends RuleCreatorFn>(v: TaggedICSS<T>, params?: AnyObj): ICSS {
-  return v.config(params as any)()
+  return v.by(params as any)()
 }
 
 /** for piv to parse icss props to String */

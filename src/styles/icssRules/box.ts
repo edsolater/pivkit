@@ -1,5 +1,5 @@
-import { addDefault } from "@edsolater/fnkit"
-import { createICSS, CSSObject } from "../../piv"
+import { addDefault, shrinkFn } from "@edsolater/fnkit"
+import { createICSS, CSSObject, type ICSSObject } from "../../piv"
 import { cssColors } from "../cssColors"
 import { ICSSFontSize, icssFontSize } from "./fondation"
 
@@ -84,6 +84,7 @@ export const icssCol = createICSS(
 
 //#region ------------------- grid -------------------
 export interface ICSSGridOption {
+  //#region ---------------- css base ----------------
   gap?: CSSObject["gap"]
   /** css: placeItems */
   items?: CSSObject["placeItems"]
@@ -92,16 +93,111 @@ export interface ICSSGridOption {
   template?: CSSObject["gridTemplate"]
   templateRow?: CSSObject["gridTemplateRows"]
   templateColumn?: CSSObject["gridTemplateColumns"]
+  //#endregion
+
+  /** direction  */
+  dir?: "x" | "y"
+
+  // divider
+  /** only use in one row */
+  dividerCSS?: CSSObject | ((dir: "x" | "y") => CSSObject)
+  //#region ---------------- feature fixed slot ----------------
+  slot?: number
+
+  /**
+   * only used when `options.slot` has set
+   * e.g.
+   * - 1 slot, if 1 child item;
+   * - 2 slots, if 2 child items
+   * - else will be 3 slots
+   */
+  autoTrim?: boolean
+  //#endregion
 }
 
-export const icssGrid = createICSS(({ items, template, templateColumn, templateRow, gap }: ICSSGridOption = {}) => ({
-  display: "grid",
-  placeItems: items,
-  gridTemplate: template,
-  gridTemplateColumns: templateColumn,
-  gridTemplateRows: templateRow,
-  gap: gap,
-}))
+export const icssGrid = createICSS(
+  ({
+    items,
+    template,
+    templateColumn,
+    templateRow,
+    gap,
+    slot,
+    autoTrim = true,
+    dir = "x",
+    dividerCSS,
+  }: ICSSGridOption = {}) => {
+    const rules = {
+      display: "grid",
+      placeItems: items,
+      gridTemplate: template,
+      gridTemplateColumns: templateColumn,
+      gridTemplateRows: templateRow,
+      gap: gap,
+      gridAutoFlow: dir === "x" ? "column" : "row",
+    } as CSSObject
+
+    if (dir === "x" && !templateColumn && slot != null) {
+      rules.gridTemplateColumns = `repeat(${slot}, 1fr)`
+      if (autoTrim) {
+        // core of auto trim
+        for (let i = 1; i <= slot; i++) {
+          rules[`&:has(:nth-child(${i}))`] = {
+            gridTemplateColumns: `repeat(${i}, 1fr)`,
+          }
+        }
+      }
+    } else if (dir === "y" && !templateRow && slot != null) {
+      rules.gridTemplateRows = `repeat(${slot}, 1fr)`
+      if (autoTrim) {
+        // core of auto trim
+        for (let i = 1; i <= slot; i++) {
+          rules[`&:has(:nth-child(${i}))`] = {
+            gridTemplateRows: `repeat(${i}, 1fr)`,
+          }
+        }
+      }
+    }
+
+    // divider
+    if (dividerCSS) {
+      const dividerCSSRaw = shrinkFn(dividerCSS, [dir])
+      if (dir === "x") {
+        Object.assign(rules, {
+          "> *": {
+            position: "relative",
+            "&:not(:last-child)::before": {
+              content: "''",
+              position: "absolute",
+              right: `calc(-1 * ${gap} / 2)`,
+              top: "0",
+              bottom: "0",
+              transform: "translateX(50%)",
+              ...dividerCSSRaw,
+            },
+          },
+        })
+      } else {
+        Object.assign(rules, {
+          "> *": {
+            position: "relative",
+            "&:not(:last-child)::before": {
+              content: "''",
+              position: "absolute",
+              bottom: `calc(-1 * ${gap} / 2)`,
+              left: "0",
+              right: "0",
+              transform: "translateY(50%)",
+              ...dividerCSSRaw,
+            },
+          },
+        })
+      
+      }
+    }
+    return rules
+  },
+)
 
 export interface ICSSGridItemOption {
   area?: CSSObject["gridArea"]
