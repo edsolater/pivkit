@@ -2,17 +2,17 @@ import { AnyFn, isObject, mergeObjects } from "@edsolater/fnkit"
 
 export type ConfigableFunction<F extends AnyFn = AnyFn> = F & {
   /** inject params */
-  by(): F
-  by(arg1: Partial<Parameters<F>[0]>): F
-  by(arg1: Partial<Parameters<F>[0]>, arg2: Partial<Parameters<F>[1]>): F
-  by(arg1: Partial<Parameters<F>[0]>, arg2: Partial<Parameters<F>[1]>, arg3: Partial<Parameters<F>[2]>): F
-  by(
+  config(): F
+  config(arg1: Partial<Parameters<F>[0]>): F
+  config(arg1: Partial<Parameters<F>[0]>, arg2: Partial<Parameters<F>[1]>): F
+  config(arg1: Partial<Parameters<F>[0]>, arg2: Partial<Parameters<F>[1]>, arg3: Partial<Parameters<F>[2]>): F
+  config(
     arg1: Partial<Parameters<F>[0]>,
     arg2: Partial<Parameters<F>[1]>,
     arg3: Partial<Parameters<F>[2]>,
     arg4: Partial<Parameters<F>[3]>,
   ): F
-  by(...args: Parameters<F>): F
+  config(...args: Parameters<F>): F
 }
 
 /**
@@ -44,7 +44,7 @@ export function createConfigableFunction<F extends AnyFn>(
     const settingsFunction = new Proxy(coreFn, {
       apply: (target, thisArg, argArray) => Reflect.apply(target, thisArg, mergeParams(cachedParameters, argArray)),
       get: (target, p, receiver) =>
-        p === "by"
+        p === "config"
           ? (...additionalParams: any[]) => createProxyWithCache(mergeParams(cachedParameters, additionalParams))
           : Reflect.get(target, p, receiver),
     }) as ConfigableFunction<F>
@@ -58,5 +58,5 @@ export function createConfigableFunction<F extends AnyFn>(
 }
 
 export function isSettingsFunction(v: any): v is ConfigableFunction {
-  return Reflect.has(v, "by")
+  return Reflect.has(v, "config")
 }
