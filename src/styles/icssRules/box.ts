@@ -320,11 +320,11 @@ export const icssCenter = createICSS((options?: {}) => ({
   alignItems: "center",
   justifyContent: "center",
 }))
-export const icssAlignCenter = createICSS((options?: {}) => ({
+export const icssCenterY = createICSS((options?: {}) => ({
   display: "flex",
   alignItems: "center",
 }))
-export const icssJustifyCenter = createICSS((options?: {}) => ({
+export const icssCenterX = createICSS((options?: {}) => ({
   display: "flex",
   justifyContent: "center",
 }))
