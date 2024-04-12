@@ -4,6 +4,7 @@ import { cssColors } from "../cssColors"
 import { ICSSFontSize, icssFontSize } from "./fondation"
 import type { C } from "vitest/dist/reporters-MmQN-57K"
 import { cssOpacity } from "../cssValues"
+import { dir } from "console"
 
 export interface ICSSRowOption {
   gap?: CSSObject["gap"]
@@ -89,9 +90,13 @@ export interface ICSSGridOption {
   //#region ---------------- css base ----------------
   gap?: CSSObject["gap"]
   /** css: placeItems */
-  items?: CSSObject["placeItems"]
+  placeItems?: CSSObject["placeItems"]
   /** css: placeContent */
-  content?: CSSObject["placeContent"]
+  placeContent?: CSSObject["placeContent"]
+  alignContent?: CSSObject["alignContent"]
+  alignItems?: CSSObject["alignItems"]
+  justifyContent?: CSSObject["justifyContent"]
+  justifyItems?: CSSObject["justifyItems"]
   template?: CSSObject["gridTemplate"]
   templateRow?: CSSObject["gridTemplateRows"]
   templateColumn?: CSSObject["gridTemplateColumns"]
@@ -100,7 +105,10 @@ export interface ICSSGridOption {
   /** direction  */
   dir?: "x" | "y"
 
-  // divider
+  /**
+   *  divider: only when used in single row or signal column
+   * can't have place/align/justify-items/content
+   */
   dividerBackground?: CSSObject["background"] | [CSSObject["background"], CSSObject["background"]]
   dividerWidth?: CSSObject["width"]
   dividerHeight?: CSSObject["height"]
@@ -122,7 +130,13 @@ export interface ICSSGridOption {
 
 export const icssGrid = createICSS(
   ({
-    items,
+    placeItems,
+    placeContent,
+    alignContent,
+    alignItems,
+    justifyContent,
+    justifyItems,
+
     template,
     templateColumn,
     templateRow,
@@ -130,14 +144,19 @@ export const icssGrid = createICSS(
     slot,
     autoTrim = true,
     dir = "x",
-    dividerBackground = cssOpacity("currentColor", .5),
+    dividerBackground = cssOpacity("currentColor", 0.5),
     dividerWidth,
     dividerHeight,
     dividerPadding,
   }: ICSSGridOption = {}) => {
     const rules = {
       display: "grid",
-      placeItems: items,
+      placeItems,
+      placeContent,
+      alignContent,
+      alignItems,
+      justifyContent,
+      justifyItems,
       gridTemplate: template,
       gridTemplateColumns: templateColumn,
       gridTemplateRows: templateRow,
@@ -294,4 +313,18 @@ export const icssInputType = createICSS((options?: { w?: CSSObject["minWidth"]; 
   // background: cssColors.component_input_bg_default,
   // outlineColor: cssColors.dodgerBlue,
   borderBottom: "solid",
+}))
+
+export const icssCenter = createICSS((options?: {}) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}))
+export const icssAlignCenter = createICSS((options?: {}) => ({
+  display: "flex",
+  alignItems: "center",
+}))
+export const icssJustifyCenter = createICSS((options?: {}) => ({
+  display: "flex",
+  justifyContent: "center",
 }))

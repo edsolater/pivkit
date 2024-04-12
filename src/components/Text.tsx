@@ -1,9 +1,17 @@
 import { createMemo } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
-import { Piv } from "../piv"
+import { Piv, type CSSObject } from "../piv"
 
 export interface TextRawProps {
   inline?: boolean
+
+  /** use flexbox; align-items */
+  centerY?: boolean
+  /** use flexbox; justify-items */
+  centerX?: boolean
+  /** use flexbox; justify-items + align-items */
+  center?: boolean
+
   /** if true, it is 'text' */
   editable?: boolean | "text" | "all"
   /**
@@ -32,11 +40,25 @@ export function Text(kitProps: TextProps) {
       : undefined,
   )
 
+  const icss = createMemo(() => {
+    const icssRules = {} as CSSObject
+    if (props.inline) {
+      icssRules.display ??= "inline-block"
+    }
+    if (props.centerX || props.center) {
+      icssRules.display ??= "flex"
+      icssRules.justifyContent ??= "center"
+    }
+    if (props.centerY || props.center) {
+      icssRules.display ??= "flex"
+      icssRules.alignItems ??= "center"
+    }
+    return Object.keys(icssRules).length > 0 ? icssRules : undefined
+  })
+
   return (
     <Piv
-      icss={{
-        display: props.inline ? "inline-block" : undefined,
-      }}
+      icss={icss()}
       // @ts-ignore no need this check
       htmlProps={{
         contentEditable: contentEditableValue(),
