@@ -79,6 +79,7 @@ export type KeyboardShortcutFn = () => void
 export type KeyboardShortcutSettings = {
   [key in KeybordShortcutKeys]?: KeyboardShortcutFn
 }
+
 export function bindKeyboardShortcutEventListener(
   el: HTMLElement,
   keyboardShortcutSettings: KeyboardShortcutSettings,
@@ -97,6 +98,7 @@ export function bindKeyboardShortcutEventListener(
   )
   return subscription
 }
+
 /** this still not prevent **all** brower shortcut (like build-in ctrl T ) */
 export function preventDefaultKeyboardShortcut(pureEl: HTMLElement) {
   pureEl.addEventListener(

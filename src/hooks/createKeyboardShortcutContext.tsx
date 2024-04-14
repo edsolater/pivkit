@@ -4,6 +4,7 @@ import { createStore, produce } from "solid-js/store"
 import { bindKeyboardShortcutEventListener } from "../domkit"
 import type { ShortcutItem, ShortcutRecord } from "../plugins/useKeyboardShortcut"
 
+
 export function createShortcutContext(defaultShortcuts: ShortcutRecord = {}) {
   const [storedShortcuts, setStoredShortcut] = createStore(defaultShortcuts)
   const context = createContext(defaultShortcuts)

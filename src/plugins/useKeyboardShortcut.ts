@@ -12,16 +12,14 @@ import {
   shakeFalsy,
   shrinkFn,
 } from "@edsolater/fnkit"
-import { Accessor, createEffect, createMemo, createSignal, onCleanup } from "solid-js"
+import { Accessor, createEffect, createSignal, onCleanup } from "solid-js"
 import {
   KeyboardShortcutFn,
   KeyboardShortcutSettings,
   KeybordShortcutKeys,
   bindKeyboardShortcutEventListener,
 } from "../domkit"
-import { createSharedSignal } from "../hooks/createSharedSignal"
 import { Accessify, ElementRefs, getElementFromRefs } from "../utils"
-import useResizeObserver from "../domkit/hooks/useResizeObserver"
 
 type Description = string
 
@@ -45,22 +43,6 @@ function registerLocalKeyboardShortcut(el: HTMLElement, settings: ShortcutRecord
   return {
     remove() {
       registeredKeyboardShortcut.delete(el)
-    },
-  }
-}
-
-function registerGlobalKeyboardShortcut(settings: ShortcutRecord): { remove(): void } {
-  const el = globalThis.document.documentElement
-  const originalObject = registeredKeyboardShortcut.get(el)
-  registeredKeyboardShortcut.set(el, { ...originalObject, ...settings })
-  return {
-    remove() {
-      if (!originalObject) return
-      const removedKeys = Object.getOwnPropertyNames(settings) as KeybordShortcutKeys[]
-      removedKeys.forEach((key) => {
-        delete originalObject[key]
-      })
-      registeredKeyboardShortcut.set(el, originalObject)
     },
   }
 }
@@ -113,33 +95,6 @@ export function useKeyboardShortcut(
   }
 }
 
-/**
- * just a wrapper for {@link bindKeyboardShortcutEventListener}
- * @deprecated use {@link createShortcutContext} instead
- * if you want regist shortcut within a specific component, please use {@link useKeyboardShortcut}
- */
-export function useKeyboardGlobalShortcut(settings?: ShortcutRecord) {
-  const [currentSettings, setCurrentSettings] = createSharedSignal(useKeyboardGlobalShortcut.name, settings ?? {})
-  createEffect(() => {
-    const shortcuts = parseShortcutConfigFromSettings(currentSettings())
-    const el = globalThis.document.documentElement
-    const { abort } = bindKeyboardShortcutEventListener(el, shortcuts)
-    const { remove } = registerGlobalKeyboardShortcut(currentSettings())
-    onCleanup(() => {
-      abort()
-      remove()
-    })
-  })
-  return {
-    setNewSettings(newSettings: ShortcutRecord | ((prev: ShortcutRecord) => ShortcutRecord)) {
-      setCurrentSettings(newSettings)
-    },
-    get registeredGlobalShortcuts() {
-      return useAllRegisteredGlobalShortcuts()
-    },
-  }
-}
-
 export function parseShortcutConfigFromSettings(settings: ShortcutRecord) {
   const configLists = shakeFalsy(
     Object.entries(settings).flatMap(([name, { fn, shortcut }]) => {
@@ -148,32 +103,6 @@ export function parseShortcutConfigFromSettings(settings: ShortcutRecord) {
     }),
   )
   return Object.fromEntries(configLists) as KeyboardShortcutSettings
-}
-
-// TODO: should move to /fnkit
-function mapObjectEntry<T extends AnyObj, NK extends keyof any, NV>(
-  o: T,
-  fn: (value: T[keyof T], key: keyof T) => [NK, NV],
-): Record<NK, NV> {
-  return Object.fromEntries(Object.entries(o).map(([key, value]) => fn(value, key as keyof T))) as Record<NK, NV>
-}
-
-/**
- * to get registered keyboard shortcut
- * usually, this hook is for show infos
- */
-export function useAllRegisteredKeyboardShortcuts() {
-  const keyboardShortcutSettingsSignal = useSubscribable(registeredKeyboardShortcutSubscribable, new WeakerMap())
-  return keyboardShortcutSettingsSignal
-}
-
-export function useAllRegisteredGlobalShortcuts() {
-  const keyboardShortcutSettingsSignal = useSubscribable(registeredKeyboardShortcutSubscribable, new WeakerMap())
-  return createMemo((prev) => {
-    const keyboardShortcutSettings = keyboardShortcutSettingsSignal()
-    const next = keyboardShortcutSettings.get(globalThis.document.documentElement)
-    return next
-  })
 }
 
 // TODO: move to pivkit
