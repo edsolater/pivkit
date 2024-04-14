@@ -1,9 +1,9 @@
-import { createSubscribable, flap, shrinkFn, toList, type AnyFn, type MayFn } from "@edsolater/fnkit"
-import { createEffect, onCleanup } from "solid-js"
+import { createSubscribable, flap, shrinkFn, toList, type MayFn, type WeakerMap } from "@edsolater/fnkit"
+import { createEffect, createMemo, onCleanup } from "solid-js"
 import { addShortcutEventListener, type KeybordShortcutKeys } from "../domkit"
 import { type ShortcutItem } from "../plugins/useKeyboardShortcut"
-import { useSubscribable } from "./useSubscribable"
 import { getElementFromRef, type ElementRef } from "../utils"
+import { useSubscribable } from "./useSubscribable"
 
 type ShortcutRuleRecord = Record<KeybordShortcutKeys, ShortcutItem>
 
@@ -24,7 +24,6 @@ export function registerShortcut(shortcutItem: ShortcutItem) {
 
   shortcutCacheSubscribable.set(
     (shortcutCache) => {
-      console.log("shortcutCache.get(el): ", shortcutCache.get(el))
       shortcutCache.set(
         el,
         shortcutCache.has(el)
@@ -87,10 +86,8 @@ export function useShortcutsRegister(
     return isEnabled
   }
 
-  console.log(1)
   createEffect(() => {
     const el = getElementFromRef(ref)
-    console.log("el: ", setting)
     if (!el) return
     for (const [desc, rule] of Object.entries(setting)) {
       // use for ? 🤔
@@ -99,8 +96,9 @@ export function useShortcutsRegister(
         description: desc,
         shortcut: rule.shortcut,
         fn() {
-          if (!isFeatureEnabled()) return
-          rule.fn()
+          if (isFeatureEnabled()) {
+            return rule.fn()
+          }
         },
       })
       onCleanup(remove)
@@ -112,7 +110,7 @@ export function useShortcutsRegister(
 export function useShortcutsInfo(ref: ElementRef) {
   const el = getElementFromRef(ref)
   const shortcutCache = useSubscribable(shortcutCacheSubscribable)
-
-  const shortcuts = () => toList(shortcutCache()?.get(el))
+  const settings = createMemo(() => shortcutCache()?.get(el))
+  const shortcuts = () => toList(settings())
   return { shortcuts }
 }
