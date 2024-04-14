@@ -1,37 +1,33 @@
+import { flap } from "@edsolater/fnkit"
 import { createContext, onCleanup, onMount, useContext } from "solid-js"
 import { createStore, produce } from "solid-js/store"
-import type { KeybordShortcutKeys } from "../domkit"
+import { bindKeyboardShortcutEventListener } from "../domkit"
+import type { ShortcutItem, ShortcutMap } from "../plugins/useKeyboardShortcut"
 
-type ShortcutItem = {
-  description: string
-
-  /** if not set, use documentElement */
-  toElement?: HTMLElement
-
-  shortcut: KeybordShortcutKeys | KeybordShortcutKeys[]
-  
-  fn: () => void | Promise<void>
-}
-
-type ShortcutMap = Record<ShortcutItem["description"], ShortcutItem>
-
-export function createShortcutContext(defaultShortcuts: ShortcutMap) {
+export function createShortcutContext(defaultShortcuts: ShortcutMap = {}) {
   const [storedShortcuts, setStoredShortcut] = createStore(defaultShortcuts)
   const context = createContext(defaultShortcuts)
 
-  function registerShortcut(options: ShortcutItem): {
-    remove: () => void
-  } {
+  function registerShortcut(shortcutItem: ShortcutItem) {
     setStoredShortcut(
       produce((shortcutMap) => {
-        shortcutMap[options.description] = options
+        shortcutMap[shortcutItem.description] = shortcutItem
       }),
+    )
+    const shortcutSetting = flap(shortcutItem.shortcut).reduce((acc, shortcutKey) => {
+      acc[shortcutKey] = shortcutItem.fn
+      return acc
+    }, {})
+    const shortcutSubscription = bindKeyboardShortcutEventListener(
+      shortcutItem.targetElement ?? document.documentElement,
+      shortcutSetting,
     )
     return {
       remove: () => {
+        shortcutSubscription.abort()
         setStoredShortcut(
           produce((shortcutMap) => {
-            delete shortcutMap[options.description]
+            delete shortcutMap[shortcutItem.description]
           }),
         )
       },
@@ -43,9 +39,9 @@ export function createShortcutContext(defaultShortcuts: ShortcutMap) {
     return { shortcuts, registerShortcut, useShortcutsRegister }
   }
 
-  function useShortcutsRegister(map: ShortcutMap) {
+  function useShortcutsRegister(...items: ShortcutItem[]) {
     onMount(() => {
-      Object.values(map).forEach((shortcut) => {
+      items.forEach((shortcut) => {
         const registerManager = registerShortcut(shortcut)
         onCleanup(() => {
           registerManager.remove()
@@ -62,5 +58,6 @@ export function createShortcutContext(defaultShortcuts: ShortcutMap) {
     ContextProvider,
     useShortcuts,
     registerShortcut,
+    useShortcutsRegister,
   }
 }

@@ -25,20 +25,22 @@ import useResizeObserver from "../domkit/hooks/useResizeObserver"
 
 type Description = string
 
-export type DetailKeyboardShortcutSetting = Record<
-  Description,
-  {
-    fn: KeyboardShortcutFn
-    keyboardShortcut: KeybordShortcutKeys | KeybordShortcutKeys[]
-  }
->
+export type ShortcutItem = {
+  description: string
+  /** if not set, use documentElement */
+  targetElement?: HTMLElement
+  fn: KeyboardShortcutFn
+  shortcut: KeybordShortcutKeys | KeybordShortcutKeys[]
+}
+
+export type ShortcutMap = Record<Description, ShortcutItem>
 
 // hook info store, store registered keyboard shortcuts
 const [registeredKeyboardShortcut, registeredKeyboardShortcutSubscribable] = makeSubscriable(
-  new WeakerMap<HTMLElement, DetailKeyboardShortcutSetting>(),
+  new WeakerMap<HTMLElement, ShortcutMap>(),
 )
 
-function registerLocalKeyboardShortcut(el: HTMLElement, settings: DetailKeyboardShortcutSetting): { remove(): void } {
+function registerLocalKeyboardShortcut(el: HTMLElement, settings: ShortcutMap): { remove(): void } {
   registeredKeyboardShortcut.set(el, settings)
   return {
     remove() {
@@ -47,7 +49,7 @@ function registerLocalKeyboardShortcut(el: HTMLElement, settings: DetailKeyboard
   }
 }
 
-function registerGlobalKeyboardShortcut(settings: DetailKeyboardShortcutSetting): { remove(): void } {
+function registerGlobalKeyboardShortcut(settings: ShortcutMap): { remove(): void } {
   const el = globalThis.document.documentElement
   const originalObject = registeredKeyboardShortcut.get(el)
   registeredKeyboardShortcut.set(el, { ...originalObject, ...settings })
@@ -70,7 +72,7 @@ function registerGlobalKeyboardShortcut(settings: DetailKeyboardShortcutSetting)
  */
 export function useKeyboardShortcut(
   ref: ElementRefs,
-  settings?: DetailKeyboardShortcutSetting,
+  settings?: ShortcutMap,
   // TODO: imply this
   otherOptions?: {
     when?: MayFn<boolean>
@@ -102,10 +104,10 @@ export function useKeyboardShortcut(
   })
   return {
     isFeatureEnabled,
-    addSettings(newSettings: DetailKeyboardShortcutSetting) {
+    addSettings(newSettings: ShortcutMap) {
       setCurrentSettings((prev) => mergeObjects(prev, newSettings))
     },
-    setSettings(newSettings: DetailKeyboardShortcutSetting) {
+    setSettings(newSettings: ShortcutMap) {
       setCurrentSettings(newSettings)
     },
   }
@@ -113,9 +115,10 @@ export function useKeyboardShortcut(
 
 /**
  * just a wrapper for {@link bindKeyboardShortcutEventListener}
+ * @deprecated use {@link createShortcutContext} instead
  * if you want regist shortcut within a specific component, please use {@link useKeyboardShortcut}
  */
-export function useKeyboardGlobalShortcut(settings?: DetailKeyboardShortcutSetting) {
+export function useKeyboardGlobalShortcut(settings?: ShortcutMap) {
   const [currentSettings, setCurrentSettings] = createSharedSignal(useKeyboardGlobalShortcut.name, settings ?? {})
   createEffect(() => {
     const shortcuts = parseShortcutConfigFromSettings(currentSettings())
@@ -128,11 +131,7 @@ export function useKeyboardGlobalShortcut(settings?: DetailKeyboardShortcutSetti
     })
   })
   return {
-    setNewSettings(
-      newSettings:
-        | DetailKeyboardShortcutSetting
-        | ((prev: DetailKeyboardShortcutSetting) => DetailKeyboardShortcutSetting),
-    ) {
+    setNewSettings(newSettings: ShortcutMap | ((prev: ShortcutMap) => ShortcutMap)) {
       setCurrentSettings(newSettings)
     },
     get registeredGlobalShortcuts() {
@@ -141,13 +140,11 @@ export function useKeyboardGlobalShortcut(settings?: DetailKeyboardShortcutSetti
   }
 }
 
-function parseShortcutConfigFromSettings(settings: DetailKeyboardShortcutSetting) {
+export function parseShortcutConfigFromSettings(settings: ShortcutMap) {
   const configLists = shakeFalsy(
-    Object.entries(settings).flatMap(([name, { fn, keyboardShortcut }]) => {
-      if (!keyboardShortcut) return []
-      return isArray(keyboardShortcut)
-        ? keyboardShortcut.map((key) => (key ? [key, fn] : undefined))
-        : [[keyboardShortcut, fn]]
+    Object.entries(settings).flatMap(([name, { fn, shortcut }]) => {
+      if (!shortcut) return []
+      return isArray(shortcut) ? shortcut.map((key) => (key ? [key, fn] : undefined)) : [[shortcut, fn]]
     }),
   )
   return Object.fromEntries(configLists) as KeyboardShortcutSettings

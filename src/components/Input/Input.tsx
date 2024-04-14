@@ -80,10 +80,11 @@ export function Input(rawProps: InputKitProps) {
     inputBodyDom,
     {
       enter: {
+        description: "Input Enter",
         fn: () => {
           props.onEnter?.(innerText(), controller)
         },
-        keyboardShortcut: "Enter",
+        shortcut: "Enter",
       },
     },
     { when: isFocused, disabled: !hasProperty(props, "onEnter") },

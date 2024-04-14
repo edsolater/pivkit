@@ -97,22 +97,26 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
     selectListDom,
     {
       close: {
+        description: "close",
         fn: () => popoverState.close(),
-        keyboardShortcut: "Escape",
+        shortcut: "Escape",
       },
       "select confirm": {
+        description: "select confirm",
         fn: () => {
           //TODO: do with focusItem
         },
-        keyboardShortcut: "Enter",
+        shortcut: "Enter",
       },
       "select prev item": {
+        description: "select prev item",
         fn: selectPrevItem,
-        keyboardShortcut: "ArrowUp",
+        shortcut: "ArrowUp",
       },
       "select next item": {
+        description: "select next item",
         fn: selectNextItem,
-        keyboardShortcut: "ArrowDown",
+        shortcut: "ArrowDown",
       },
     },
     { enabled: popoverState.isTriggerOn },
