@@ -80,23 +80,45 @@ export type KeyboardShortcutSettings = {
   [key in KeybordShortcutKeys]?: KeyboardShortcutFn
 }
 
-export function bindKeyboardShortcutEventListener(
+//#region ---------------- data state ----------------
+const settingCache = new WeakMap<HTMLElement, KeyboardShortcutSettings>()
+
+let haveListenToDocument = false
+function startListenShortcutEvent() {
+  if (!haveListenToDocument) {
+    addEventListener(globalThis.document.documentElement, "keydown", ({ ev }) => {
+      const pressedKey = getShorcutStringFromKeyboardEvent(ev)
+      for (const target of ev.composedPath()) {
+        const settings = settingCache.get(target as any)
+        if (!settings) continue
+        const targetShortcutFn = Reflect.get(settings, pressedKey)
+        targetShortcutFn?.()
+      }
+    })
+    haveListenToDocument = true
+  }
+}
+//#endregion
+
+export function addShortcutEventListener(
   el: HTMLElement,
   keyboardShortcutSettings: KeyboardShortcutSettings,
-  options?: { stopPropagation?: boolean },
-): EventListenerController {
-  addTabIndex(el) // keydown must have fousable element
-  const subscription = addEventListener(
-    el,
-    "keydown",
-    ({ ev }) => {
-      const pressedKey = getShorcutStringFromKeyboardEvent(ev)
-      const targetShortcutFn = Reflect.get(keyboardShortcutSettings, pressedKey)
-      targetShortcutFn?.()
+): { abort(): void } {
+  startListenShortcutEvent()
+  if (!settingCache.has(el)) {
+    addTabIndex(el) // keydown must have fousable element
+  }
+
+  settingCache.set(el, { ...settingCache.get(el), ...keyboardShortcutSettings })
+  return {
+    abort() {
+      const targetSetting = settingCache.get(el)
+      if (!targetSetting) return
+      for (const shortcut of Object.keys(keyboardShortcutSettings)) {
+        Reflect.deleteProperty(targetSetting, shortcut)
+      }
     },
-    { stopPropergation: options?.stopPropagation },
-  )
-  return subscription
+  }
 }
 
 /** this still not prevent **all** brower shortcut (like build-in ctrl T ) */

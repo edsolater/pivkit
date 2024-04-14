@@ -1,9 +1,9 @@
 import { isExist } from "@edsolater/fnkit"
 import { Accessor, createEffect } from "solid-js"
 import { DeKitProps, KitProps, useKitProps } from "../../createKit"
-import { createDomRef, useClickOutside } from "../../hooks"
+import { createDomRef, useClickOutside, useShortcutsRegister } from "../../hooks"
 import { AddDefaultPivProps, Piv, PivChild } from "../../piv"
-import { buildPopover, useKeyboardShortcut } from "../../plugins"
+import { buildPopover } from "../../plugins"
 import { cssVar, icssCardPanel, icssClickable, icssRow } from "../../styles"
 import { Box } from "../Boxes"
 import { ItemBox, ItemBoxKitProps } from "../ItemBox"
@@ -93,28 +93,24 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
   const { renderTriggerItem, renderItem, renderTriggerItemArrow } = buildRenderFunction<T>(methods, props)
 
   // keyboard shortcut
-  useKeyboardShortcut(
+  useShortcutsRegister(
     selectListDom,
     {
       close: {
-        description: "close",
         fn: () => popoverState.close(),
         shortcut: "Escape",
       },
       "select confirm": {
-        description: "select confirm",
         fn: () => {
           //TODO: do with focusItem
         },
         shortcut: "Enter",
       },
       "select prev item": {
-        description: "select prev item",
         fn: selectPrevItem,
         shortcut: "ArrowUp",
       },
       "select next item": {
-        description: "select next item",
         fn: selectNextItem,
         shortcut: "ArrowDown",
       },

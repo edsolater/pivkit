@@ -1,14 +1,13 @@
-import { hasProperty, mergeObjects } from "@edsolater/fnkit"
+import { mergeObjects } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on } from "solid-js"
-import { useElementFocus } from "../../domkit"
 import { KitProps, useKitProps } from "../../createKit"
+import { useElementFocus } from "../../domkit"
 import { runtimeObject } from "../../fnkit/runtimeObject"
 import { createDomRef } from "../../hooks"
 import { createDisclosure } from "../../hooks/createDisclosure"
 import { createRef } from "../../hooks/createRef"
 import { Piv, PivChild, PivProps } from "../../piv"
 import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
-import { useKeyboardShortcut } from "../../plugins/useKeyboardShortcut"
 import { icssRow } from "../../styles"
 import { ElementRefs, getElementFromRefs } from "../../utils"
 import { DeAccessifyProps } from "../../utils/accessifyProps"
@@ -75,20 +74,21 @@ export function Input(rawProps: InputKitProps) {
   })
 
   const [additionalProps, { innerText, updateText }] = useInputInnerValue(props, controller)
-
-  useKeyboardShortcut(
-    inputBodyDom,
-    {
-      enter: {
-        description: "Input Enter",
-        fn: () => {
-          props.onEnter?.(innerText(), controller)
-        },
-        shortcut: "Enter",
-      },
-    },
-    { when: isFocused, disabled: !hasProperty(props, "onEnter") },
-  )
+  console.log("3: ", 3)
+  // useShortcutsRegister(
+  //   inputBodyDom,
+  //   {
+  //     "Input Enter": {
+  //       shortcut: "Enter",
+  //       fn: () => {
+  //         if (!isFocused()) return
+  //         if (!hasProperty(props, "onEnter")) return
+  //         props.onEnter?.(innerText(), controller)
+  //       },
+  //     },
+  //   },
+  //   { when: isFocused, enabled: !hasProperty(props, "onEnter") },
+  // )
 
   // ---------------- auto focus ----------------
   if (props.autoFocus) useAutoFocus(inputBodyDom)
