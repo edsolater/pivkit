@@ -2,9 +2,9 @@ import { flap } from "@edsolater/fnkit"
 import { createContext, onCleanup, onMount, useContext } from "solid-js"
 import { createStore, produce } from "solid-js/store"
 import { bindKeyboardShortcutEventListener } from "../domkit"
-import type { ShortcutItem, ShortcutMap } from "../plugins/useKeyboardShortcut"
+import type { ShortcutItem, ShortcutRecord } from "../plugins/useKeyboardShortcut"
 
-export function createShortcutContext(defaultShortcuts: ShortcutMap = {}) {
+export function createShortcutContext(defaultShortcuts: ShortcutRecord = {}) {
   const [storedShortcuts, setStoredShortcut] = createStore(defaultShortcuts)
   const context = createContext(defaultShortcuts)
 

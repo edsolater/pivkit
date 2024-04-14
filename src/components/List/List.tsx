@@ -1,4 +1,14 @@
-import { MayFn, shrinkFn, toList } from "@edsolater/fnkit"
+import {
+  MayFn,
+  shrinkFn,
+  toEntries,
+  toList,
+  type Collection,
+  type Entry,
+  type GetCollectionKey,
+  type GetCollectionValue,
+  type Items,
+} from "@edsolater/fnkit"
 import {
   Accessor,
   For,
@@ -19,20 +29,12 @@ import { createRef } from "../../hooks/createRef"
 import { Piv } from "../../piv"
 import { ListItem } from "./ListItem"
 
-export type ItemList<T> =
-  | Map<any, T>
-  | Set<T>
-  | T[]
-  | Record<keyof any, T>
-  | IterableIterator<T>
-  | Iterable<T>
-  | undefined
 export interface ListController {
   resetRenderCount(): void
 }
-export type ListProps<T> = {
-  children(item: T, index: () => number): JSXElement
-  items?: MayFn<ItemList<T>>
+export type ListProps<T extends Collection> = {
+  items?: MayFn<T>
+  children(item: GetCollectionValue<T>, key: GetCollectionKey<T>, idx: () => number): JSXElement
 
   /** lazy render for get init frame faster */
   async?: boolean
@@ -53,7 +55,7 @@ export type ListProps<T> = {
    */
   reachBottomMargin?: number
 }
-export type ListKitProps<T> = KitProps<ListProps<T>, { controller: ListController }>
+export type ListKitProps<T extends Collection> = KitProps<ListProps<T>, { controller: ListController }>
 
 export interface InnerListContext {
   observeFunction?: ObserveFn<HTMLElement>
@@ -65,7 +67,7 @@ export const ListContext = createContext<InnerListContext>({} as InnerListContex
 /**
  * if for layout , don't render important content in Box
  */
-export function List<T>(kitProps: ListKitProps<T>) {
+export function List<T extends Collection>(kitProps: ListKitProps<T>) {
   const { props, lazyLoadController } = useKitProps(kitProps, {
     name: "List",
     noNeedDeAccessifyChildren: true,
@@ -76,9 +78,11 @@ export function List<T>(kitProps: ListKitProps<T>) {
 
   // [configs]
 
-  const _allItems = props.async
-    ? createAsyncMemo(() => toList(shrinkFn(props.items ?? [])), [] as T[])
-    : createMemo(() => toList(shrinkFn(props.items ?? [])))
+  const _allItems = (
+    props.async
+      ? createAsyncMemo(() => [...toEntries(shrinkFn(props.items ?? []))], [])
+      : createMemo(() => [...toEntries(shrinkFn(props.items ?? []))])
+  ) as () => Entry<GetCollectionValue<T>, GetCollectionKey<T>>[]
   const allItems = createDeferred(_allItems) // ⚡ to smoother the render
   const increaseRenderCount = createMemo(
     () => props.increaseRenderCount ?? Math.min(Math.floor(allItems().length / 10), 30),
@@ -123,10 +127,10 @@ export function List<T>(kitProps: ListKitProps<T>) {
   const controller = { resetRenderCount } as ListController
   lazyLoadController(controller)
 
-  const renderListItems = (item: T, idx: () => number) => {
+  const renderListItems = (entry: Entry, idx: () => number) => {
     return (
       <Show when={checkNeedRenderByIndex(idx(), renderItemLength())}>
-        <ListItem>{() => props.children(item, idx)}</ListItem>
+        <ListItem>{() => props.children(entry.value, entry.key, idx)}</ListItem>
       </Show>
     )
   }

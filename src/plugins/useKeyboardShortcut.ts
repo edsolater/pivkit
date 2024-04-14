@@ -33,14 +33,14 @@ export type ShortcutItem = {
   shortcut: KeybordShortcutKeys | KeybordShortcutKeys[]
 }
 
-export type ShortcutMap = Record<Description, ShortcutItem>
+export type ShortcutRecord = Record<Description, ShortcutItem>
 
 // hook info store, store registered keyboard shortcuts
 const [registeredKeyboardShortcut, registeredKeyboardShortcutSubscribable] = makeSubscriable(
-  new WeakerMap<HTMLElement, ShortcutMap>(),
+  new WeakerMap<HTMLElement, ShortcutRecord>(),
 )
 
-function registerLocalKeyboardShortcut(el: HTMLElement, settings: ShortcutMap): { remove(): void } {
+function registerLocalKeyboardShortcut(el: HTMLElement, settings: ShortcutRecord): { remove(): void } {
   registeredKeyboardShortcut.set(el, settings)
   return {
     remove() {
@@ -49,7 +49,7 @@ function registerLocalKeyboardShortcut(el: HTMLElement, settings: ShortcutMap): 
   }
 }
 
-function registerGlobalKeyboardShortcut(settings: ShortcutMap): { remove(): void } {
+function registerGlobalKeyboardShortcut(settings: ShortcutRecord): { remove(): void } {
   const el = globalThis.document.documentElement
   const originalObject = registeredKeyboardShortcut.get(el)
   registeredKeyboardShortcut.set(el, { ...originalObject, ...settings })
@@ -72,7 +72,7 @@ function registerGlobalKeyboardShortcut(settings: ShortcutMap): { remove(): void
  */
 export function useKeyboardShortcut(
   ref: ElementRefs,
-  settings?: ShortcutMap,
+  settings?: ShortcutRecord,
   // TODO: imply this
   otherOptions?: {
     when?: MayFn<boolean>
@@ -104,10 +104,10 @@ export function useKeyboardShortcut(
   })
   return {
     isFeatureEnabled,
-    addSettings(newSettings: ShortcutMap) {
+    addSettings(newSettings: ShortcutRecord) {
       setCurrentSettings((prev) => mergeObjects(prev, newSettings))
     },
-    setSettings(newSettings: ShortcutMap) {
+    setSettings(newSettings: ShortcutRecord) {
       setCurrentSettings(newSettings)
     },
   }
@@ -118,7 +118,7 @@ export function useKeyboardShortcut(
  * @deprecated use {@link createShortcutContext} instead
  * if you want regist shortcut within a specific component, please use {@link useKeyboardShortcut}
  */
-export function useKeyboardGlobalShortcut(settings?: ShortcutMap) {
+export function useKeyboardGlobalShortcut(settings?: ShortcutRecord) {
   const [currentSettings, setCurrentSettings] = createSharedSignal(useKeyboardGlobalShortcut.name, settings ?? {})
   createEffect(() => {
     const shortcuts = parseShortcutConfigFromSettings(currentSettings())
@@ -131,7 +131,7 @@ export function useKeyboardGlobalShortcut(settings?: ShortcutMap) {
     })
   })
   return {
-    setNewSettings(newSettings: ShortcutMap | ((prev: ShortcutMap) => ShortcutMap)) {
+    setNewSettings(newSettings: ShortcutRecord | ((prev: ShortcutRecord) => ShortcutRecord)) {
       setCurrentSettings(newSettings)
     },
     get registeredGlobalShortcuts() {
@@ -140,7 +140,7 @@ export function useKeyboardGlobalShortcut(settings?: ShortcutMap) {
   }
 }
 
-export function parseShortcutConfigFromSettings(settings: ShortcutMap) {
+export function parseShortcutConfigFromSettings(settings: ShortcutRecord) {
   const configLists = shakeFalsy(
     Object.entries(settings).flatMap(([name, { fn, shortcut }]) => {
       if (!shortcut) return []
