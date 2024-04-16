@@ -66,6 +66,8 @@ export const ListContext = createContext<InnerListContext>({} as InnerListContex
 
 /**
  * if for layout , don't render important content in Box
+ * 
+ * as hidden item, there is two different list item: not rendered and solidjs rendered but dom hidden
  */
 export function List<T extends Collection>(kitProps: ListKitProps<T>) {
   const { props, lazyLoadController } = useKitProps(kitProps, {
@@ -78,6 +80,8 @@ export function List<T extends Collection>(kitProps: ListKitProps<T>) {
 
   // [configs]
 
+  // TODO: bug is when value hold a object, hold object will refresh
+
   const _allItems = (
     props.async
       ? createAsyncMemo(() => [...toEntries(shrinkFn(props.items ?? []))], [])
@@ -88,6 +92,9 @@ export function List<T extends Collection>(kitProps: ListKitProps<T>) {
     () => props.increaseRenderCount ?? Math.min(Math.floor(allItems().length / 10), 30),
   )
   const initRenderCount = createMemo(() => props.initRenderCount ?? Math.min(allItems().length, 50))
+  // [actually showed item count]
+  const [renderItemLength, setRenderItemLength] = createSignal(initRenderCount())
+  
 
   // [list ref]
   const [listRef, setRef] = createRef<HTMLElement>()
@@ -98,8 +105,6 @@ export function List<T extends Collection>(kitProps: ListKitProps<T>) {
     options: { rootMargin: "100%" },
   })
 
-  // [actually showed item count]
-  const [renderItemLength, setRenderItemLength] = createSignal(initRenderCount())
 
   // [scroll handler]
   const { forceCalculate } = useScrollDegreeDetector(listRef, {

@@ -80,12 +80,11 @@ export function Input(rawProps: InputKitProps) {
       "Input Enter": {
         shortcut: "Enter",
         fn: () => {
-          console.log("3: ", inputBodyDom()) // TIXME: why donn't work
           props.onEnter?.(innerText(), controller)
         },
       },
     },
-    // { when: isFocused, enabled: !hasProperty(props, "onEnter") },
+    { when: isFocused, enabled: !hasProperty(props, "onEnter") },
   )
 
   // ---------------- auto focus ----------------

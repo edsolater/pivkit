@@ -9,7 +9,7 @@ import { InputController, InputKitProps } from "../Input"
 // NOTE: plugin is a function accept props and return additional props
 // TODO: apply `createConfigableFunction((options) => (props) => {...})`
 export const keyboardShortcutObserverPlugin = (options: {
-  onRecordShortcut?: (shortcut: KeybordShortcutKeys) => void
+  onRecordShortcut?: (payload: { shortcut: KeybordShortcutKeys; el: HTMLElement }) => void
 }) =>
   createPlugin<{}, InputKitProps>(() => (inputProps) => {
     const [elRef, setElRef] = createRef<HTMLDivElement>()
@@ -34,7 +34,12 @@ export const keyboardShortcutObserverPlugin = (options: {
     const handleKeydownKeyboardShortcut = (text: string) => {
       setRecordedShortcut(text)
       intputController.setText?.(text)
-      options.onRecordShortcut?.(text as KeybordShortcutKeys)
+      const el = elRef()
+      if (!el) return // it is impossible
+      options.onRecordShortcut?.({
+        shortcut: text as KeybordShortcutKeys,
+        el,
+      })
     }
 
     return { domRef: setElRef, controllerRef: setControllerRef }

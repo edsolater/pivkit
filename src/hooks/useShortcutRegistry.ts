@@ -78,7 +78,9 @@ export function useShortcutsRegister(
     disabled?: MayFn<boolean>
     enabled?: MayFn<boolean>
   },
-) {
+): {
+  updateShortcut: (description: string, item: Partial<Omit<ShortcutItem, "targetElement" | "description">>) => void
+} {
   const isFeatureEnabled = () => {
     const enabled = shrinkFn(otherOptions?.enabled)
     const disabled = shrinkFn(otherOptions?.disabled)
@@ -104,8 +106,35 @@ export function useShortcutsRegister(
       onCleanup(remove)
     }
   })
+
+  function updateShortcut(description: string, item: Partial<Omit<ShortcutItem, "targetElement" | "description">>) {
+    const el = getElementFromRef(ref)
+    if (!el) return
+    const oldShortcutItems = getShortcutItemsFromDescription(el, description)
+    if (!oldShortcutItems || oldShortcutItems.length === 0) return
+    deleteShortcutItemsFromDescription(el, description)
+    registerShortcut({ ...oldShortcutItems[0]!, ...item })
+  }
+
+  return { updateShortcut }
 }
 
+function getShortcutItemsFromDescription(el: HTMLElement, description: string): ShortcutItem[] | undefined {
+  const cacheMap = shortcutCacheSubscribable().get(el)
+  if (!cacheMap) return
+  const shortcutItems = Object.values(cacheMap).filter(({ description: desc }) => desc === description)
+  return shortcutItems
+}
+
+function deleteShortcutItemsFromDescription(el: HTMLElement, description: string) {
+  const cacheMap = shortcutCacheSubscribable().get(el)
+  if (!cacheMap) return
+  for (const [key, item] of Object.entries(cacheMap)) {
+    if (item.description === description) {
+      delete cacheMap[key]
+    }
+  }
+}
 // watcher means info watcher
 export function useShortcutsInfo(ref: ElementRef) {
   const el = getElementFromRef(ref)
