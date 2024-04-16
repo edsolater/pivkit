@@ -4,34 +4,34 @@ import { KitProps, useKitProps } from "../createKit"
 import { createRef } from "../hooks/createRef"
 import { AddProps, PivChild, parsePivChildren } from "../piv"
 
-export interface LoopController {}
+export interface ListController {}
 
 type ComponentStructure = (...anys: any[]) => JSXElement
 
-export type LoopProps<T> = {
+export type ListProps<T> = {
   wrapper?: ComponentStructure
-  of?: MayFn<Iterable<T>>
+  items?: MayFn<Iterable<T>>
   children(item: T, index: () => number): PivChild
 }
 
-export type LoopKitProps<T> = KitProps<LoopProps<T>, { controller: LoopController }>
+export type ListKitProps<T> = KitProps<ListProps<T>, { controller: ListController }>
 
 /**
  * just a wrapper of <For>, very simple
  * if for layout , don't render important content in Box
  */
-export function Loop<T>(kitProps: LoopKitProps<T>) {
+export function List<T>(kitProps: ListKitProps<T>) {
   const { props, shadowProps } = useKitProps(kitProps, {
-    name: "Loop",
+    name: "List",
     noNeedDeAccessifyChildren: true,
   })
   const Wrapper = kitProps.wrapper ?? AddProps //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
 
   // [configs]
-  const allItems = createMemo(() => Array.from(shrinkFn(props.of ?? []) as T[]))
+  const allItems = createMemo(() => Array.from(shrinkFn(props.items ?? []) as T[]))
 
   // [loop ref]
-  const [loopRef, setRef] = createRef<HTMLElement>()
+  const [componentWrapperRef, setRef] = createRef<HTMLElement>()
 
   const content = <For each={allItems()}>{(item, idx) => parsePivChildren(props.children(item, idx))}</For>
   return (

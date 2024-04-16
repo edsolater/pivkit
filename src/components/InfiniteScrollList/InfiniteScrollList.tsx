@@ -2,12 +2,10 @@ import {
   MayFn,
   shrinkFn,
   toEntries,
-  toList,
   type Collection,
   type Entry,
   type GetCollectionKey,
   type GetCollectionValue,
-  type Items,
 } from "@edsolater/fnkit"
 import {
   Accessor,
@@ -27,17 +25,19 @@ import { useScrollDegreeDetector } from "../../domkit/hooks/useScrollDegreeDetec
 import { createAsyncMemo } from "../../hooks/createAsyncMemo"
 import { createRef } from "../../hooks/createRef"
 import { Piv } from "../../piv"
-import { ListItem } from "./ListItem"
+import { InfiniteScrollListItem } from "./InfiniteScrollListItem"
 
-export interface ListController {
+export interface InfiniteScrollListController {
   resetRenderCount(): void
 }
-export type ListProps<T extends Collection> = {
+export type InfiniteScrollListProps<T extends Collection> = {
+  /**
+   * async render for get init frame faster
+   */
+  async?: boolean
   items?: MayFn<T>
   children(item: GetCollectionValue<T>, key: GetCollectionKey<T>, idx: () => number): JSXElement
 
-  /** lazy render for get init frame faster */
-  async?: boolean
   /**
    * only meaningfull when turnOnScrollObserver is true
    * @default 30
@@ -55,23 +55,28 @@ export type ListProps<T extends Collection> = {
    */
   reachBottomMargin?: number
 }
-export type ListKitProps<T extends Collection> = KitProps<ListProps<T>, { controller: ListController }>
+export type InfiniteScrollListKitProps<T extends Collection> = KitProps<
+  InfiniteScrollListProps<T>,
+  { controller: InfiniteScrollListController }
+>
 
-export interface InnerListContext {
+export interface InnerInfiniteScrollListContext {
   observeFunction?: ObserveFn<HTMLElement>
   renderItemLength?: Accessor<number>
 }
 
-export const ListContext = createContext<InnerListContext>({} as InnerListContext, { name: "ListController" })
+export const InfiniteScrollListContext = createContext<InnerInfiniteScrollListContext>(
+  {} as InnerInfiniteScrollListContext,
+  { name: "ListController" },
+)
 
 /**
  * if for layout , don't render important content in Box
- * 
  * as hidden item, there is two different list item: not rendered and solidjs rendered but dom hidden
  */
-export function List<T extends Collection>(kitProps: ListKitProps<T>) {
+export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrollListKitProps<T>) {
   const { props, lazyLoadController } = useKitProps(kitProps, {
-    name: "List",
+    name: "InfiniteScrollList",
     noNeedDeAccessifyChildren: true,
     defaultProps: {
       reachBottomMargin: 50,
@@ -80,12 +85,43 @@ export function List<T extends Collection>(kitProps: ListKitProps<T>) {
 
   // [configs]
 
-  // TODO: bug is when value hold a object, hold object will refresh
+  // entry map to ensure, same value will get same entry map
+  let innerEntryMap: Map<any, Entry> = new Map()
+
+  // entry map utils to ensure, same value will get same entry map
+  function getEntriesFromItems(items: Collection): Entry[] {
+    const entriesIterables = toEntries(items)
+    const resultList = [] as Entry[]
+    const traveledKeys = new Set()
+    for (const entry of entriesIterables) {
+      const canReuse = innerEntryMap.has(entry.key) && innerEntryMap.get(entry.key)!.value === entry.value
+      if (canReuse) {
+        resultList.push(innerEntryMap.get(entry.key)!)
+      } else {
+        innerEntryMap.set(entry.key, entry)
+        resultList.push(entry)
+      }
+      traveledKeys.add(entry.key)
+    }
+    // release unnecessary cached entry
+    for (const key of innerEntryMap.keys()) {
+      if (!traveledKeys.has(key)) {
+        innerEntryMap.delete(key)
+      }
+    }
+    return resultList
+  }
 
   const _allItems = (
     props.async
-      ? createAsyncMemo(() => [...toEntries(shrinkFn(props.items ?? []))], [])
-      : createMemo(() => [...toEntries(shrinkFn(props.items ?? []))])
+      ? createAsyncMemo(async () => {
+          const items = await shrinkFn(props.items ?? [])
+          return getEntriesFromItems(items)
+        }, [])
+      : createMemo(() => {
+          const items = shrinkFn(props.items ?? [])
+          return getEntriesFromItems(items)
+        })
   ) as () => Entry<GetCollectionValue<T>, GetCollectionKey<T>>[]
   const allItems = createDeferred(_allItems) // ⚡ to smoother the render
   const increaseRenderCount = createMemo(
@@ -94,7 +130,6 @@ export function List<T extends Collection>(kitProps: ListKitProps<T>) {
   const initRenderCount = createMemo(() => props.initRenderCount ?? Math.min(allItems().length, 50))
   // [actually showed item count]
   const [renderItemLength, setRenderItemLength] = createSignal(initRenderCount())
-  
 
   // [list ref]
   const [listRef, setRef] = createRef<HTMLElement>()
@@ -104,7 +139,6 @@ export function List<T extends Collection>(kitProps: ListKitProps<T>) {
     rootRef: listRef,
     options: { rootMargin: "100%" },
   })
-
 
   // [scroll handler]
   const { forceCalculate } = useScrollDegreeDetector(listRef, {
@@ -125,27 +159,28 @@ export function List<T extends Collection>(kitProps: ListKitProps<T>) {
     ),
   )
 
-  const resetRenderCount: ListController["resetRenderCount"] = () => {
+  const resetRenderCount: InfiniteScrollListController["resetRenderCount"] = () => {
     setRenderItemLength(initRenderCount())
   }
 
-  const controller = { resetRenderCount } as ListController
+  const controller = { resetRenderCount } as InfiniteScrollListController
   lazyLoadController(controller)
 
   const renderListItems = (entry: Entry, idx: () => number) => {
+    const needRender = createMemo(() => checkNeedRenderByIndex(idx(), renderItemLength()))
     return (
-      <Show when={checkNeedRenderByIndex(idx(), renderItemLength())}>
-        <ListItem>{() => props.children(entry.value, entry.key, idx)}</ListItem>
+      <Show when={needRender}>
+        <InfiniteScrollListItem initVisiable={needRender}>{() => props.children(entry.value, entry.key, idx)}</InfiniteScrollListItem>
       </Show>
     )
   }
 
   return (
-    <ListContext.Provider value={{ observeFunction: observe, renderItemLength }}>
+    <InfiniteScrollListContext.Provider value={{ observeFunction: observe, renderItemLength }}>
       <Piv domRef={setRef} shadowProps={props} icss={{ overflow: "auto", contain: "paint" }}>
         <For each={allItems()}>{renderListItems}</For>
       </Piv>
-    </ListContext.Provider>
+    </InfiniteScrollListContext.Provider>
   )
 }
 

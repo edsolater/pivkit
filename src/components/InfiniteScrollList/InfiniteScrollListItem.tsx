@@ -1,26 +1,29 @@
 import { Accessor, JSX, createEffect, createMemo, createSignal, splitProps, useContext } from "solid-js"
-import { useKitProps } from "../../createKit"
+import { useKitProps, type KitProps } from "../../createKit"
 import useResizeObserver from "../../domkit/hooks/useResizeObserver"
-import { createRef } from "../../hooks/createRef"
-import { Piv, PivProps, omitProps } from "../../piv"
-import { ListContext } from "./List"
 import { createDomRef } from "../../hooks"
+import { createRef } from "../../hooks/createRef"
 import isClientSide from "../../jFetch/utils/isSSR"
+import { Piv, omitProps } from "../../piv"
+import { InfiniteScrollListContext } from "./InfiniteScrollList"
 
-export interface ListItemProps extends Omit<PivProps, "children"> {
+export type InfiniteScrollListItemRawProps = {
   children: () => JSX.Element
   // TODO: just forceVisiable is not enough, should have more control props
-  forceVisiable?: boolean
+  /** default is false */
+  initVisiable?: boolean
 }
 
-export interface ListItemController {
+export interface InfiniteScrollListItemController {
   isIntersecting: Accessor<boolean>
 }
+
+export type InfiniteScrollListItemProps = KitProps<InfiniteScrollListItemRawProps, { controller: InfiniteScrollListItemController }>
 /**
  * context acceptor for `<List>` \
  * only used in `<List>`
  */
-export function ListItem(originalProps: ListItemProps) {
+export function InfiniteScrollListItem(originalProps: InfiniteScrollListItemProps) {
   const [childrenProps, rawProps] = splitProps(originalProps, ["children"])
   const children = childrenProps.children
   const { props, lazyLoadController } = useKitProps(rawProps, { name: "ListItem" })
@@ -28,8 +31,8 @@ export function ListItem(originalProps: ListItemProps) {
   const [itemDomRef, setItemDom] = createRef<HTMLElement>()
 
   //=== isIntersecting with parent `<List>`'s intersectionObserver
-  const listContext = useContext(ListContext)
-  const [isIntersecting, setIsIntersecting] = createSignal(Boolean(props.forceVisiable))
+  const listContext = useContext(InfiniteScrollListContext)
+  const [isIntersecting, setIsIntersecting] = createSignal(Boolean(props.initVisiable))
   createEffect(() => {
     const el = itemDomRef()
     if (!el) return
@@ -42,7 +45,7 @@ export function ListItem(originalProps: ListItemProps) {
   const { setRef: setSizeDetectorTarget, innerHeight, innerWidth } = useElementSizeDetector()
 
   //=== Controller
-  const controller: ListItemController = { isIntersecting }
+  const controller: InfiniteScrollListItemController = { isIntersecting }
   lazyLoadController(controller)
 
   //=== render children
@@ -50,7 +53,7 @@ export function ListItem(originalProps: ListItemProps) {
 
   return (
     <Piv
-      class="ListItem"
+      class="InfiniteScrollListItem"
       domRef={[setItemDom, setSizeDetectorTarget]} // FIXME: why ref not setted🤔?
       shadowProps={omitProps(props, "children")} // FIXME: should not use tedius omit
       style={isIntersecting() ? undefined : { height: `${innerHeight()}px`, width: `${innerWidth()}px` }}
