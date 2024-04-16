@@ -1,58 +1,52 @@
-import { createSubscribable, flap, shrinkFn, toList, type MayFn, type WeakerMap } from "@edsolater/fnkit"
+import { createSubscribable, flap, isArray, shrinkFn, toList, type MayFn, type WeakerMap } from "@edsolater/fnkit"
 import { createEffect, createMemo, onCleanup } from "solid-js"
 import { addShortcutEventListener, type KeybordShortcutKeys } from "../domkit"
 import { type ShortcutItem } from "../plugins/useKeyboardShortcut"
 import { getElementFromRef, type ElementRef } from "../utils"
 import { useSubscribable } from "./useSubscribable"
 
-type ShortcutRuleRecord = Record<KeybordShortcutKeys, ShortcutItem>
+type ShortcutDiscription = string
+type RegisteredShortcuts = Map<ShortcutDiscription, ShortcutItem>
 
-export type ShortcutMap = WeakMap<HTMLElement, ShortcutRuleRecord>
+export type ShortcutStore = WeakMap<HTMLElement, RegisteredShortcuts>
 
-const shortcutCache: ShortcutMap = new WeakMap()
+const shortcutCache: ShortcutStore = new WeakMap()
 const shortcutCacheSubscribable = createSubscribable(shortcutCache)
-
-function toShortcutRuleMap(shortcutItem: ShortcutItem) {
-  return flap(shrinkFn(shortcutItem.shortcut)).reduce((acc, key) => {
-    acc[key] = shortcutItem
-    return acc
-  }, {} as ShortcutRuleRecord)
-}
 
 export function registerShortcut(shortcutItem: ShortcutItem) {
   const el = shrinkFn(shortcutItem.targetElement)
 
   shortcutCacheSubscribable.set(
     (shortcutCache) => {
-      shortcutCache.set(
-        el,
-        shortcutCache.has(el)
-          ? { ...shortcutCache.get(el), ...toShortcutRuleMap(shortcutItem) }
-          : toShortcutRuleMap(shortcutItem),
-      )
-
+      const oldShortcutRuleRecord = shortcutCache.get(el)
+      const newShortcutRuleRecord = new Map(oldShortcutRuleRecord)
+      newShortcutRuleRecord.set(shortcutItem.description, shortcutItem)
+      shortcutCache.set(el, newShortcutRuleRecord)
       return shortcutCache
     },
     { force: true },
   ) // force invoke subscribable
 
   const shortcutSetting = flap(shortcutItem.shortcut).reduce((acc, shortcutKey) => {
-    acc[shortcutKey] = shortcutItem.fn
+    if (isArray(shortcutKey)) {
+      for (const key of shortcutKey) {
+        acc[key] = shortcutItem.fn
+      }
+    } else {
+      acc[shortcutKey] = shortcutItem.fn
+    }
     return acc
   }, {})
   const shortcutSubscription = addShortcutEventListener(el, shortcutSetting)
   return {
     remove: () => {
-      shortcutSubscription.abort()
+      shortcutSubscription.cancel()
       shortcutCacheSubscribable.set(
         (shortcutCache) => {
           if (shortcutCache.has(el)) {
-            const shortcutRuleMap = toShortcutRuleMap(shortcutItem)
             const cacheMap = shortcutCache.get(el)
             if (cacheMap) {
-              for (const rule of Object.keys(shortcutRuleMap)) {
-                delete cacheMap[rule]
-              }
+              cacheMap.delete(shortcutItem.description)
             }
             if (cacheMap && Object.keys(cacheMap).length === 0) {
               shortcutCache.delete(el)
@@ -110,31 +104,14 @@ export function useShortcutsRegister(
   function updateShortcut(description: string, item: Partial<Omit<ShortcutItem, "targetElement" | "description">>) {
     const el = getElementFromRef(ref)
     if (!el) return
-    const oldShortcutItems = getShortcutItemsFromDescription(el, description)
-    if (!oldShortcutItems || oldShortcutItems.length === 0) return
-    deleteShortcutItemsFromDescription(el, description)
-    registerShortcut({ ...oldShortcutItems[0]!, ...item })
+    const oldShortcutItem = shortcutCacheSubscribable().get(el)?.get(description)
+    if (!oldShortcutItem) return
+    registerShortcut({ ...oldShortcutItem, ...item })
   }
 
   return { updateShortcut }
 }
 
-function getShortcutItemsFromDescription(el: HTMLElement, description: string): ShortcutItem[] | undefined {
-  const cacheMap = shortcutCacheSubscribable().get(el)
-  if (!cacheMap) return
-  const shortcutItems = Object.values(cacheMap).filter(({ description: desc }) => desc === description)
-  return shortcutItems
-}
-
-function deleteShortcutItemsFromDescription(el: HTMLElement, description: string) {
-  const cacheMap = shortcutCacheSubscribable().get(el)
-  if (!cacheMap) return
-  for (const [key, item] of Object.entries(cacheMap)) {
-    if (item.description === description) {
-      delete cacheMap[key]
-    }
-  }
-}
 // watcher means info watcher
 export function useShortcutsInfo(ref: ElementRef) {
   const el = getElementFromRef(ref)

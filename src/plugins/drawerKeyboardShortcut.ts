@@ -15,7 +15,7 @@ export const drawerKeyboardShortcut = createPlugin(() => (props) => {
     const subscription = addShortcutEventListener(el, {
       Escape: () => drawerController.close?.(),
     })
-    return subscription.abort
+    return subscription.cancel
   }, [])
   return { domRef: setDivRef, controllerRef: setControllerRef }
 })

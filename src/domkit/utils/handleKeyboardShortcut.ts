@@ -103,7 +103,7 @@ function startListenShortcutEvent() {
 export function addShortcutEventListener(
   el: HTMLElement,
   keyboardShortcutSettings: KeyboardShortcutSettings,
-): { abort(): void } {
+): { cancel(): void } {
   startListenShortcutEvent()
   if (!settingCache.has(el)) {
     addTabIndex(el) // keydown must have fousable element
@@ -111,7 +111,7 @@ export function addShortcutEventListener(
 
   settingCache.set(el, { ...settingCache.get(el), ...keyboardShortcutSettings })
   return {
-    abort() {
+    cancel() {
       const targetSetting = settingCache.get(el)
       if (!targetSetting) return
       for (const shortcut of Object.keys(keyboardShortcutSettings)) {

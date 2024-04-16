@@ -15,7 +15,7 @@ export const modalKeyboardShortcut = createPlugin<ModalProps>(() => () => {
     const subscription = addShortcutEventListener(el, {
       Escape: () => modalController.close?.(),
     })
-    return subscription.abort
+    return subscription.cancel
   }, [])
   return { domRef: setDivRef, controllerRef: setControllerRef }
 })
