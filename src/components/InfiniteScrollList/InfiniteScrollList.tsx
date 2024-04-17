@@ -1,5 +1,7 @@
 import {
   MayFn,
+  getEntryKey,
+  getEntryValue,
   shrinkFn,
   toEntries,
   type Collection,
@@ -67,7 +69,7 @@ export interface InnerInfiniteScrollListContext {
 
 export const InfiniteScrollListContext = createContext<InnerInfiniteScrollListContext>(
   {} as InnerInfiniteScrollListContext,
-  { name: "ListController" },
+  { name: "InfiniteScrollListController" },
 )
 
 /**
@@ -90,25 +92,30 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
 
   // entry map utils to ensure, same value will get same entry map
   function getEntriesFromItems(items: Collection): Entry[] {
+    console.time("InfiniteScrollList.getEntriesFromItems")
     const entriesIterables = toEntries(items)
     const resultList = [] as Entry[]
     const traveledKeys = new Set()
     for (const entry of entriesIterables) {
-      const canReuse = innerEntryMap.has(entry.key) && innerEntryMap.get(entry.key)!.value === entry.value
+      const key = getEntryKey(entry)
+      const value = getEntryValue(entry)
+      const canReuse = innerEntryMap.has(key) && getEntryValue(innerEntryMap.get(key)!) === value
       if (canReuse) {
-        resultList.push(innerEntryMap.get(entry.key)!)
+        resultList.push(innerEntryMap.get(key)!)
       } else {
-        innerEntryMap.set(entry.key, entry)
+        innerEntryMap.set(key, entry)
         resultList.push(entry)
       }
-      traveledKeys.add(entry.key)
+      traveledKeys.add(key)
     }
+
     // release unnecessary cached entry
     for (const key of innerEntryMap.keys()) {
       if (!traveledKeys.has(key)) {
         innerEntryMap.delete(key)
       }
     }
+    console.timeEnd("InfiniteScrollList.getEntriesFromItems")
     return resultList
   }
 
@@ -169,8 +176,10 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
   const renderListItems = (entry: Entry, idx: () => number) => {
     const needRender = createMemo(() => checkNeedRenderByIndex(idx(), renderItemLength()))
     return (
-      <Show when={needRender}>
-        <InfiniteScrollListItem initVisiable={needRender}>{() => props.children(entry.value, entry.key, idx)}</InfiniteScrollListItem>
+      <Show when={needRender()}>
+        <InfiniteScrollListItem>
+          {() => props.children(getEntryValue(entry), getEntryKey(entry), idx)}
+        </InfiniteScrollListItem>
       </Show>
     )
   }
