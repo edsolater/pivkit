@@ -12,7 +12,7 @@ export type AuxiliaryKeyName =
   | "alt"
   | "ctrl + alt"
   | "ctrl + shift"
-  | "alt + shift"
+  | "shift + alt"
   | "ctrl + shift + alt"
 type KeyNamesActionKey = `F${number}` | "Backspace" | "Enter" | "Escape" | "Delete" | "Insert" | " "
 type KeyNamesNormalContent =
@@ -133,6 +133,62 @@ export function preventDefaultKeyboardShortcut(pureEl: HTMLElement) {
   )
 }
 
+const shiftKeyMap = new Map([
+  ["~", "`"],
+  ["!", "1"],
+  ["@", "2"],
+  ["#", "3"],
+  ["$", "4"],
+  ["%", "5"],
+  ["^", "6"],
+  ["&", "7"],
+  ["*", "8"],
+  ["(", "9"],
+  [")", "0"],
+  ["_", "-"],
+  ["+", "="],
+  ["{", "["],
+  ["}", "]"],
+  ["|", "\\"],
+  [":", ";"],
+  ['"', "'"],
+  ["<", ","],
+  [">", "."],
+  ["?", "/"],
+
+  ["A", "a"],
+  ["B", "b"],
+  ["C", "c"],
+  ["D", "d"],
+  ["E", "e"],
+  ["F", "f"],
+  ["G", "g"],
+  ["H", "h"],
+  ["I", "i"],
+  ["J", "j"],
+  ["K", "k"],
+  ["L", "l"],
+  ["M", "m"],
+  ["N", "n"],
+  ["O", "o"],
+  ["P", "p"],
+  ["Q", "q"],
+  ["R", "r"],
+  ["S", "s"],
+  ["T", "t"],
+  ["U", "u"],
+  ["V", "v"],
+  ["W", "w"],
+  ["X", "x"],
+  ["Y", "y"],
+  ["Z", "z"],
+])
+function handleShiftedKey(key: string) {
+  if (shiftKeyMap.has(key)) {
+    return shiftKeyMap.get(key)
+  }
+  return key
+}
 /**
  * parse from original KeyboardEvent to a string
  * @example
@@ -145,7 +201,7 @@ export function getShorcutStringFromKeyboardEvent(ev: KeyboardEvent) {
     ev.shiftKey ? "shift" : undefined,
     ev.altKey ? "alt" : undefined,
     ev.metaKey ? "meta" : undefined,
-    rawKey.replace(/(ctrl|shift|alt|meta)/i, ""),
+    handleShiftedKey(rawKey.replace(/(ctrl|shift|alt|meta)/i, "")),
   ].map((s) => s?.trim())
   return unifyItem(shakeFalsy(keyArray)).join(" + ")
 }
