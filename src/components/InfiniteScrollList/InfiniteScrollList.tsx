@@ -41,18 +41,15 @@ export type InfiniteScrollListProps<T extends Collection> = {
   children(item: GetCollectionValue<T>, key: GetCollectionKey<T>, idx: () => number): JSXElement
 
   /**
-   * only meaningfull when turnOnScrollObserver is true
-   * @default 30
+   * @default auto =clamp(5, itemCount / 10, 20)
    */
   increaseRenderCount?: number
   /**
-   * only meaningfull when turnOnScrollObserver is true
-   * @default 30
+   * @default 20
    * can accept Infinity
    */
   initRenderCount?: number
   /**
-   * only meaningfull when turnOnScrollObserver is true
    * @default 50(px)
    */
   reachBottomMargin?: number
@@ -92,7 +89,6 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
 
   // entry map utils to ensure, same value will get same entry map
   function getEntriesFromItems(items: Collection): Entry[] {
-    console.time("InfiniteScrollList.getEntriesFromItems")
     const entriesIterables = toEntries(items)
     const resultList = [] as Entry[]
     const traveledKeys = new Set()
@@ -115,7 +111,6 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
         innerEntryMap.delete(key)
       }
     }
-    console.timeEnd("InfiniteScrollList.getEntriesFromItems")
     return resultList
   }
 
@@ -132,9 +127,9 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
   ) as () => Entry<GetCollectionValue<T>, GetCollectionKey<T>>[]
   const allItems = createDeferred(_allItems) // ⚡ to smoother the render
   const increaseRenderCount = createMemo(
-    () => props.increaseRenderCount ?? Math.min(Math.floor(allItems().length / 10), 30),
+    () => props.increaseRenderCount ?? Math.min(Math.max(Math.floor(allItems().length / 10), 5), 20),
   )
-  const initRenderCount = createMemo(() => props.initRenderCount ?? Math.min(allItems().length, 50))
+  const initRenderCount = createMemo(() => props.initRenderCount ?? Math.min(allItems().length, 20))
   // [actually showed item count]
   const [renderItemLength, setRenderItemLength] = createSignal(initRenderCount())
 
