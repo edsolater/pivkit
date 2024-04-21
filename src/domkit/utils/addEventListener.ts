@@ -10,6 +10,7 @@ export interface EventListenerController {
 export interface EventListenerOptions extends AddEventListenerOptions {
   stopPropergation?: boolean
   onlyTargetIsSelf?: boolean
+  
 }
 
 //IDEA: maybe I should use weakMap here
