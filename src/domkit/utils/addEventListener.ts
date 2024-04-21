@@ -74,10 +74,15 @@ export function addEventListener<
       eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
     })
   }
+  let requestAnimationFrameId: number | undefined = undefined
   const registedListener = (ev: Event) => {
     if (options?.restrict) {
       if (options.restrict === "rAF") {
-        requestAnimationFrame(() => coreEventListener(ev))
+        if (requestAnimationFrameId) cancelAnimationFrame(requestAnimationFrameId)
+        requestAnimationFrameId = requestAnimationFrame(() => {
+          requestAnimationFrameId = undefined
+          coreEventListener(ev)
+        })
       }
     } else {
       coreEventListener(ev)

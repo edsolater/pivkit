@@ -66,7 +66,7 @@ export function listenGestureDrag(
     if (!events.length) {
       events.push(ev)
       options.onMoveStart?.({ el: el!, ev, evStart: ev, evs: events })
-      addEventListener(el, "pointermove", ({ ev }) => pointerMove(ev), { passive: true })
+      addEventListener(el, "pointermove", ({ ev }) => pointerMove(ev), { passive: true, restrict: "rAF" })
       addEventListener(el, "pointerup", ({ ev }) => pointerUp(ev), { passive: true })
       el?.setPointerCapture(ev.pointerId)
       // ev.stopPropagation()
