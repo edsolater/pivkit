@@ -10,15 +10,21 @@ export interface EventListenerController {
 export interface EventListenerOptions extends AddEventListenerOptions {
   stopPropergation?: boolean
   onlyTargetIsSelf?: boolean
-  
+  /** in 60FPS screen, pointer move max run 60 times each seconds */
+  restrict?: "rAF" // TODO: 'debounce 10' means max 10 times each seconds
 }
+
+type EventIdMap = Map<
+  number,
+  {
+    eventName: keyof HTMLElementEventMap
+    cb: AnyFn
+  }
+>
 
 //IDEA: maybe I should use weakMap here
 // TODO: why not use native cancel controller
-const eventIdMap = new Map<
-  number,
-  { el: HTMLElement | Document | Window | undefined | null; eventName: string; cb: AnyFn }
->()
+const listenerCacheMaps = new WeakMap<HTMLElement | Document | Window, EventIdMap>()
 
 export type EventCallback<
   K extends keyof HTMLElementEventMap,
@@ -50,10 +56,11 @@ export function addEventListener<
   const controller = {
     eventId: targetEventId,
     abort() {
-      abortEvent(targetEventId, options)
+      if (!el) return
+      abortEvent(el, targetEventId, options)
     },
   } as EventListenerController
-  const newEventCallback = (ev: Event) => {
+  const coreEventListener = (ev: Event) => {
     if (options?.stopPropergation) ev.stopPropagation()
     if (options?.onlyTargetIsSelf && el !== ev.target) return
     fn({
@@ -67,14 +74,40 @@ export function addEventListener<
       eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
     })
   }
-  el?.addEventListener(eventName as unknown as string, newEventCallback, defaultedOptions)
-  eventIdMap.set(targetEventId, { el, eventName: eventName as unknown as string, cb: newEventCallback })
+  const registedListener = (ev: Event) => {
+    if (options?.restrict) {
+      if (options.restrict === "rAF") {
+        requestAnimationFrame(() => coreEventListener(ev))
+      }
+    } else {
+      coreEventListener(ev)
+    }
+  }
+  el?.addEventListener(eventName as unknown as string, registedListener, defaultedOptions)
+  if (el) {
+    const registedListeners = (() => {
+      if (!listenerCacheMaps.has(el)) {
+        const newListenersMap: EventIdMap = new Map()
+        listenerCacheMaps.set(el, newListenersMap)
+        return newListenersMap
+      } else {
+        return listenerCacheMaps.get(el)!
+      }
+    })()
+    listenerCacheMaps.set(el, registedListeners.set(targetEventId, { eventName: eventName, cb: coreEventListener }))
+  }
   return controller
 }
 
-function abortEvent(id: number | undefined | null, options?: EventListenerOptions) {
-  if (!id || !eventIdMap.has(id)) return
-  const { el, eventName, cb } = eventIdMap.get(id)!
+function abortEvent(
+  el: HTMLElement | Document | Window,
+  id: number | undefined | null,
+  options?: EventListenerOptions,
+) {
+  if (!id || !el || !listenerCacheMaps.has(el)) return
+  const registedListeners = listenerCacheMaps.get(el)
+  if (!registedListeners?.has(id)) return
+  const { eventName, cb } = registedListeners.get(id)!
   el?.removeEventListener(eventName, cb, { capture: Boolean(options?.capture) })
-  eventIdMap.delete(id)
+  listenerCacheMaps.delete(el)
 }
