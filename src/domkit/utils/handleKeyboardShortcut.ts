@@ -1,5 +1,5 @@
 import { shakeFalsy, toLowerCase, unifyItem } from "@edsolater/fnkit"
-import { addEventListener, EventListenerController } from "./addEventListener"
+import { listenDomEvent, EventListenerController } from "./addDomEventListener"
 import { addTabIndex } from "./addTabIndex"
 
 /**
@@ -86,7 +86,7 @@ const settingCache = new WeakMap<HTMLElement, KeyboardShortcutSettings>()
 let haveListenToDocument = false
 function startListenShortcutEvent() {
   if (!haveListenToDocument) {
-    addEventListener(globalThis.document.documentElement, "keydown", ({ ev }) => {
+    listenDomEvent(globalThis.document.documentElement, "keydown", ({ ev }) => {
       const pressedKey = getShorcutStringFromKeyboardEvent(ev)
       for (const target of ev.composedPath()) {
         const settings = settingCache.get(target as any)

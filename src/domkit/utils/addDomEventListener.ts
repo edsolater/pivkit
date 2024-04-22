@@ -1,4 +1,5 @@
-import { AnyFn } from "@edsolater/fnkit"
+import { AnyFn, throttle } from "@edsolater/fnkit"
+import { isHTMLElement } from "./isHTMLElement"
 
 let eventId = 1
 
@@ -41,7 +42,27 @@ export type EventCallback<
 }
 
 // TODO: !!! move to domkit
-export function addEventListener<
+export function listenDomEvent<
+  El extends HTMLElement | Document | Window | undefined | null,
+  K extends keyof HTMLElementEventMap,
+>(
+  el: El,
+  eventName: K,
+  fn: (payload: EventCallback<K, El>) => void,
+  /** default is `{ passive: true }` */
+  options?: EventListenerOptions,
+): EventListenerController
+export function listenDomEvent<
+  El extends HTMLElement | Document | Window | undefined | null,
+  K extends keyof HTMLElementEventMap,
+>(
+  el: El,
+  eventName: string,
+  fn: (payload: EventCallback<keyof HTMLElementEventMap, El>) => void,
+  /** default is `{ passive: true }` */
+  options?: EventListenerOptions,
+): EventListenerController
+export function listenDomEvent<
   El extends HTMLElement | Document | Window | undefined | null,
   K extends keyof HTMLElementEventMap,
 >(
@@ -71,19 +92,13 @@ export function addEventListener<
       isBubbled: () => el !== ev.target,
       stopPropagation: () => ev.stopPropagation(),
       preventDefault: () => ev.preventDefault(),
-      eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
+      eventPath: () => ev.composedPath().filter(isHTMLElement),
     })
   }
-  let requestAnimationFrameId: number | undefined = undefined
+  const throttled = throttle(coreEventListener, { rAF: options?.restrict === "rAF" })
   const registedListener = (ev: Event) => {
     if (options?.restrict) {
-      if (options.restrict === "rAF") {
-        if (requestAnimationFrameId) cancelAnimationFrame(requestAnimationFrameId)
-        requestAnimationFrameId = requestAnimationFrame(() => {
-          requestAnimationFrameId = undefined
-          coreEventListener(ev)
-        })
-      }
+      throttled(ev)
     } else {
       coreEventListener(ev)
     }

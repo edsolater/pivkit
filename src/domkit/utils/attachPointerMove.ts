@@ -1,5 +1,5 @@
 import type { AnyFn } from "@edsolater/fnkit"
-import { addEventListener } from "./addEventListener"
+import { listenDomEvent } from "./addDomEventListener"
 
 /** used by gesture: pointer move */
 export type Delta2dTranslate = {
@@ -66,8 +66,8 @@ export function listenGestureDrag(
     if (!events.length) {
       events.push(ev)
       options.onMoveStart?.({ el: el!, ev, evStart: ev, evs: events })
-      addEventListener(el, "pointermove", ({ ev }) => pointerMove(ev), { passive: true, restrict: "rAF" })
-      addEventListener(el, "pointerup", ({ ev }) => pointerUp(ev), { passive: true })
+      listenDomEvent(el, "pointermove", ({ ev }) => pointerMove(ev), { passive: true, restrict: "rAF" })
+      listenDomEvent(el, "pointerup", ({ ev }) => pointerUp(ev), { passive: true })
       el?.setPointerCapture(ev.pointerId)
       // ev.stopPropagation()
     }

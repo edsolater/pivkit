@@ -1,6 +1,6 @@
 import { MayArray, MayFn, flap, shrinkFn } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
-import { addEventListener } from "../domkit"
+import { listenDomEvent } from "../domkit"
 import { CSSObject, PivProps, createPlugin, mergeProps } from "../piv"
 
 export type TransitionPhase = "before-going" | "on-going" | "finish"
@@ -88,7 +88,7 @@ export const transitionFromAutoSizePlugin = createPlugin(
 
       // make inTransition during state sync with CSS event
       createEffect(() => {
-        const { abort } = addEventListener(dom(), "transitionend", () => setCurrentPhase("finish"), {
+        const { abort } = listenDomEvent(dom(), "transitionend", () => setCurrentPhase("finish"), {
           onlyTargetIsSelf: true /* TODO - add feature: attach max one time  */,
         }) // not event fired by bubbled
         onCleanup(abort)

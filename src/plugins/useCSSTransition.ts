@@ -1,10 +1,10 @@
 import { flap, MayArray, MayFn, shrinkFn, switchCase } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
+import { listenDomEvent } from "../domkit"
 import { runtimeObject } from "../fnkit/runtimeObject"
-import { addEventListener } from "../domkit"
 import { createDomRef } from "../hooks"
 import { createRef } from "../hooks/createRef"
-import { createPlugin, CSSObject, mergeProps, PivProps, type ICSS } from "../piv"
+import { createPlugin, CSSObject, PivProps, type ICSS } from "../piv"
 import { Accessify, accessifyProps } from "../utils/accessifyProps"
 import { createController2 } from "../utils/createController"
 
@@ -126,7 +126,7 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
   createEffect(() => {
     const el = contentDom()
     if (!el) return
-    const subscription = addEventListener(
+    const subscription = listenDomEvent(
       el,
       "transitionend",
       () => {
@@ -134,7 +134,7 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
       },
       { onlyTargetIsSelf: true /* not event fired by bubbled */ },
     )
-    // const subscription2 = addEventListener(
+    // const subscription2 = listenDomEvent(
     //   el,
     //   'transitioncancel',
     //   () => {
@@ -395,7 +395,7 @@ export function loadModuleAutoSizeTransition(options?: {
   //       el.style.removeProperty('height')
   //       observer.observe(el)
   //     }
-  //     el.addEventListener('transitionend', () => {
+  //     el.listenDomEvent('transitionend', () => {
   //       console.log('end')
   //       el.style.removeProperty('height')
   //       observer.observe(el)

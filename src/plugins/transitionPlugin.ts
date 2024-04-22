@@ -1,6 +1,6 @@
 import { MayArray, MayFn, flap, shrinkFn } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
-import { addEventListener } from "../domkit"
+import { listenDomEvent } from "../domkit"
 import { CSSObject, PivProps, createPlugin, mergeProps } from "../piv"
 
 export type TransitionDetectorActionPhase = "before-going" | "on-going" | "finish"
@@ -100,11 +100,11 @@ export const transitionDetectorPlugin = createPlugin(
       createEffect(() => {
         const el = dom()
         if (!el) return
-        const { abort } = addEventListener(el, "transitionend", () => setCurrentPhase("finish"), {
+        const { abort } = listenDomEvent(el, "transitionend", () => setCurrentPhase("finish"), {
           onlyTargetIsSelf: true /* TODO - add feature: attach max one time  */,
         }) // not event fired by bubbled
         onCleanup(abort)
-        const { abort: abort2 } = addEventListener(el, "transitionstart", () => setCurrentPhase("on-going"), {
+        const { abort: abort2 } = listenDomEvent(el, "transitionstart", () => setCurrentPhase("on-going"), {
           onlyTargetIsSelf: true /* TODO - add feature: attach max one time  */,
         })
         onCleanup(abort2)
