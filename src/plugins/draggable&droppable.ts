@@ -10,6 +10,7 @@ import { createPlugin, type CSSObject } from "../piv/propHandlers"
 
 type GestureDragCustomedEventInfo = {
   dragElement: HTMLElement
+  oldContainer: HTMLElement | null
 }
 
 export const draggablePlugin = createPlugin(
@@ -31,16 +32,25 @@ export const draggablePlugin = createPlugin(
           const { newAdded, noLongerExist } = queryDiffInfo(droppableElements, droppables)
           droppableElements = droppables
           newAdded.forEach((el) => {
-            emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-dragEnter", { dragElement })
+            emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-dragEnter", {
+              dragElement,
+              oldContainer: dragElement.parentElement,
+            })
           })
           noLongerExist.forEach((el) => {
-            emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-dragLeave", { dragElement })
+            emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-dragLeave", {
+              dragElement,
+              oldContainer: dragElement.parentElement,
+            })
           })
         },
         onMoveEnd({ ev, el: dragElement }) {
           draggingStateClassRegistry.remove()
           findValidDroppableAreas(ev).forEach((el) => {
-            emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", { dragElement })
+            emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", {
+              dragElement,
+              oldContainer: dragElement.parentElement,
+            })
           })
         },
       })
@@ -66,7 +76,7 @@ export const draggablePlugin = createPlugin(
 )
 
 export const droppablePlugin = createPlugin(
-  (options?: { droppableIcss?: CSSObject; dragoverIcss?: CSSObject }) => () => {
+  (options?: { noPresetIcss?: boolean; droppableIcss?: CSSObject; dragoverIcss?: CSSObject }) => () => {
     const { dom, setDom } = createDomRef()
     createEffect(() => {
       const el = dom()
@@ -77,8 +87,10 @@ export const droppablePlugin = createPlugin(
       const { add: addDragoverStateClass, remove: removeDragoverStateClass } = createStateClass("_dragover")(el)
 
       addDroppableStateClass()
-      listenCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", ({ dragElement }) => {
-        moveElementDOMToNewContiner({ dragElement, container: el })
+      listenCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", ({ dragElement, oldContainer }) => {
+        if (oldContainer !== el) {
+          moveElementDOMToNewContiner({ dragElement, container: el })
+        }
         removeDragoverStateClass()
       })
       listenCustomEvent<GestureDragCustomedEventInfo>(el, "customed-dragEnter", () => {
@@ -97,7 +109,7 @@ export const droppablePlugin = createPlugin(
       icss: {
         "&._droppable": {
           "&._dragover": {
-            boxShadow: `inset 0 0 32px 16px ${cssOpacity("currentcolor", 0.4)}`,
+            boxShadow: options?.noPresetIcss ? undefined : `inset 0 0 32px 16px ${cssOpacity("currentcolor", 0.1)}`,
             ...options?.dragoverIcss,
           },
           ...options?.droppableIcss,
