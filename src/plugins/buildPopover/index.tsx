@@ -62,7 +62,7 @@ export function buildPopover(options?: PopoverPluginOptions) {
       createEffect(() => {
         const el = panelDom()
         if (!el) return
-        const { abort } = listenDomEvent(el, "toggle", ({ ev }) => {
+        const { cancel } = listenDomEvent(el, "toggle", ({ ev }) => {
           // @ts-expect-error force
           const { newState } = ev as { newState: "open" | "closed" }
           if (newState === "open") {
@@ -71,7 +71,7 @@ export function buildPopover(options?: PopoverPluginOptions) {
             close()
           }
         })
-        onCleanup(abort)
+        onCleanup(cancel)
       })
       const { coorStyle } = usePopoverLocation({
         buttonDom: buttonDom,

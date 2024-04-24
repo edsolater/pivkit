@@ -18,9 +18,6 @@ export type Vector = {
 
 export type SpeedVector = Vector
 
-let eventId = 1
-const eventIdMap = new Map<number, { el: Element; eventName: string; fn: AnyFn }>()
-
 type OnMoveStart = (ev: { el: HTMLElement; ev: PointerEvent; evStart: PointerEvent; evs: PointerEvent[] }) => void
 
 type OnMoving = (ev: {
@@ -56,23 +53,48 @@ export function listenGestureDrag(
     onMoveEnd?: OnMoveEnd
   },
 ) {
-  if (!el) return
+  if (!el) return { cancel: () => {} }
   const events: PointerEvent[] = []
   /**
    *
    * @param {Event} ev
    */
-  function pointerDown(ev: PointerEvent) {
+  function handlePointerDown(ev: PointerEvent) {
+    const thisPointerId = ev.pointerId
     if (!events.length) {
       events.push(ev)
       options.onMoveStart?.({ el: el!, ev, evStart: ev, evs: events })
-      listenDomEvent(el, "pointermove", ({ ev }) => pointerMove(ev), { passive: true, restrict: "rAF" })
-      listenDomEvent(el, "pointerup", ({ ev }) => pointerUp(ev), { passive: true })
-      el?.setPointerCapture(ev.pointerId)
-      // ev.stopPropagation()
+
+      const { cancel: cancel1 } = listenDomEvent(
+        globalThis.document,
+        "pointermove",
+        ({ ev }) => {
+          if (ev.pointerId === thisPointerId) {
+            handlePointerMove(ev)
+          }
+        },
+        { restrict: "rAF" },
+      )
+
+      const { cancel: cancel2 } = listenDomEvent(
+        globalThis.document,
+        "pointerup",
+        ({ ev }) => {
+          console.log("pointerup ev: ", ev)
+          if (ev.pointerId === thisPointerId) {
+            handlePointerUp(ev)
+            cancel1()
+          }
+        },
+      )
+      // el?.setPointerCapture(ev.pointerId)
+      return () => {
+        cancel1()
+        cancel2()
+      }
     }
   }
-  function pointerMove(ev: PointerEvent) {
+  function handlePointerMove(ev: PointerEvent) {
     if (events.length && events.length > 0 && ev.pointerId === events[events.length - 1]?.pointerId) {
       events.push(ev)
       const deltaX = ev.clientX - events[events.length - 1]!.clientX
@@ -90,7 +112,7 @@ export function listenGestureDrag(
       })
     }
   }
-  function pointerUp(ev: PointerEvent) {
+  function handlePointerUp(ev: PointerEvent) {
     if (events.length && events.length > 0 && ev.pointerId === events[events.length - 1]?.pointerId) {
       events.push(ev)
       const eventNumber = 4
@@ -114,20 +136,10 @@ export function listenGestureDrag(
         totalDeltaInPx: { dx: totalDeltaX, dy: totalDeltaY },
       })
       events.splice(0, events.length)
-      el?.removeEventListener("pointermove", pointerMove)
     }
   }
-  el?.addEventListener("pointerdown", pointerDown)
-  // record it to cancel by id
-  eventIdMap.set(eventId++, { el, eventName: "pointerdown", fn: pointerDown })
-  return eventId
-}
-
-export function cancelPointerMove(id: number | undefined) {
-  if (!id || !eventIdMap.has(id)) return
-  const { el, eventName, fn } = eventIdMap.get(id)!
-  el.removeEventListener(eventName, fn)
-  eventIdMap.delete(id)
+  const { cancel } = listenDomEvent(el, "pointerdown", ({ ev }) => handlePointerDown(ev))
+  return { cancel }
 }
 
 /** use translate by --x and --y */
@@ -138,8 +150,8 @@ export function attachPointerGrag(
     onMoving?: OnMoving
     onMoveEnd?: OnMoveEnd
   },
-): { remove: () => void } {
-  const pointerId = listenGestureDrag(el, {
+): { cancel: () => void } {
+  const { cancel } = listenGestureDrag(el, {
     onMoveStart: (iev) => {
       cbs?.onMoveStart?.(iev)
       iev.el.style.transform = "translate(var(--x, 0), var(--y, 0))"
@@ -155,5 +167,5 @@ export function attachPointerGrag(
       iev.el.style.removeProperty("--y")
     },
   })
-  return { remove: () => cancelPointerMove(pointerId) }
+  return { cancel }
 }

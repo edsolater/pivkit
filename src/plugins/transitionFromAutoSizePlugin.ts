@@ -88,10 +88,10 @@ export const transitionFromAutoSizePlugin = createPlugin(
 
       // make inTransition during state sync with CSS event
       createEffect(() => {
-        const { abort } = listenDomEvent(dom(), "transitionend", () => setCurrentPhase("finish"), {
+        const { cancel } = listenDomEvent(dom(), "transitionend", () => setCurrentPhase("finish"), {
           onlyTargetIsSelf: true /* TODO - add feature: attach max one time  */,
         }) // not event fired by bubbled
-        onCleanup(abort)
+        onCleanup(cancel)
       })
 
       // invoke callbacks

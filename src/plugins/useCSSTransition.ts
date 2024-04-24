@@ -143,7 +143,7 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
     //   { onlyTargetIsSelf: true /* not event fired by bubbled */ },
     // )
     onCleanup(() => {
-      subscription.abort()
+      subscription.cancel()
       // subscription2.abort()
     })
   })

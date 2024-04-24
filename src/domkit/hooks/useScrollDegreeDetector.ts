@@ -37,7 +37,7 @@ export function useScrollDegreeDetector(
     if (options?.disabled) return
 
     onScroll()
-    const { abort: cancel } = listenDomEvent(el, "scroll", onScroll, { passive: true })
+    const { cancel: cancel } = listenDomEvent(el, "scroll", onScroll, { passive: true })
     onCleanup(cancel)
   }, [ref])
   return { forceCalculate: onScroll /* TODO: don't invoke forceCalculate manually, just use mutationObserver */ }

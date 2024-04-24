@@ -100,11 +100,11 @@ export const transitionDetectorPlugin = createPlugin(
       createEffect(() => {
         const el = dom()
         if (!el) return
-        const { abort } = listenDomEvent(el, "transitionend", () => setCurrentPhase("finish"), {
+        const { cancel } = listenDomEvent(el, "transitionend", () => setCurrentPhase("finish"), {
           onlyTargetIsSelf: true /* TODO - add feature: attach max one time  */,
         }) // not event fired by bubbled
-        onCleanup(abort)
-        const { abort: abort2 } = listenDomEvent(el, "transitionstart", () => setCurrentPhase("on-going"), {
+        onCleanup(cancel)
+        const { cancel: abort2 } = listenDomEvent(el, "transitionstart", () => setCurrentPhase("on-going"), {
           onlyTargetIsSelf: true /* TODO - add feature: attach max one time  */,
         })
         onCleanup(abort2)

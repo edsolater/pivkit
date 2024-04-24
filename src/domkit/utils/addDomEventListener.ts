@@ -5,11 +5,12 @@ let eventId = 1
 
 export interface EventListenerController {
   eventId: number
-  abort(): void
+  cancel(): void
 }
 
 export interface EventListenerOptions extends AddEventListenerOptions {
   stopPropergation?: boolean
+  preventDefault?: boolean
   onlyTargetIsSelf?: boolean
   /** in 60FPS screen, pointer move max run 60 times each seconds */
   restrict?: "rAF" // TODO: 'debounce 10' means max 10 times each seconds
@@ -72,17 +73,18 @@ export function listenDomEvent<
   /** default is `{ passive: true }` */
   options?: EventListenerOptions,
 ): EventListenerController {
-  const defaultedOptions = { passive: true, ...options }
+  const eventOptions = { passive: options?.preventDefault ? false : true, ...options }
   const targetEventId = eventId++
   const controller = {
     eventId: targetEventId,
-    abort() {
+    cancel() {
       if (!el) return
       abortEvent(el, targetEventId, options)
     },
   } as EventListenerController
   const coreEventListener = (ev: Event) => {
     if (options?.stopPropergation) ev.stopPropagation()
+    if (options?.preventDefault) ev.preventDefault()
     if (options?.onlyTargetIsSelf && el !== ev.target) return
     fn({
       el,
@@ -103,7 +105,7 @@ export function listenDomEvent<
       coreEventListener(ev)
     }
   }
-  el?.addEventListener(eventName as unknown as string, registedListener, defaultedOptions)
+  el?.addEventListener(eventName as unknown as string, registedListener, eventOptions)
   if (el) {
     const registedListeners = (() => {
       if (!listenerCacheMaps.has(el)) {

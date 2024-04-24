@@ -21,7 +21,7 @@ export function useDOMEventListener<El extends ElementRefs, K extends keyof HTML
     const els = getElementFromRefs(el)
     els.forEach((el) => {
       // @ts-expect-error no need to check
-      const { abort: cancel } = listenDomEvent(el, eventName, fn, options)
+      const { cancel: cancel } = listenDomEvent(el, eventName, fn, options)
       onCleanup(cancel)
     })
   })
@@ -38,7 +38,7 @@ export function useDocumentEventListener<K extends keyof HTMLElementEventMap>(
   options?: EventListenerOptions,
 ) {
   createEffect(() => {
-    const { abort: cancel } = listenDomEvent(globalThis.document, eventName, fn, options)
+    const { cancel: cancel } = listenDomEvent(globalThis.document, eventName, fn, options)
     onCleanup(cancel)
   })
 }
@@ -54,7 +54,7 @@ export function useWindowEventListener<K extends keyof HTMLElementEventMap>(
   options?: EventListenerOptions,
 ) {
   createEffect(() => {
-    const { abort: cancel } = listenDomEvent(globalThis.window, eventName, fn, options)
+    const { cancel: cancel } = listenDomEvent(globalThis.window, eventName, fn, options)
     onCleanup(cancel)
   })
 }

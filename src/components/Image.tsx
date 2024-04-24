@@ -43,10 +43,10 @@ export function Image(rawProps: ImageKitProps) {
   const { props, shadowProps } = useKitProps(rawProps, { name: "Image", defaultProps })
 
   createEffect(() => {
-    const { abort } = listenDomEvent(dom(), "load", () => {
+    const { cancel } = listenDomEvent(dom(), "load", () => {
       setIsLoaded(true)
     })
-    onCleanup(abort)
+    onCleanup(cancel)
   })
   /* ---------------------------------- props --------------------------------- */
   return (
