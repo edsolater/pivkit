@@ -7,29 +7,47 @@ import { createDomRef } from "../hooks"
 import { createPlugin, type CSSObject } from "../piv/propHandlers"
 import { cssOpacity } from "../styles"
 
-type GestureDragCustomedEventInfo = {
+export type GestureDragCustomedEventInfo = {
   dragElement: HTMLElement
   oldContainer: HTMLElement | null
 }
 let isDragging = false
+
+const droppableElements = new Set<HTMLElement>()
+
+function deleteDroppableElement(el: HTMLElement) {
+  droppableElements.delete(el)
+}
+
+function cacheDroppableElement(el: HTMLElement) {
+  droppableElements.add(el)
+}
+
+function findValidDroppableAreas() {
+  return Array.from(droppableElements)
+}
+
 export const draggablePlugin = createPlugin(
   (options?: { draggableIcss?: CSSObject; draggingIcss?: CSSObject }) => () => {
     const { dom, setDom } = createDomRef()
     createEffect(() => {
-      const el = dom()
-      if (!el) return
-      const draggableStateClassRegistry = createStateClass("_draggable")(el)
-      const draggingStateClassRegistry = createStateClass("_dragging")(el)
-      draggableStateClassRegistry.add()
-      const { cancel } = attachPointerGrag(el, {
+      const selfElement = dom()
+      if (!selfElement) return
+      const { add: addDraggableStateClass, remove: removeDraggableStateClass } =
+        createStateClass("_draggable")(selfElement)
+      const { add: addDraggingStateClass, remove: removeDraggingStateClass } =
+        createStateClass("_dragging")(selfElement)
+      addDraggableStateClass()
+      onCleanup(removeDraggableStateClass)
+      const { cancel: cancelPresetGestureGrag } = attachPointerGrag(selfElement, {
         onMoveStart() {
-          draggingStateClassRegistry.add()
+          addDraggingStateClass()
           isDragging = true
         },
         onMoveEnd({ ev, el: dragElement }) {
-          draggingStateClassRegistry.remove()
+          removeDraggingStateClass()
           isDragging = false
-          findValidDroppableAreas(ev).forEach((el) => {
+          findValidDroppableAreas().forEach((el) => {
             emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", {
               dragElement,
               oldContainer: dragElement.parentElement,
@@ -37,9 +55,8 @@ export const draggablePlugin = createPlugin(
           })
         },
       })
+      onCleanup(cancelPresetGestureGrag)
       onCleanup(() => {
-        cancel()
-        draggableStateClassRegistry.remove()
         isDragging = false
       })
     })
@@ -65,33 +82,42 @@ export const droppablePlugin = createPlugin(
   (options?: { noPresetIcss?: boolean; droppableIcss?: CSSObject; dragoverIcss?: CSSObject }) => () => {
     const { dom, setDom } = createDomRef()
     createEffect(() => {
-      const el = dom()
-      if (!el) return
-      const { add: addDroppableStateClass, remove: removeDroppableStateClass } = createStateClass("_droppable")(el)
-      const { add: addDragoverStateClass, remove: removeDragoverStateClass } = createStateClass("_dragover")(el)
+      const selfElement = dom()
+      if (!selfElement) return
+      const { add: addDroppableStateClass, remove: removeDroppableStateClass } =
+        createStateClass("_droppable")(selfElement) // TODO: is not good to read
+      const { add: addDragoverStateClass, remove: removeDragoverStateClass } =
+        createStateClass("_dragover")(selfElement)
+      addDroppableStateClass()
+      onCleanup(removeDroppableStateClass)
+
       function cleanSelf() {
-        if (el) deleteDroppableElement(el)
+        if (selfElement) deleteDroppableElement(selfElement)
         removeDragoverStateClass()
       }
       function observeSelf() {
         if (!isDragging) return
-        if (el) cacheDroppableElement(el)
+        if (selfElement) cacheDroppableElement(selfElement)
         addDragoverStateClass()
       }
-      addDroppableStateClass()
-      listenCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", ({ dragElement, oldContainer }) => {
-        if (oldContainer !== el) {
-          moveElementDOMToNewContiner({ dragElement, container: el })
-        }
-        cleanSelf()
-      })
-      listenDomEvent(el, "pointerenter", observeSelf)
-      listenDomEvent(el, "pointerleave", cleanSelf)
-      listenDomEvent(globalThis.document, "pointercancel", cleanSelf)
 
-      onCleanup(() => {
-        removeDroppableStateClass()
-      })
+      const { cancel: cancelCustomedDropEnterListener } = listenCustomEvent<GestureDragCustomedEventInfo>(
+        selfElement,
+        "customed-drop",
+        ({ dragElement, oldContainer }) => {
+          if (oldContainer !== selfElement) {
+            moveElementDOMToNewContiner({ dragElement, container: selfElement })
+          }
+          cleanSelf()
+        },
+      )
+      onCleanup(cancelCustomedDropEnterListener)
+      const { cancel: cancelPointerEnterListener } = listenDomEvent(selfElement, "pointerenter", observeSelf)
+      onCleanup(cancelPointerEnterListener)
+      const { cancel: cancelPointerLeaveListener } = listenDomEvent(selfElement, "pointerleave", cleanSelf)
+      onCleanup(cancelPointerLeaveListener)
+      const { cancel: cancelPointerCancelListener } = listenDomEvent(globalThis.document, "pointercancel", cleanSelf)
+      onCleanup(cancelPointerCancelListener)
     })
     return {
       domRef: setDom,
@@ -108,16 +134,6 @@ export const droppablePlugin = createPlugin(
   },
 )
 
-const droppableElements = new Set<HTMLElement>()
-
-function deleteDroppableElement(el: HTMLElement) {
-  droppableElements.delete(el)
-}
-
-function cacheDroppableElement(el: HTMLElement) {
-  droppableElements.add(el)
-}
-
-function findValidDroppableAreas(pointer: { x: number; y: number }) {
-  return Array.from(droppableElements)
+function isDraggableElement(el: HTMLElement) {
+  return el.classList.contains("_draggable")
 }

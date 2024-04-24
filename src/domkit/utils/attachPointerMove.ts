@@ -76,17 +76,12 @@ export function listenGestureDrag(
         { restrict: "rAF" },
       )
 
-      const { cancel: cancel2 } = listenDomEvent(
-        globalThis.document,
-        "pointerup",
-        ({ ev }) => {
-          console.log("pointerup ev: ", ev)
-          if (ev.pointerId === thisPointerId) {
-            handlePointerUp(ev)
-            cancel1()
-          }
-        },
-      )
+      const { cancel: cancel2 } = listenDomEvent(globalThis.document, "pointerup", ({ ev }) => {
+        if (ev.pointerId === thisPointerId) {
+          handlePointerUp(ev)
+          cancel1()
+        }
+      })
       // el?.setPointerCapture(ev.pointerId)
       return () => {
         cancel1()
