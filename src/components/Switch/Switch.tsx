@@ -1,6 +1,6 @@
 import { Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { makeElementMoveSmooth } from "../../domkit/utils/makeElementMoveSmooth"
+import { usePositionTranslate } from "../../domkit/hooks/usePositionTranslate"
 import { createSyncSignal } from "../../hooks/createSyncSignal"
 import { Piv } from "../../piv"
 import { LabelKitProps } from "../Label"
@@ -64,7 +64,7 @@ export function Switch(rawProps: SwitchProps) {
 
   const { wrapperLabelStyleProps, htmlCheckboxStyleProps, switchThumbStyleProps } = useSwitchStyle({ props })
 
-  const { setMotionTargetRef } = makeElementMoveSmooth({ observeOn: isChecked })
+  const { setMotionTargetRef } = usePositionTranslate({ observeOn: isChecked })
 
   const switchController = {
     isChecked,

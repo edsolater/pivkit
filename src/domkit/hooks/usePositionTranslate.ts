@@ -10,7 +10,7 @@ import { createRef } from "../../hooks/createRef"
  * @returns An object with a `setRef` function to set the element reference.
  */
 // TODO: makeElementMoveSmooth should be a plugin instead of a hook
-export function makeElementMoveSmooth(options: {
+export function usePositionTranslate(options: {
   animateOptions?: KeyframeEffectOptions
   observeOn: Accessor<any> | AccessorArray<any>
 }) {

@@ -328,3 +328,13 @@ export const icssCenterX = createICSS((options?: {}) => ({
   display: "flex",
   justifyContent: "center",
 }))
+
+export const icssThreeSlotGrid = createICSS((opts: { gap?: CSSObject["gap"] } = {}) => ({
+  display: "grid",
+  gridTemplateColumns: "1fr 1fr 1fr",
+  gap: opts.gap ?? "8px",
+  alignItems: "center",
+  "& > *:nth-child(1)": { justifySelf: "start" },
+  "& > *:nth-child(2)": { justifySelf: "center" },
+  "& > *:nth-child(3)": { justifySelf: "end" },
+}))

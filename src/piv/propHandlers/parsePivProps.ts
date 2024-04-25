@@ -10,7 +10,7 @@ import { parsePivChildren } from "./children"
 import { classname } from "./classname"
 import { handlePluginProps } from "./handlePluginProps"
 import { parseHTMLProps } from "./htmlProps"
-import { parseICSSProps } from "./icss"
+import { handleICSSProps } from "./icss"
 import { parseIStyles } from "./istyle"
 import { handleMergifyOnCallbackProps } from "./mergifyProps"
 import { parseOnClick } from "./onClick"
@@ -55,7 +55,7 @@ function getNativeHTMLPropsFromParsedPivProp(props: any, controller: ValidContro
         get class() {
           // get ter for lazy solidjs render
           return (
-            shakeFalsy([classname(props.class, controller), parseICSSProps(props.icss, controller)]).join(" ") ||
+            shakeFalsy([classname(props.class, controller), handleICSSProps(props.icss, controller)]).join(" ") ||
             undefined
           ) /* don't render if empty string */
         },
@@ -76,7 +76,7 @@ function getNativeHTMLPropsFromParsedPivProp(props: any, controller: ValidContro
         get class() {
           // get ter for lazy solidjs render
           return (
-            shakeFalsy([classname(props.class, controller), parseICSSProps(props.icss, controller)]).join(" ") ||
+            shakeFalsy([classname(props.class, controller), handleICSSProps(props.icss, controller)]).join(" ") ||
             undefined
           ) /* don't render if empty string */
         },
@@ -173,7 +173,7 @@ function debugLog(rawProps: PivProps<any>, props: PivProps<any>, controller: Val
       console.debug("[piv debug] htmlProps (raw → parsed): ", props.htmlProps, { ...parseHTMLProps(props.htmlProps) })
     }
     if (props.debugLog.includes("icss")) {
-      console.debug("[piv debug] icss (raw → parsed): ", props.icss, parseICSSProps(props.icss, controller))
+      console.debug("[piv debug] icss (raw → parsed): ", props.icss, handleICSSProps(props.icss, controller))
     }
     if (props.debugLog.includes("style")) {
       console.debug("[piv debug] style (raw → parsed): ", props.style, parseIStyles(props.style, controller))

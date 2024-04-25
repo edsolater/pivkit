@@ -122,3 +122,5 @@ export function Tabs(rawProps: TabsKitProps) {
 
 Tabs.List = TabList
 Tabs.Tab = Tab
+
+export { TabList, Tab }
