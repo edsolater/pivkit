@@ -79,7 +79,7 @@ export function handleICSSProps<Controller extends ValidController | unknown = u
     const shrinked = shrinkFn(fn, [controller])
     if (!shrinked || (!isString(shrinked) && !isObject(shrinked))) continue
 
-    const className = isString(shrinked) ? shrinked : css(shrinked as any)
+    const className = isString(shrinked) ? shrinked : css(collapseMergeableCSSValue(shrinked as any) as any)
     outputClassName += (outputClassName ? " " : "") + className
   }
 
@@ -118,4 +118,86 @@ export function mergeICSSObject<Controller extends ValidController | unknown = u
       icssEs.map((ic) => shrinkFn(ic, [controller])),
       ({ valueA: v1, valueB: v2 }) => v2 ?? v1,
     )
+}
+
+/**
+ * @example
+ * {_background_j: "var(--bg1)", _background_k: "var(--bg2)", background: "var(--bg3)", _background_: "var(--bg4)"} => {background: "vat(--bg3), var(--bg1), var(--bg2), var(--bg4)"}
+ * *j k is just sault
+ */
+function collapseMergeableCSSValue(icssRule: ICSSObject): ICSSObject {
+  const needMerge = Object.keys(icssRule).some((k) => k.startsWith("_"))
+  if (!needMerge) return icssRule
+
+  const resultIcss: ICSSObject = {}
+  for (const [key, value] of Object.entries(icssRule)) {
+    if (key.startsWith("_background_")) {
+      resultIcss.background = resultIcss.background ? resultIcss.background + "," + value : value
+    } else if (key.startsWith("_boxShadow_")) {
+      resultIcss.boxShadow = resultIcss.boxShadow ? resultIcss.boxShadow + "," + value : value
+    } else if (key.startsWith("_translate_")) {
+      resultIcss.translate = resultIcss.translate ? combineTwoCSSTranslateValue(resultIcss.translate, value) : value
+    } else if (key.startsWith("_rotate_")) {
+      resultIcss.rotate = resultIcss.rotate ? combineTwoCSSRotateValue(resultIcss.rotate, value) : value
+    } else if (key.startsWith("_scale_")) {
+      resultIcss.scale = resultIcss.scale ? combineTwoCSSScaleValue(resultIcss.scale, value) : value
+    } else if (key.startsWith("_transform_")) {
+      resultIcss.transform = resultIcss.transform ? resultIcss.transform + " " + value : value
+    } else if (key.startsWith("_filter_")) {
+      resultIcss.filter = resultIcss.filter ? resultIcss.filter + " " + value : value
+    } else if (key.startsWith("_backdropFilter_")) {
+      resultIcss.backdropFilter = resultIcss.backdropFilter ? resultIcss.backdropFilter + " " + value : value
+    } else {
+      resultIcss[key] = value
+    }
+  }
+  return resultIcss
+}
+
+/**
+ * basic utils
+ */
+function isMeaningfullCSSValue(v: string | number | undefined) {
+  return Boolean(v && v != "0")
+}
+
+/** utils for {@link collapseMergeableCSSValue} */
+function combineTwoCSSTranslateValue(oldCssValue: string | undefined, newCssValue: string): string {
+  const [oldX = "", oldY = ""] = (oldCssValue ?? "").split(" ")
+  const [newX = "", newY = ""] = newCssValue.split(" ")
+  const mergedX =
+    isMeaningfullCSSValue(oldX) && isMeaningfullCSSValue(newX)
+      ? `calc(${oldX} + ${newX})`
+      : isMeaningfullCSSValue(newX)
+        ? newX
+        : oldX
+  const mergedY =
+    isMeaningfullCSSValue(oldY) && isMeaningfullCSSValue(newY)
+      ? `calc(${oldY} + ${newY})`
+      : isMeaningfullCSSValue(newY)
+        ? newY
+        : oldY
+  return `${mergedX} ${mergedY}`.trim()
+}
+
+/** utils for {@link collapseMergeableCSSValue} */
+function combineTwoCSSRotateValue(oldCssValue: string | undefined, newCssValue: string): string {
+  const merged =
+    isMeaningfullCSSValue(oldCssValue) && isMeaningfullCSSValue(newCssValue)
+      ? `calc(${oldCssValue} + ${newCssValue})`
+      : isMeaningfullCSSValue(newCssValue)
+        ? newCssValue
+        : oldCssValue ?? ""
+  return merged
+}
+
+/** utils for {@link collapseMergeableCSSValue} */
+function combineTwoCSSScaleValue(oldCssValue: string | number | undefined, newCssValue: string): string | number {
+  const merged =
+    isMeaningfullCSSValue(oldCssValue) && isMeaningfullCSSValue(newCssValue)
+      ? `calc(${oldCssValue} * ${newCssValue})`
+      : isMeaningfullCSSValue(newCssValue)
+        ? newCssValue
+        : oldCssValue ?? ""
+  return merged
 }
