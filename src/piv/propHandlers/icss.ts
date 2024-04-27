@@ -6,16 +6,14 @@ import {
   filter,
   flap,
   flapDeep,
-  getKeys,
   isObject,
   isString,
   mergeObjectsWithConfigs,
   overwriteFunctionName,
-  shrinkFn,
+  shrinkFn
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
 // just for type, just use goober is not enough
-import type _ from "csstype"
 import { ConfigableFunction, createConfigableFunction } from "../../fnkit/configableFunction"
 
 type ValidController = AnyObj
@@ -135,6 +133,10 @@ function collapseMergeableCSSValue(icssRule: ICSSObject): ICSSObject {
       resultIcss.background = resultIcss.background ? resultIcss.background + "," + value : value
     } else if (key.startsWith("_boxShadow_")) {
       resultIcss.boxShadow = resultIcss.boxShadow ? resultIcss.boxShadow + "," + value : value
+    } else if (key.startsWith("_animation_")) {
+      resultIcss.animation = resultIcss.animation ? resultIcss.animation + "," + value : value
+    } else if (key.startsWith("_transition_")) {
+      resultIcss.transition = resultIcss.transition ? resultIcss.transition + "," + value : value
     } else if (key.startsWith("_translate_")) {
       resultIcss.translate = resultIcss.translate ? combineTwoCSSTranslateValue(resultIcss.translate, value) : value
     } else if (key.startsWith("_rotate_")) {
