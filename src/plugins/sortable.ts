@@ -7,7 +7,11 @@ import { createDomRef } from "../hooks"
 import { createPlugin, type CSSObject } from "../piv/propHandlers"
 import { cssOpacity } from "../styles"
 import { GestureDragCustomedEventInfo } from "./draggable&droppable"
-
+type GestureSortCustomedEventInfo = {
+  dragElement: HTMLElement
+  dragTranslateX: number
+  dragTranslateY: number
+}
 const sortableElements = new Set<HTMLElement>()
 
 function deleteSortableElement(el: HTMLElement) {
@@ -69,16 +73,17 @@ export const sortablePlugin = createPlugin(
             addDraggingStateClass()
             isSorting = true
           },
-          onMoveEnd({ el: dragElement }) {
+          onMoveEnd({ el: dragElement, totalDeltaInPx }) {
             removeDraggingStateClass()
             isSorting = false
             findValidSortableAreas().forEach((el) =>
-              emitCustomEvent<GestureDragCustomedEventInfo>(
+              emitCustomEvent<GestureSortCustomedEventInfo>(
                 el,
                 "customed-sort-drop",
                 {
                   dragElement,
-                  oldContainer: dragElement.parentElement,
+                  dragTranslateX: totalDeltaInPx.dx,
+                  dragTranslateY: totalDeltaInPx.dy,
                 },
                 { async: false },
               ),
@@ -88,12 +93,18 @@ export const sortablePlugin = createPlugin(
         onCleanup(cancelPresetGestureGrag)
 
         // be cover by other(should switch position)
-        const { cancel: cancelCustomSortDropEnterListener } = listenCustomEvent<GestureDragCustomedEventInfo>(
+        const { cancel: cancelCustomSortDropEnterListener } = listenCustomEvent<GestureSortCustomedEventInfo>(
           selfElement,
           "customed-sort-drop",
-          ({ dragElement, oldContainer }) => {
+          ({ dragElement, dragTranslateX, dragTranslateY }) => {
             if (isSortableElement(selfElement) && isSortableElement(dragElement)) {
-              moveElementNextToSibling({ dragElement, leaderElement: selfElement })
+              moveElementNextToSibling({
+                dragElement,
+                droppedElement: selfElement,
+                withTransition: true,
+                dragTranslateX,
+                dragTranslateY,
+              })
             }
             cleanSelf()
           },
