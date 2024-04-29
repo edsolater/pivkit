@@ -1,6 +1,7 @@
 import { makeElementMove, type RectInfo } from "../hooks/usePositionTranslate"
 import { isHTMLElement } from "./isHTMLElement"
 
+/** for plugin:draggable and plugin:droppable */
 export function moveElementDOMToNewContiner({
   dropElement,
   dragElement,
@@ -48,6 +49,7 @@ export function moveElementDOMToNewContiner({
   }
 }
 
+/** for plugin:sortable */
 export function moveElementNextToSibling({
   dragElement,
   droppedElement,
