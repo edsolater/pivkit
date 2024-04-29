@@ -30,7 +30,7 @@ let isSorting = false
  * droppable means `<Box>` is a container
  * sortable means `<Box>` is in an container
  */
-export const sortablePlugin = createPlugin(
+export const itemSortablePlugin = createPlugin(
   (options?: {
     noPresetIcss?: boolean
     sortableIcss?: CSSObject

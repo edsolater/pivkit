@@ -1,15 +1,28 @@
-import { from } from "solid-js"
 import { makeElementMove, type RectInfo } from "../hooks/usePositionTranslate"
 import { isHTMLElement } from "./isHTMLElement"
 
 export function moveElementDOMToNewContiner({
+  dropElement,
   dragElement,
-  container,
+  needRelaceContent,
+  withTransition = true,
+  transitionDuration = 150,
 }: {
+  dropElement: HTMLElement
   dragElement: HTMLElement
-  container: HTMLElement
+  needRelaceContent?: boolean
+  // animation
+  withTransition?: boolean
+  transitionDuration?: number
 }) {
-  container.appendChild(dragElement)
+  if (needRelaceContent) {
+    const moveTargetNodes = Array.from(dragElement.childNodes)
+    const oldChildren = Array.from(dropElement.childNodes)
+    dragElement.append(...oldChildren)
+    dropElement.append(...moveTargetNodes)
+  } else {
+    dropElement.append(dragElement)
+  }
 }
 
 export function moveElementNextToSibling({
@@ -22,6 +35,7 @@ export function moveElementNextToSibling({
 }: {
   dragElement: HTMLElement
   droppedElement: HTMLElement
+  // animation
   withTransition?: boolean
   dragTranslateX: number
   dragTranslateY: number
@@ -30,32 +44,6 @@ export function moveElementNextToSibling({
   const dragElementRect = dragElement.getBoundingClientRect()
 
   const leaderElementRect = droppedElement.getBoundingClientRect()
-
-  const direction = (() => {
-    const dragElementCenterPoint = {
-      x: dragElementRect.left + dragElementRect.width / 2,
-      y: dragElementRect.top + dragElementRect.height / 2,
-    }
-    const leaderElementCenterPoint = {
-      x: leaderElementRect.left + leaderElementRect.width / 2,
-      y: leaderElementRect.top + leaderElementRect.height / 2,
-    }
-    const deltaX = Math.abs(leaderElementCenterPoint.x - dragElementCenterPoint.x)
-    const deltaY = Math.abs(leaderElementCenterPoint.y - dragElementCenterPoint.y)
-    if (deltaX > deltaY) {
-      return "horizontal"
-    } else {
-      return "vertical"
-    }
-  })()
-
-  const leaderShouldAppearFirst = (() => {
-    if (direction === "horizontal") {
-      return dragElementRect.left < leaderElementRect.left
-    } else {
-      return dragElementRect.top < leaderElementRect.top
-    }
-  })()
 
   // const computed = getComputedStyle(droppedElement) //
 
@@ -104,6 +92,32 @@ export function moveElementNextToSibling({
   }
 
   function core() {
+    const direction = (() => {
+      const dragElementCenterPoint = {
+        x: dragElementRect.left + dragElementRect.width / 2,
+        y: dragElementRect.top + dragElementRect.height / 2,
+      }
+      const leaderElementCenterPoint = {
+        x: leaderElementRect.left + leaderElementRect.width / 2,
+        y: leaderElementRect.top + leaderElementRect.height / 2,
+      }
+      const deltaX = Math.abs(leaderElementCenterPoint.x - dragElementCenterPoint.x)
+      const deltaY = Math.abs(leaderElementCenterPoint.y - dragElementCenterPoint.y)
+      if (deltaX > deltaY) {
+        return "horizontal"
+      } else {
+        return "vertical"
+      }
+    })()
+
+    const leaderShouldAppearFirst = (() => {
+      if (direction === "horizontal") {
+        return dragElementRect.left < leaderElementRect.left
+      } else {
+        return dragElementRect.top < leaderElementRect.top
+      }
+    })()
+
     if (leaderShouldAppearFirst) {
       droppedElement.before(dragElement)
     } else {
