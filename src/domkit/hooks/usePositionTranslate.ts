@@ -88,8 +88,8 @@ export function makeElementMove(options: {
   to: RectInfo
   actionElement: HTMLElement
   additionalTranslateInfo?: {
-    dx: number
-    dy: number
+    x: number
+    y: number
   }
   animateOptions?: KeyframeEffectOptions
 }): Animation {
@@ -101,7 +101,7 @@ export function makeElementMove(options: {
   const animation = options.actionElement.animate(
     [
       {
-        transform: `translate(${-deltaX + (options.additionalTranslateInfo?.dx ?? 0)}px, ${-deltaY + (options.additionalTranslateInfo?.dy ?? 0)}px) scale(${deltaWidth}, ${deltaHeight})`,
+        transform: `translate(${-deltaX + (options.additionalTranslateInfo?.x ?? 0)}px, ${-deltaY + (options.additionalTranslateInfo?.y ?? 0)}px) scale(${deltaWidth}, ${deltaHeight})`,
       },
       { transform: "" },
     ],

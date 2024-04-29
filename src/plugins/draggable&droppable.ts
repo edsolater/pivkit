@@ -11,6 +11,10 @@ import type { AnyFn } from "@edsolater/fnkit"
 export type GestureDragCustomedEventInfo = {
   dragElement: HTMLElement
   shouldSwitch?: boolean
+  dragTranslate: {
+    x: number
+    y: number
+  }
 }
 
 export function isDraggableElement(el: HTMLElement) {
@@ -122,16 +126,19 @@ function attachDragFeature(
       addDraggingStateClass()
       isDragging = true
     },
-    onMoveEnd({ ev, el: dragElement }) {
+    onMoveEnd({ ev, el: dragElement, totalDeltaInPx }) {
       removeDraggingStateClass()
       isDragging = false
       const selectedDroppableAreas = findValidDroppableAreas()
       options?.onDrop?.({ dragElement, droppableAreas: selectedDroppableAreas })
-      console.log("options?.canOnlyContent: ", options)
       selectedDroppableAreas.forEach((el) => {
         emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", {
           dragElement: dragElement,
           shouldSwitch: options?.canOnlyContent,
+          dragTranslate:{
+            x: totalDeltaInPx.dx,
+            y: totalDeltaInPx.dy
+          }
         })
       })
     },
@@ -171,11 +178,12 @@ function attachDropFeature(
   const { cancel: cancelCustomedDropEnterListener } = listenCustomEvent<GestureDragCustomedEventInfo>(
     selfElement,
     "customed-drop",
-    ({ dragElement, shouldSwitch }) => {
+    ({ dragElement, shouldSwitch, dragTranslate }) => {
       if (dragElement && dragElement !== selfElement && dragElement.parentElement !== selfElement) {
         moveElementDOMToNewContiner({
           dropElement: selfElement,
           dragElement: dragElement,
+          dragTranslate,
           needRelaceContent: shouldSwitch && options?.canOnlyContent,
         })
       }

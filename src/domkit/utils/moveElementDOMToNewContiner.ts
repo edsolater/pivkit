@@ -6,6 +6,7 @@ export function moveElementDOMToNewContiner({
   dragElement,
   needRelaceContent,
   withTransition = true,
+  dragTranslate,
   transitionDuration = 150,
 }: {
   dropElement: HTMLElement
@@ -13,15 +14,37 @@ export function moveElementDOMToNewContiner({
   needRelaceContent?: boolean
   // animation
   withTransition?: boolean
+  dragTranslate: {
+    x: number
+    y: number
+  }
   transitionDuration?: number
 }) {
-  if (needRelaceContent) {
-    const moveTargetNodes = Array.from(dragElement.childNodes)
-    const oldChildren = Array.from(dropElement.childNodes)
-    dragElement.append(...oldChildren)
-    dropElement.append(...moveTargetNodes)
+  function core() {
+    if (needRelaceContent) {
+      const moveTargetNodes = Array.from(dragElement.childNodes)
+      const oldChildren = Array.from(dropElement.childNodes)
+      dragElement.append(...oldChildren)
+      dropElement.append(...moveTargetNodes)
+    } else {
+      dropElement.append(dragElement)
+    }
+  }
+
+  if (withTransition) {
+    const startDragElementRect = getRectInfo(dragElement)
+    core()
+    const endDragElementRect = getRectInfo(dragElement)
+    makeElementMove({
+      from: startDragElementRect,
+      to: endDragElementRect,
+      actionElement: dragElement,
+      additionalTranslateInfo: dragTranslate,
+      animateOptions: { duration: transitionDuration },
+    })
   } else {
-    dropElement.append(dragElement)
+    core()
+    //TODO: still don't know to transition switch
   }
 }
 
@@ -29,16 +52,17 @@ export function moveElementNextToSibling({
   dragElement,
   droppedElement,
   withTransition = true,
-  dragTranslateX,
-  dragTranslateY,
+  dragTranslate,
   transitionDuration = 150,
 }: {
   dragElement: HTMLElement
   droppedElement: HTMLElement
   // animation
   withTransition?: boolean
-  dragTranslateX: number
-  dragTranslateY: number
+  dragTranslate: {
+    x: number
+    y: number
+  }
   transitionDuration?: number
 }) {
   const dragElementRect = dragElement.getBoundingClientRect()
@@ -64,10 +88,7 @@ export function moveElementNextToSibling({
       from: beforeDragRect,
       to: afterDragRect,
       actionElement: dragElement,
-      additionalTranslateInfo: {
-        dx: dragTranslateX,
-        dy: dragTranslateY,
-      },
+      additionalTranslateInfo: dragTranslate,
       animateOptions: { duration: transitionDuration },
     })
     makeElementMove({

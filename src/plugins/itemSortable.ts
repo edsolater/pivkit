@@ -9,8 +9,10 @@ import { cssOpacity } from "../styles"
 import { GestureDragCustomedEventInfo } from "./draggable&droppable"
 type GestureSortCustomedEventInfo = {
   dragElement: HTMLElement
-  dragTranslateX: number
-  dragTranslateY: number
+  dragTranslate: {
+    x: number
+    y: number
+  }
 }
 const sortableElements = new Set<HTMLElement>()
 
@@ -82,8 +84,10 @@ export const itemSortablePlugin = createPlugin(
                 "customed-sort-drop",
                 {
                   dragElement,
-                  dragTranslateX: totalDeltaInPx.dx,
-                  dragTranslateY: totalDeltaInPx.dy,
+                  dragTranslate: {
+                    x: totalDeltaInPx.dx,
+                    y: totalDeltaInPx.dy,
+                  },
                 },
                 { async: false },
               ),
@@ -96,14 +100,13 @@ export const itemSortablePlugin = createPlugin(
         const { cancel: cancelCustomSortDropEnterListener } = listenCustomEvent<GestureSortCustomedEventInfo>(
           selfElement,
           "customed-sort-drop",
-          ({ dragElement, dragTranslateX, dragTranslateY }) => {
+          ({ dragElement, dragTranslate }) => {
             if (isSortableElement(selfElement) && isSortableElement(dragElement)) {
               moveElementNextToSibling({
                 dragElement,
                 droppedElement: selfElement,
                 withTransition: true,
-                dragTranslateX,
-                dragTranslateY,
+                dragTranslate,
               })
             }
             cleanSelf()
