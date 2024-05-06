@@ -5,7 +5,7 @@ import { PivProps } from "../Piv"
 import { ValidController } from "../typeTools"
 import { mergeProps } from "../utils/mergeProps"
 import { omitProps } from "../utils/omitProps"
-import { extractPluginCore, isPluginObj, Plugin } from "./plugin"
+import { extractPluginCore, isPluginObj, Pluginable } from "./plugin"
 
 export const pluginCoreSymbol = Symbol("pluginCore")
 
@@ -22,8 +22,8 @@ export function handlePluginProps<P extends AnyObj>(
   return getMergePluginReturnedProps(sortPluginByPriority(flap(plugin)), props)
 }
 
-function sortPluginByPriority(plugins: Plugin<any>[]) {
-  function getPluginPriority(plugin: Plugin<any>) {
+function sortPluginByPriority(plugins: Pluginable<any>[]) {
+  function getPluginPriority(plugin: Pluginable<any>) {
     return isPluginObj(plugin) ? plugin.priority ?? 0 : 0
   }
   if (plugins.length <= 1) return plugins
@@ -43,7 +43,7 @@ function sortPluginByPriority(plugins: Plugin<any>[]) {
  */
 
 function getMergePluginReturnedProps<T extends AnyObj>(
-  plugins: MayArray<Plugin<T> | undefined>,
+  plugins: MayArray<Pluginable<T> | undefined>,
   props: T & PivProps,
 ): Omit<T & PivProps, "plugin"> {
   return omitProps(
@@ -53,7 +53,7 @@ function getMergePluginReturnedProps<T extends AnyObj>(
 }
 
 /** core */
-function invokePlugin(plugin: Plugin<any>, props: KitProps<any>) {
+function invokePlugin(plugin: Pluginable<any>, props: KitProps<any>) {
   const [controller, setController] = createSignal<ValidController>({})
   const [dom, setDom] = createSignal<HTMLElement>()
 

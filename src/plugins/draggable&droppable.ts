@@ -1,12 +1,12 @@
-import { createEffect, onCleanup } from "solid-js"
-import { attachPointerGrag, listenDomEvent } from "../domkit"
+import type { AnyFn } from "@edsolater/fnkit"
+import { createEffect } from "solid-js"
+import { attachPointerGrag, listenDomEvent, type OnMoveEnd, type OnMoveStart, type OnMoving } from "../domkit"
 import { emitCustomEvent, listenCustomEvent } from "../domkit/utils/customEvent"
 import { moveElementDOMToNewContiner } from "../domkit/utils/moveElementDOMToNewContiner"
 import { createStateClass } from "../domkit/utils/stateClass"
 import { createDomRef } from "../hooks"
-import { createPlugin, type CSSObject } from "../piv/propHandlers"
+import { createPlugin, type CSSObject, type Plugin } from "../piv/propHandlers"
 import { cssOpacity } from "../styles"
-import type { AnyFn } from "@edsolater/fnkit"
 
 export type GestureDragCustomedEventInfo = {
   dragElement: HTMLElement
@@ -35,39 +35,36 @@ function findValidDroppableAreas() {
   return Array.from(droppableElements)
 }
 
-export const draggablePlugin = createPlugin(
-  (options?: {
-    /** only replace work when target canOnlyContent is also on*/
-    canOnlyContent?: boolean
-    draggableIcss?: CSSObject
-    draggingIcss?: CSSObject
-  }) =>
-    () => {
-      const { dom, setDom } = createDomRef()
-      createEffect(() => {
-        const selfElement = dom()
-        if (!selfElement) return
-        attachDragFeature(selfElement, {
-          canOnlyContent: options?.canOnlyContent,
-        })
-      })
-      return {
-        icss: {
-          "&._draggable": {
-            cursor: "grab",
-            "&._dragging": {
-              cursor: "grabbing",
-              userSelect: "none",
-              pointerEvents: "none",
-              ...options?.draggingIcss,
-            },
-            ...options?.draggableIcss,
-          },
-        } as const,
-        domRef: setDom,
-      }
-    },
-)
+export type DraggablePluginOptions = {
+  draggableIcss?: CSSObject
+  draggingIcss?: CSSObject
+} & DragFeatureOptions
+
+export type DraggablePlugin = Plugin<{ draggableIcss?: CSSObject; draggingIcss?: CSSObject } & DragFeatureOptions>
+
+export const draggablePlugin: DraggablePlugin = createPlugin((options) => () => {
+  const { dom, setDom } = createDomRef()
+  createEffect(() => {
+    const selfElement = dom()
+    if (!selfElement) return
+    attachDragFeature(selfElement, options)
+  })
+  return {
+    icss: {
+      "&._draggable": {
+        cursor: "grab",
+        "&._dragging": {
+          cursor: "grabbing",
+          userSelect: "none",
+          pointerEvents: "none",
+          ...options.draggingIcss,
+        },
+        ...options.draggableIcss,
+      },
+    } as const,
+    domRef: setDom,
+  }
+})
 
 export const droppablePlugin = createPlugin(
   (options?: {
@@ -104,29 +101,36 @@ export const droppablePlugin = createPlugin(
 
 let isDragging = false
 
+type DragFeatureOptions = {
+  onDrop?: (payloads: { dragElement: HTMLElement; droppableAreas: HTMLElement[] }) => void
+  onMoving?: OnMoving
+  onMoveStart?: OnMoveStart
+  onMoveEnd?: OnMoveEnd
+  /** only replace work when target canOnlyContent is also on*/
+  canOnlyContent?: boolean
+}
+
 /**
  * at end of drag, will emit customed-drop event to all droppable areas (the action can be changed by options)
  * onDrop callback is fired before customed-drop event is emitted
  */
-function attachDragFeature(
-  selfElement: HTMLElement,
-  options?: {
-    onDrop?: (payloads: { dragElement: HTMLElement; droppableAreas: HTMLElement[] }) => void
-    /** only replace work when target canOnlyContent is also on*/
-    canOnlyContent?: boolean
-  },
-) {
+function attachDragFeature(selfElement: HTMLElement, options?: DragFeatureOptions) {
   const cleanFns = [] as AnyFn[]
   const { add: addDraggableStateClass, remove: removeDraggableStateClass } = createStateClass("_draggable")(selfElement)
   const { add: addDraggingStateClass, remove: removeDraggingStateClass } = createStateClass("_dragging")(selfElement)
   addDraggableStateClass()
   cleanFns.push(removeDraggableStateClass)
   const { cancel: cancelPresetGestureGrag } = attachPointerGrag(selfElement, {
-    onMoveStart() {
+    onMoving(cev) {
+      options?.onMoving?.(cev)
+    },
+    onMoveStart(cev) {
       addDraggingStateClass()
       isDragging = true
+      options?.onMoveStart?.(cev)
     },
-    onMoveEnd({ ev, el: dragElement, totalDeltaInPx }) {
+    onMoveEnd(cev) {
+      const { ev, el: dragElement, totalDeltaInPx } = cev
       removeDraggingStateClass()
       isDragging = false
       const selectedDroppableAreas = findValidDroppableAreas()
@@ -135,12 +139,13 @@ function attachDragFeature(
         emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", {
           dragElement: dragElement,
           shouldSwitch: options?.canOnlyContent,
-          dragTranslate:{
+          dragTranslate: {
             x: totalDeltaInPx.dx,
-            y: totalDeltaInPx.dy
-          }
+            y: totalDeltaInPx.dy,
+          },
         })
       })
+      options?.onMoveEnd?.(cev)
     },
   })
   cleanFns.push(cancelPresetGestureGrag)

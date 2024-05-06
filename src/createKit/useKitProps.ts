@@ -8,7 +8,7 @@ import { getPropsFromPropContextContext } from "../piv/PropContext"
 import { loadPropsControllerRef } from "../piv/propHandlers/children"
 import { handlePluginProps } from "../piv/propHandlers/handlePluginProps"
 import { handleMergifyOnCallbackProps } from "../piv/propHandlers/mergifyProps"
-import { Plugin } from "../piv/propHandlers/plugin"
+import { Pluginable } from "../piv/propHandlers/plugin"
 import { handleShadowProps } from "../piv/propHandlers/shadowProps"
 import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { mergeProps } from "../piv/utils"
@@ -28,7 +28,7 @@ export type KitPropsOptions<
     props: ParsedKitProps<KitProps>,
   ) => any /* use any to avoid this type check (type check means type infer) */
   defaultProps?: DefaultProps
-  plugin?: MayArray<Plugin<any>>
+  plugin?: MayArray<Pluginable<any>>
   /** default is false
    * @deprecated use `needAccessify` instead
    */

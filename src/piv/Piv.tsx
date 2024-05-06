@@ -6,7 +6,7 @@ import {
   ICSS,
   IStyle,
   OnClickPayloads,
-  Plugin,
+  Pluginable,
   PluginCoreFn,
   handlePluginProps,
   handleShadowProps,
@@ -80,7 +80,7 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
    * auto merge by shadowProps
    * special: every kit baseon <Piv> should support this prop
    */
-  plugin?: MayArray<Plugin<any> | PluginCoreFn>
+  plugin?: MayArray<Pluginable<any> | PluginCoreFn>
 
   // -------- special prop --------
 

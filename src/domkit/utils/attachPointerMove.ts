@@ -18,9 +18,17 @@ export type Vector = {
 
 export type SpeedVector = Vector
 
-type OnMoveStart = (ev: { el: HTMLElement; ev: PointerEvent; evStart: PointerEvent; evs: PointerEvent[] }) => void
+type MoveStartCustomizedEvent = {
+  el: HTMLElement
+  ev: PointerEvent
+  evStart: PointerEvent
+  evs: PointerEvent[]
+}
 
-type OnMoving = (ev: {
+export type OnMoveStart = (ev: MoveStartCustomizedEvent) => void
+
+
+export type OnMoving = (ev: {
   el: HTMLElement
   ev: PointerEvent
   evStart: PointerEvent
@@ -29,7 +37,7 @@ type OnMoving = (ev: {
   totalDeltaInPx: Delta2dTranslate
 }) => void
 
-type OnMoveEnd = (ev: {
+export type OnMoveEnd = (ev: {
   el: HTMLElement
   ev: PointerEvent
   evStart: PointerEvent
@@ -39,19 +47,22 @@ type OnMoveEnd = (ev: {
   currentSpeed: SpeedVector
 }) => void
 
+
+export type GestureMoveOptions = {
+  onMoveStart?: OnMoveStart
+  onMoving?: OnMoving
+  onMoveEnd?: OnMoveEnd
+}
+
 /**
  * listen to element' pointermove（pointerDown + pointerMove + pointerUp）clean event automaticly
  * @param el targetElement
  * @param options !must registed, so user can do something when pointer move
  * @returns cancelable event id (it is not dom's event id, it is just a number to cancel event listener)
  */
-export function listenGestureDrag(
+export function listenGestureMove(
   el: HTMLElement | undefined | null,
-  options: {
-    onMoveStart?: OnMoveStart
-    onMoving?: OnMoving
-    onMoveEnd?: OnMoveEnd
-  },
+  options: GestureMoveOptions,
 ) {
   if (!el) return { cancel: () => {} }
   const events: PointerEvent[] = []
@@ -146,7 +157,7 @@ export function attachPointerGrag(
     onMoveEnd?: OnMoveEnd
   },
 ): { cancel: () => void } {
-  const { cancel } = listenGestureDrag(el, {
+  const { cancel } = listenGestureMove(el, {
     onMoveStart: (iev) => {
       cbs?.onMoveStart?.(iev)
       iev.el.style.transform = "translate(var(--x, 0), var(--y, 0))"

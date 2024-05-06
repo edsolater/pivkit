@@ -270,8 +270,8 @@ export const icssClickable = createICSS((options?: ICSSClickableOption) => ({
   transition: "100ms",
   // backdropFilter: "brightness(1)", // backdrop-filter will cause render performance issue, avoid to use
   filter: "brightness(1)",
-  "&:is(:hover,:active,:focus)": { filter: "brightness(0.95)" },
-  "&:active": { transform: "scale(0.95)" },
+  "&:is(:hover,:active,:focus)": { filter: "brightness(0.7)" },
+  "&:active": { transform: "scale(0.6)" },
 }))
 
 export const icssFocusDetector = createICSS(() => ({

@@ -2,7 +2,7 @@ import { AnyFn, MayArray, MayDeepArray } from "@edsolater/fnkit"
 import { AccessifyProps } from ".."
 import { CallbackRef, PivProps } from "../piv/Piv"
 import { MergifyProps } from "../piv/propHandlers/mergifyProps"
-import { GetPluginParams, Plugin } from "../piv/propHandlers/plugin"
+import { GetPluginParams, Pluginable } from "../piv/propHandlers/plugin"
 import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { OmitItem } from "./utils"
 
@@ -15,7 +15,7 @@ import { OmitItem } from "./utils"
 type KitPropsInstance<
   RawProps extends ValidProps,
   Controller extends ValidController,
-  Plugins extends MayDeepArray<Plugin<any>>,
+  Plugins extends MayDeepArray<Pluginable<any>>,
   TagName extends HTMLTag,
   NeedAccessifyProps extends keyof RawProps,
 > = AccessifyProps<Pick<RawProps, NeedAccessifyProps>, Controller> &
@@ -41,7 +41,7 @@ export type KitProps<
   O extends {
     /** will auto-add props: */
     controller?: ValidController
-    plugin?: MayArray<Plugin<any>>
+    plugin?: MayArray<Pluginable<any>>
     htmlPropsTagName?: HTMLTag
     // default is auto detect, only set when auto is not ok
     needAccessifyProps?: (keyof RawProps)[]

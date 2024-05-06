@@ -7,38 +7,38 @@ import { ValidController, ValidProps } from "../typeTools"
 import { PivProps } from "../Piv"
 
 export type GetPluginParams<T> =
-  T extends Plugin<infer Px1>
+  T extends Pluginable<infer Px1>
     ? Px1
-    : T extends Plugin<infer Px1>[]
+    : T extends Pluginable<infer Px1>[]
       ? Px1
-      : T extends (Plugin<infer Px1> | Plugin<infer Px2>)[]
+      : T extends (Pluginable<infer Px1> | Pluginable<infer Px2>)[]
         ? Px1 & Px2
-        : T extends (Plugin<infer Px1> | Plugin<infer Px2> | Plugin<infer Px3>)[]
+        : T extends (Pluginable<infer Px1> | Pluginable<infer Px2> | Pluginable<infer Px3>)[]
           ? Px1 & Px2 & Px3
-          : T extends (Plugin<infer Px1> | Plugin<infer Px2> | Plugin<infer Px3> | Plugin<infer Px4>)[]
+          : T extends (Pluginable<infer Px1> | Pluginable<infer Px2> | Pluginable<infer Px3> | Pluginable<infer Px4>)[]
             ? Px1 & Px2 & Px3 & Px4
             : T extends (
-                  | Plugin<infer Px1>
-                  | Plugin<infer Px2>
-                  | Plugin<infer Px3>
-                  | Plugin<infer Px4>
-                  | Plugin<infer Px5>
+                  | Pluginable<infer Px1>
+                  | Pluginable<infer Px2>
+                  | Pluginable<infer Px3>
+                  | Pluginable<infer Px4>
+                  | Pluginable<infer Px5>
                 )[]
               ? Px1 & Px2 & Px3 & Px4 & Px5
               : unknown
 
-export type Plugin<
+export type Pluginable<
   PluginOptions extends Record<string, any> = any,
   PluginState extends Record<string, any> = any,
   T extends ValidProps = any,
   C extends ValidController = ValidController,
-> = PluginObj<PluginOptions, PluginState, T, C> | PluginCoreFn<T, C>
+> = Plugin<PluginOptions, PluginState, T, C> | PluginCoreFn<T, C>
 
-export type PluginObj<
+export type Plugin<
   PluginOptions extends Record<string, any>,
   PluginState extends Record<string, any> = any,
   T extends ValidProps = any,
-  C extends ValidController = ValidController,
+  C extends ValidController = any,
 > = ConfigableFunction<{
   (options?: PluginOptions): { plugin: PluginCoreFn<T, C>; state: PluginState }
   [isPluginObjSymbol]: true
@@ -78,7 +78,7 @@ export function createPlugin<
     /** Fixme: why not work? */
     name?: string
   },
-): PluginObj<PluginOptions, PluginState, Props, Controller> {
+): Plugin<PluginOptions, PluginState, Props, Controller> {
   const pluginCoreFn = createConfigableFunction((params: PluginOptions) => {
     const mayPluginCore = createrFn(params)
     const renamedMayPluginCore =
@@ -94,13 +94,13 @@ export function createPlugin<
 }
 
 export function extractPluginCore<T extends ValidProps, C extends ValidController>(
-  plugin: Plugin<any, any, T, C>,
+  plugin: Pluginable<any, any, T, C>,
   options?: any,
 ): PluginCoreFn<T, C> {
   const pluginCoreFn = (isPluginObj(plugin) ? plugin(options ?? {}).plugin : plugin) as PluginCoreFn<T, C>
   return pluginCoreFn
 }
 
-export function isPluginObj(v: any): v is PluginObj<any> {
+export function isPluginObj(v: any): v is Plugin<any> {
   return Reflect.has(v, isPluginObjSymbol)
 }
