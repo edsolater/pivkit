@@ -1,10 +1,7 @@
-import { addDefault, shrinkFn } from "@edsolater/fnkit"
-import { createICSS, CSSObject, type ICSSObject } from "../../piv"
+import { CSSObject, createICSS } from "../../piv"
 import { cssColors } from "../cssColors"
-import { ICSSFontSize, icssFontSize } from "./fondation"
-import type { C } from "vitest/dist/reporters-MmQN-57K"
 import { cssOpacity } from "../cssValues"
-import { dir } from "console"
+import { ICSSFontSize, icssFontSize } from "./fondation"
 
 export interface ICSSRowOption {
   gap?: CSSObject["gap"]
