@@ -19,7 +19,6 @@ function createCachedFunction<F extends AnyFn>(fn: F): F {
     return cachedResult
   } as F
 }
-
 /** as will only calculate props when access, so, return verbose big object is ok */
 export function handleShadowProps<P extends Partial<PivProps<any>>>(
   props: P,

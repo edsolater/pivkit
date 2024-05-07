@@ -1,6 +1,7 @@
 import { isNumber, isObjectLiteral, isString, toPercentString } from "@edsolater/fnkit"
+import type { CSSObject } from "@edsolater/pivkit"
 
-type ColorString = string
+type ColorString = CSSObject["color"]
 
 type ColorPercent = number | `${number}%`
 
@@ -75,18 +76,18 @@ function isColorItem(c: ColorPercent | ColorString | ColorItem | undefined): c i
  * @param transparentPercent 0~1
  * @returns color-mix() string
  */
-export function cssOpacity(color: string, alpha: number) {
+export function cssOpacity(color: CSSObject["color"], alpha: number) {
   return cssColorMix(color, "transparent", 1 - alpha)
 }
 
-export function cssLighten(color: string, depth: number) {
+export function cssLighten(color: CSSObject["color"], depth: number) {
   return cssColorMix(color, "white", depth)
 }
 
-export function cssDarken(color: string, depth: number) {
+export function cssDarken(color: CSSObject["color"], depth: number) {
   return cssColorMix(color, "black", depth)
 }
 
-export function cssGrayscale(color: string, depth: number) {
+export function cssGrayscale(color: CSSObject["color"], depth: number) {
   return cssColorMix(color, "gray", depth)
 }

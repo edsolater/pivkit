@@ -155,6 +155,7 @@ function getParsedKitProps<
         () => hasProperty(options, "plugin"),
       ), // defined-time (parsing option)
     (props) => (hasProperty(options, "name") ? mergeProps(props, { class: options!.name }) : props), // defined-time (parsing option)
+    
     (props) => handleShadowProps(props, options?.selfProps), // outside-props-run-time(parsing props) // TODO: assume can't be promisify
     (props) => handlePluginProps(props), // outside-props-run-time(parsing props) // TODO: assume can't be promisify  //<-- bug is HERE!!, after this, class is doubled
     /**

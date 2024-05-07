@@ -1,10 +1,10 @@
 import { createEffect } from "solid-js"
+import { createStateClass, listenGestureMove, type GestureMoveOptions } from "../../domkit"
 import { createDomRef } from "../../hooks"
-import { type CSSObject, createPlugin, type Plugin } from "../../piv"
-import { attachPointerGrag, createStateClass, listenGestureMove, type GestureMoveOptions } from "../../domkit"
+import { createPlugin, type CSSObject, type Plugin } from "../../piv"
 
-export function isMoveableElement(el: HTMLElement) {
-  return el.classList.contains("_movebale")
+export function isMovableElement(el: HTMLElement) {
+  return el.classList.contains("_movable")
 }
 
 export type MovablePluginOptions = GestureMoveOptions
