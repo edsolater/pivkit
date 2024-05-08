@@ -1,8 +1,16 @@
-import { createEffect, onCleanup, onMount } from "solid-js"
-import { listenGestureMove, useStateClass, type OnMoveEnd, type OnMoveStart, type OnMoving } from "../../domkit"
+import { createEffect, createSignal, on, onCleanup, onMount, type Accessor, type Setter } from "solid-js"
+import {
+  listenDomEvent,
+  listenGestureMove,
+  useStateClass,
+  type OnMoveEnd,
+  type OnMoveStart,
+  type OnMoving,
+} from "../../domkit"
 import { createDomRef } from "../../hooks"
 import { Piv, createPlugin, type CSSObject, type Plugin } from "../../piv"
 import { cssOpacity } from "../../styles"
+import { glob } from "goober"
 
 export function isResizableElement(el: HTMLElement) {
   return el.classList.contains("_resizable")
@@ -11,6 +19,9 @@ export function isResizableElement(el: HTMLElement) {
 export type ResizablePluginOptions = {
   resizableIcss?: CSSObject
   resizingIcss?: CSSObject
+
+  /** @default true */
+  valueStoreInLocalStorage?: boolean
 
   /** default when 'onMoveX' is set  */
   canResizeX?: boolean
@@ -32,6 +43,7 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => () => 
   const { dom, setDom } = createDomRef()
   const resizableStateClassManager = useStateClass("_resizable")
   const resizingStateClassManager = useStateClass("_resizing")
+
   onMount(() => {
     resizableStateClassManager.add()
     onCleanup(resizableStateClassManager.remove)
@@ -64,14 +76,14 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => () => 
             right: 0,
             top: 0,
             height: "100%",
-            width: "8px",
-            background: cssOpacity("dodgerblue", 0.3),
+            width: "6px",
+            background: "transparent",
             borderRadius: "99px",
             zIndex: 2,
             transition: "300ms",
+            cursor: "ew-resize",
             "._resizing &": {
-              width: "32px",
-              background: "dodgerblue",
+              background: "#598def",
             },
           }}
           domRef={(el) => {
@@ -82,10 +94,14 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => () => 
               onMoveStart(cev) {
                 options.onMoveXStart?.(cev)
                 resizingStateClassManager.add()
+                document.body.style.setProperty("cursor", "ew-resize")
+                document.body.style.setProperty("user-select", "none")
               },
               onMoveEnd(cev) {
                 options.onMoveXEnd?.(cev)
                 resizingStateClassManager.remove()
+                document.body.style.removeProperty("cursor")
+                document.body.style.removeProperty("user-select")
               },
             })
           }}
@@ -97,15 +113,15 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => () => 
             position: "absolute",
             bottom: 0,
             left: 0,
-            height: "8px",
+            height: "6px",
             width: "100%",
-            background: cssOpacity("dodgerblue", 0.3),
-            zIndex: 2,
+            background: "transparent",
             borderRadius: "99px",
+            zIndex: 2,
             transition: "300ms",
+            cursor: "ns-resize",
             "._resizing &": {
-              height: "32px",
-              background: "dodgerblue",
+              background: "#598def",
             },
           }}
           domRef={(el) => {
@@ -116,10 +132,14 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => () => 
               onMoveStart(cev) {
                 options.onMoveYStart?.(cev)
                 resizingStateClassManager.add()
+                document.body.style.setProperty("cursor", "ns-resize")
+                document.body.style.setProperty("user-select", "none")
               },
               onMoveEnd(cev) {
                 options.onMoveYEnd?.(cev)
                 resizingStateClassManager.remove()
+                document.body.style.removeProperty("cursor")
+                document.body.style.removeProperty("user-select")
               },
             })
           }}
@@ -128,3 +148,36 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => () => 
     ],
   }
 })
+
+function useLocalStorageValue(
+  key: string,
+  defaultValue?: string,
+): [Accessor<string | undefined>, Setter<string | undefined>] {
+  const [value, setValue] = createSignal<string | undefined>(globalThis.localStorage.getItem(key) ?? defaultValue)
+  createEffect(
+    on(value, async (v) => {
+      await 0 // force the action into microtask
+      const storedValue = globalThis.localStorage.getItem(key)
+      if (storedValue !== v) {
+        if (v != null) {
+          globalThis.localStorage.setItem(key, v)
+        } else {
+          globalThis.localStorage.removeItem(key)
+        }
+      }
+    }),
+  )
+  onMount(() => {
+    listenDomEvent(globalThis.window, "storage", ({ ev }) => {
+      const { key: newKey, newValue } = ev as StorageEvent
+      if (key === newKey) {
+        if (newValue != null) {
+          setValue(newValue)
+        } else {
+          setValue(defaultValue)
+        }
+      }
+    })
+  })
+  return [value, setValue]
+}
