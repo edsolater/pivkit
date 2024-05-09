@@ -175,6 +175,7 @@ export const domMap = {
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     >

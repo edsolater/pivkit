@@ -9,8 +9,7 @@ import {
 } from "../../domkit"
 import { createDomRef } from "../../hooks"
 import { Piv, createPlugin, type CSSObject, type Plugin } from "../../piv"
-import { cssOpacity } from "../../styles"
-import { glob } from "goober"
+import { WeakerSet, createSubscribable } from "@edsolater/fnkit"
 
 export function isResizableElement(el: HTMLElement) {
   return el.classList.contains("_resizable")
@@ -20,6 +19,8 @@ export type ResizablePluginOptions = {
   resizableIcss?: CSSObject
   resizingIcss?: CSSObject
 
+  /** for localStorage */
+  localStorageKey?: string
   /** @default true */
   valueStoreInLocalStorage?: boolean
 
@@ -37,116 +38,182 @@ export type ResizablePluginOptions = {
   onMoveYEnd?: OnMoveEnd
 }
 
-export type ResizablePlugin = Plugin<ResizablePluginOptions>
+export type ResizableState = {
+  /** @deprecated prefer styleMaskRef instead */
+  styleMask: { turnOn(el: HTMLElement | undefined): void; turnOff(el: HTMLElement | undefined): void }
 
-export const resizablePlugin: ResizablePlugin = createPlugin((options) => () => {
-  const { dom, setDom } = createDomRef()
-  const resizableStateClassManager = useStateClass("_resizable")
-  const resizingStateClassManager = useStateClass("_resizing")
+  resizingHiddenTransactionMask: (el: HTMLElement) => void
+}
 
-  onMount(() => {
-    resizableStateClassManager.add()
-    onCleanup(resizableStateClassManager.remove)
-  })
+export type ResizablePlugin = Plugin<ResizablePluginOptions, ResizableState>
+
+export const resizablePlugin: ResizablePlugin = createPlugin((options) => {
+  //#region ---------------- resize style mask ----------------
+  const styleMaskEls = new WeakerSet<HTMLElement>()
+  const [isResizingX, setIsResizingX] = createSignal(false)
+  const [isResizingY, setIsResizingY] = createSignal(false)
 
   createEffect(() => {
-    const el = dom()
-    if (!el) return
+    if (isResizingX()) {
+      document.body.style.setProperty("cursor", "ew-resize")
+      document.body.style.setProperty("user-select", "none")
+      styleMaskEls.forEach((el) => {
+        el.style.setProperty("transition", "none")
+      })
+    } else {
+      document.body.style.removeProperty("cursor")
+      document.body.style.removeProperty("user-select")
+      styleMaskEls.forEach((el) => {
+        el.style.removeProperty("transition")
+      })
+    }
   })
-  const canResizeX = options.canResizeX ?? "onMoveX" in options
-  const canResizeY = options.canResizeY ?? "onMoveY" in options
-  return {
-    icss: {
-      "&._resizable": {
-        position: "relative",
-        "&._resizing": {
-          userSelect: "none",
-          pointerEvents: "none",
-          ...options.resizingIcss,
+  createEffect(() => {
+    if (isResizingY()) {
+      document.body.style.setProperty("cursor", "ew-resize")
+      document.body.style.setProperty("user-select", "none")
+      styleMaskEls.forEach((el) => {
+        el.style.setProperty("transition", "none")
+      })
+    } else {
+      document.body.style.removeProperty("cursor")
+      document.body.style.removeProperty("user-select")
+      styleMaskEls.forEach((el) => {
+        el.style.removeProperty("transition")
+      })
+    }
+  })
+  //#endregion
+
+  const plugin = () => {
+    const { dom, setDom } = createDomRef()
+    const resizableStateClassManager = useStateClass("_resizable")
+    const resizingStateClassManager = useStateClass("_resizing")
+
+    onMount(() => {
+      resizableStateClassManager.add()
+      onCleanup(resizableStateClassManager.remove)
+    })
+
+    createEffect(() => {
+      const el = dom()
+      if (!el) return
+    })
+    const canResizeX = options.canResizeX ?? "onMoveX" in options
+    const canResizeY = options.canResizeY ?? "onMoveY" in options
+    return {
+      icss: {
+        "&._resizable": {
+          position: "relative",
+          "&._resizing": {
+            userSelect: "none",
+            pointerEvents: "none",
+            ...options.resizingIcss,
+          },
+          ...options.resizableIcss,
         },
-        ...options.resizableIcss,
-      },
-    } as const,
-    domRef: [setDom, resizableStateClassManager.setDom, resizingStateClassManager.setDom],
-    "render:firstChild": [
-      canResizeX ? (
-        <Piv // resize vertical handler
-          icss={{
-            position: "absolute",
-            right: 0,
-            top: 0,
-            height: "100%",
-            width: "6px",
-            background: "transparent",
-            borderRadius: "99px",
-            zIndex: 2,
-            transition: "300ms",
-            cursor: "ew-resize",
-            "._resizing &": {
-              background: "#598def",
-            },
-          }}
-          domRef={(el) => {
-            listenGestureMove(el, {
-              onMoving(cev) {
-                options.onMoveX?.(cev)
+      } as const,
+      domRef: [setDom, resizableStateClassManager.setDom, resizingStateClassManager.setDom],
+      "render:firstChild": [
+        canResizeX ? (
+          <Piv // resize vertical handler
+            icss={{
+              position: "absolute",
+              right: 0,
+              top: 0,
+              height: "100%",
+              width: "6px",
+              background: "transparent",
+              borderRadius: "99px",
+              zIndex: 2,
+              transition: "300ms",
+              cursor: "ew-resize",
+              "._resizing &": {
+                background: "#598def",
               },
-              onMoveStart(cev) {
-                options.onMoveXStart?.(cev)
-                resizingStateClassManager.add()
-                document.body.style.setProperty("cursor", "ew-resize")
-                document.body.style.setProperty("user-select", "none")
+            }}
+            domRef={(el) => {
+              listenGestureMove(el, {
+                onMoving(cev) {
+                  options.onMoveX?.(cev)
+                },
+                onMoveStart(cev) {
+                  setIsResizingX(true)
+                  options.onMoveXStart?.(cev)
+                  resizingStateClassManager.add()
+                  document.body.style.setProperty("cursor", "ew-resize")
+                  document.body.style.setProperty("user-select", "none")
+                },
+                onMoveEnd(cev) {
+                  setIsResizingX(false)
+                  options.onMoveXEnd?.(cev)
+                  resizingStateClassManager.remove()
+                  document.body.style.removeProperty("cursor")
+                  document.body.style.removeProperty("user-select")
+                },
+              })
+            }}
+          />
+        ) : null,
+        canResizeY ? (
+          <Piv // resize horizontal handler
+            icss={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              height: "6px",
+              width: "100%",
+              background: "transparent",
+              borderRadius: "99px",
+              zIndex: 2,
+              transition: "300ms",
+              cursor: "ns-resize",
+              "._resizing &": {
+                background: "#598def",
               },
-              onMoveEnd(cev) {
-                options.onMoveXEnd?.(cev)
-                resizingStateClassManager.remove()
-                document.body.style.removeProperty("cursor")
-                document.body.style.removeProperty("user-select")
-              },
-            })
-          }}
-        />
-      ) : null,
-      canResizeY ? (
-        <Piv // resize horizontal handler
-          icss={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            height: "6px",
-            width: "100%",
-            background: "transparent",
-            borderRadius: "99px",
-            zIndex: 2,
-            transition: "300ms",
-            cursor: "ns-resize",
-            "._resizing &": {
-              background: "#598def",
-            },
-          }}
-          domRef={(el) => {
-            listenGestureMove(el, {
-              onMoving(cev) {
-                options.onMoveY?.(cev)
-              },
-              onMoveStart(cev) {
-                options.onMoveYStart?.(cev)
-                resizingStateClassManager.add()
-                document.body.style.setProperty("cursor", "ns-resize")
-                document.body.style.setProperty("user-select", "none")
-              },
-              onMoveEnd(cev) {
-                options.onMoveYEnd?.(cev)
-                resizingStateClassManager.remove()
-                document.body.style.removeProperty("cursor")
-                document.body.style.removeProperty("user-select")
-              },
-            })
-          }}
-        />
-      ) : null,
-    ],
+            }}
+            domRef={(el) => {
+              listenGestureMove(el, {
+                onMoving(cev) {
+                  options.onMoveY?.(cev)
+                },
+                onMoveStart(cev) {
+                  setIsResizingY(true)
+                  options.onMoveYStart?.(cev)
+                  resizingStateClassManager.add()
+                  document.body.style.setProperty("cursor", "ns-resize")
+                  document.body.style.setProperty("user-select", "none")
+                },
+                onMoveEnd(cev) {
+                  setIsResizingY(false)
+                  options.onMoveYEnd?.(cev)
+                  resizingStateClassManager.remove()
+                  document.body.style.removeProperty("cursor")
+                  document.body.style.removeProperty("user-select")
+                },
+              })
+            }}
+          />
+        ) : null,
+      ],
+    }
   }
+  const state: ResizableState = {
+    get styleMask() {
+      return {
+        turnOn(el: HTMLElement | undefined) {
+          el?.style.setProperty("transition", "none")
+        },
+        turnOff(el: HTMLElement | undefined) {
+          el?.style.removeProperty("transition")
+        },
+      }
+    },
+    resizingHiddenTransactionMask: (el) => {
+      styleMaskEls.add(el)
+    },
+  }
+  return { plugin, state }
 })
 
 function useLocalStorageValue(
