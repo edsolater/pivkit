@@ -2,19 +2,30 @@ import { AnyObj } from "@edsolater/fnkit"
 import { NativeProps } from ".."
 
 export const domMap = {
-  div: (props: NativeProps, additionalProps: AnyObj | undefined) => (
-    <div
-      // solidjs prefer static props for variable reactive
-      onClick={props.onClick}
-      ref={props.ref}
-      class={props.class}
-      style={props.style}
-      {...props.htmlProps}
-      {...additionalProps}
-    >
-      {props.children}
-    </div>
-  ),
+  div: (props: NativeProps, additionalProps: AnyObj | undefined) =>
+    "htmlProps" in props || additionalProps ? ( // when use additionalProps, solidjs will subscribe any change of props. it's not pure
+      <div
+        // solidjs prefer static props for variable reactive
+        onClick={props.onClick}
+        ref={props.ref}
+        class={props.class}
+        style={props.style}
+        {...props.htmlProps}
+        {...additionalProps}
+      >
+        {props.children}
+      </div>
+    ) : (
+      <div
+        // solidjs prefer static props for variable reactive
+        onClick={props.onClick}
+        ref={props.ref}
+        class={props.class}
+        style={props.style}
+      >
+        {props.children}
+      </div>
+    ),
   span: (props: NativeProps, additionalProps: AnyObj | undefined) => (
     <span
       // solidjs prefer static props for variable reactive
@@ -318,6 +329,7 @@ export const domMap = {
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     />
@@ -329,6 +341,7 @@ export const domMap = {
       // @ts-ignore
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     />
@@ -339,6 +352,7 @@ export const domMap = {
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     >
@@ -351,6 +365,7 @@ export const domMap = {
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     />
@@ -361,6 +376,7 @@ export const domMap = {
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     >
@@ -373,6 +389,7 @@ export const domMap = {
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     >
@@ -385,6 +402,7 @@ export const domMap = {
       onClick={props.onClick}
       ref={props.ref}
       class={props.class}
+      style={props.style}
       {...props.htmlProps}
       {...additionalProps}
     >

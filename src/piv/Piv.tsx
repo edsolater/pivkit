@@ -1,5 +1,5 @@
 import { MayArray, MayFn, flap, pipeDo } from "@edsolater/fnkit"
-import { JSX, JSXElement } from "solid-js"
+import { JSX, JSXElement, createEffect } from "solid-js"
 import {
   ClassName,
   HTMLProps,
@@ -144,6 +144,7 @@ export const Piv = <TagName extends HTMLTag = HTMLTag, Controller extends ValidC
 
 function handleNormalPivProps(rawProps?: Omit<PivProps<any, any>, "plugin" | "shadowProps">) {
   if (!rawProps) return
+
   return renderHTMLDOM("div", rawProps)
 }
 

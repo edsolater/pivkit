@@ -1,7 +1,7 @@
 import { AnyObj } from "@edsolater/fnkit"
 import { JSX, JSXElement, Show } from "solid-js"
-import { PivProps } from "../Piv"
-import { HTMLTag } from "../typeTools"
+import type { PivProps } from "../Piv"
+import type { HTMLTag } from "../typeTools"
 import { domMap } from "./domMap"
 import { NativeProps, parsePivProps } from "./parsePivProps"
 

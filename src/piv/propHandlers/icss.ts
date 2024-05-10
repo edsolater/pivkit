@@ -10,7 +10,7 @@ import {
   isString,
   mergeObjectsWithConfigs,
   overwriteFunctionName,
-  shrinkFn
+  shrinkFn,
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
 // just for type, just use goober is not enough
@@ -70,14 +70,18 @@ function invokeTaggedICSS<T extends RuleCreatorFn>(v: TaggedICSS<T>, params?: An
 export function handleICSSProps<Controller extends ValidController | unknown = unknown>(
   cssProp: ICSS<Controller>,
   controller: Controller = {} as Controller,
+  debug?: boolean,
 ) {
+  if (debug) {
+    return ''
+  }
   let outputClassName = ""
   for (const i of flapDeep(cssProp)) {
     const fn = isTaggedICSS(i) ? invokeTaggedICSS(i as any) : i
     const shrinked = shrinkFn(fn, [controller])
     if (!shrinked || (!isString(shrinked) && !isObject(shrinked))) continue
 
-    const className = isString(shrinked) ? shrinked : css(collapseMergeableCSSValue(shrinked as any) as any)
+    const className = isString(shrinked) ? shrinked : css(shrinked as any as any)
     outputClassName += (outputClassName ? " " : "") + className
   }
 
