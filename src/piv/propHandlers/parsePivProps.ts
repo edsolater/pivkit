@@ -40,7 +40,7 @@ function getPropsInfoOfRawPivProps(raw: Partial<PivProps>) {
       ? () => Boolean(shrinkFn(parsedPivProps.ifSelfShown))
       : undefined
   const selfCoverNode =
-    "render:self" in parsedPivProps
+    "render:self" in raw
       ? parsedPivProps["render:self"]?.(omitProps(parsedPivProps, ["render:self"]))
       : undefined
   return {
