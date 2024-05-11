@@ -27,7 +27,6 @@ type MoveStartCustomizedEvent = {
 
 export type OnMoveStart = (ev: MoveStartCustomizedEvent) => void
 
-
 export type OnMoving = (ev: {
   el: HTMLElement
   ev: PointerEvent
@@ -47,7 +46,6 @@ export type OnMoveEnd = (ev: {
   currentSpeed: SpeedVector
 }) => void
 
-
 export type GestureMoveOptions = {
   onMoveStart?: OnMoveStart
   onMoving?: OnMoving
@@ -60,10 +58,7 @@ export type GestureMoveOptions = {
  * @param options !must registed, so user can do something when pointer move
  * @returns cancelable event id (it is not dom's event id, it is just a number to cancel event listener)
  */
-export function listenGestureMove(
-  el: HTMLElement | undefined | null,
-  options: GestureMoveOptions,
-) {
+export function listenGestureMove(el: HTMLElement | undefined | null, options: GestureMoveOptions) {
   if (!el) return { cancel: () => {} }
   const events: PointerEvent[] = []
   /**

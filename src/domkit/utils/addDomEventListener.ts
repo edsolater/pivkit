@@ -97,7 +97,9 @@ export function listenDomEvent<
       eventPath: () => ev.composedPath().filter(isHTMLElement),
     })
   }
-  const throttled = throttle(coreEventListener, { rAF: options?.restrict === "rAF" })
+  const shouldUseRAF = options && "restrict" in options ? options?.restrict === "rAF" : useRAFEventNames.has(eventName)
+
+  const throttled = throttle(coreEventListener, { rAF: shouldUseRAF })
   const registedListener = (ev: Event) => {
     if (options?.restrict) {
       throttled(ev)
@@ -133,3 +135,5 @@ function abortEvent(
   el?.removeEventListener(eventName, cb, { capture: Boolean(options?.capture) })
   listenerCacheMaps.delete(el)
 }
+
+const useRAFEventNames = new Set(["pointermove", "mousemove", "pointermove", "scroll", "resize", "wheel"])

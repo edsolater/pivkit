@@ -1,15 +1,16 @@
+import { WeakerSet } from "@edsolater/fnkit"
 import { createEffect, createSignal, on, onCleanup, onMount, type Accessor, type Setter } from "solid-js"
 import {
   listenDomEvent,
   listenGestureMove,
   useStateClass,
+  type Delta2dTranslate,
   type OnMoveEnd,
   type OnMoveStart,
   type OnMoving,
 } from "../../domkit"
 import { createDomRef } from "../../hooks"
 import { Piv, createPlugin, type CSSObject, type Plugin } from "../../piv"
-import { WeakerSet, createSubscribable } from "@edsolater/fnkit"
 
 export function isResizableElement(el: HTMLElement) {
   return el.classList.contains("_resizable")
@@ -24,11 +25,13 @@ export type ResizablePluginOptions = {
   /** @default true */
   valueStoreInLocalStorage?: boolean
 
-  /** default when 'onMoveX' is set  */
+  /** @default true  */
   canResizeX?: boolean
-  /** default when 'onMoveY' is set  */
+  /** @default false  */
   canResizeY?: boolean
 
+  onSizeChange?: (payloads: { dir: "x"; currentVal: number } | { dir: "y"; currentVal: number }) => void
+  onResizing?: (payloads: { dir: "x"; currentVal: number } | { dir: "y"; currentVal: number }) => void
   onMoveXStart?: OnMoveStart
   onMoveX?: OnMoving
   onMoveXEnd?: OnMoveEnd
@@ -90,6 +93,61 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => {
     const resizableStateClassManager = useStateClass("_resizable")
     const resizingStateClassManager = useStateClass("_resizing")
 
+    let elementRecordWidthPx = 0
+    let elementRecordHeightPx = 0
+
+    function tempResizeTo(size: { x?: number; y?: number }) {
+      if (size.x) dom()?.style.setProperty("width", size.x + "px")
+      if (size.y) dom()?.style.setProperty("height", size.y + "px")
+    }
+
+    function clearTempResize() {
+      dom()?.style.removeProperty("width")
+      dom()?.style.removeProperty("height")
+    }
+
+    function recordElementSize(el: HTMLElement) {
+      const { width, height } = el.getBoundingClientRect()
+      elementRecordWidthPx = width
+      elementRecordHeightPx = height
+    }
+
+    function reportSizeChange(dir: "x" | "y", totalDelta: Delta2dTranslate) {
+      if (dir === "x") {
+        options.onSizeChange?.({
+          dir: "x",
+          get currentVal() {
+            return (elementRecordWidthPx ?? 0) + totalDelta.dx
+          },
+        })
+      } else {
+        options.onSizeChange?.({
+          dir: "y",
+          get currentVal() {
+            return (elementRecordHeightPx ?? 0) + totalDelta.dy
+          },
+        })
+      }
+    }
+
+    function reportResizing(dir: "x" | "y", totalDelta: Delta2dTranslate) {
+      if (dir === "x") {
+        options.onResizing?.({
+          dir: "x",
+          get currentVal() {
+            return (elementRecordWidthPx ?? 0) + totalDelta.dx
+          },
+        })
+      } else {
+        options.onResizing?.({
+          dir: "y",
+          get currentVal() {
+            return (elementRecordHeightPx ?? 0) + totalDelta.dy
+          },
+        })
+      }
+    }
+
     onMount(() => {
       resizableStateClassManager.add()
       onCleanup(resizableStateClassManager.remove)
@@ -99,8 +157,8 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => {
       const el = dom()
       if (!el) return
     })
-    const canResizeX = options.canResizeX ?? "onMoveX" in options
-    const canResizeY = options.canResizeY ?? "onMoveY" in options
+    const canResizeX = options.canResizeX ?? true
+    const canResizeY = options.canResizeY ?? false
     return {
       icss: {
         "&._resizable": {
@@ -134,19 +192,25 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => {
             }}
             domRef={(el) => {
               listenGestureMove(el, {
-                onMoving(cev) {
-                  options.onMoveX?.(cev)
-                },
                 onMoveStart(cev) {
                   setIsResizingX(true)
+                  recordElementSize(cev.el.parentElement as HTMLElement)
                   options.onMoveXStart?.(cev)
                   resizingStateClassManager.add()
                   document.body.style.setProperty("cursor", "ew-resize")
                   document.body.style.setProperty("user-select", "none")
                 },
+                onMoving(cev) {
+                  options.onMoveX?.(cev)
+                  reportResizing("x", cev.totalDeltaInPx)
+                  tempResizeTo({ x: elementRecordWidthPx + cev.totalDeltaInPx.dx })
+                },
                 onMoveEnd(cev) {
                   setIsResizingX(false)
                   options.onMoveXEnd?.(cev)
+                  reportSizeChange("x", cev.totalDeltaInPx)
+                  clearTempResize()
+                  recordElementSize(cev.el.parentElement as HTMLElement)
                   resizingStateClassManager.remove()
                   document.body.style.removeProperty("cursor")
                   document.body.style.removeProperty("user-select")
@@ -174,19 +238,23 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => {
             }}
             domRef={(el) => {
               listenGestureMove(el, {
-                onMoving(cev) {
-                  options.onMoveY?.(cev)
-                },
                 onMoveStart(cev) {
                   setIsResizingY(true)
+                  recordElementSize(cev.el.parentElement as HTMLElement)
                   options.onMoveYStart?.(cev)
                   resizingStateClassManager.add()
                   document.body.style.setProperty("cursor", "ns-resize")
                   document.body.style.setProperty("user-select", "none")
                 },
+                onMoving(cev) {
+                  options.onMoveY?.(cev)
+                  reportResizing("y", cev.totalDeltaInPx)
+                },
                 onMoveEnd(cev) {
                   setIsResizingY(false)
                   options.onMoveYEnd?.(cev)
+                  reportSizeChange("y", cev.totalDeltaInPx)
+                  recordElementSize(cev.el.parentElement as HTMLElement)
                   resizingStateClassManager.remove()
                   document.body.style.removeProperty("cursor")
                   document.body.style.removeProperty("user-select")
