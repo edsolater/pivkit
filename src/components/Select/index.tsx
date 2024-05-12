@@ -97,21 +97,21 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
     selectListDom,
     {
       close: {
-        fn: () => popoverState.close(),
+        action: () => popoverState.close(),
         shortcut: "Escape",
       },
       "select confirm": {
-        fn: () => {
+        action: () => {
           //TODO: do with focusItem
         },
         shortcut: "Enter",
       },
       "select prev item": {
-        fn: selectPrevItem,
+        action: selectPrevItem,
         shortcut: "ArrowUp",
       },
       "select next item": {
-        fn: selectNextItem,
+        action: selectNextItem,
         shortcut: "ArrowDown",
       },
     },

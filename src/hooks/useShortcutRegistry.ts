@@ -30,10 +30,10 @@ export function registerShortcut(shortcutItem: ShortcutItem) {
   const shortcutSetting = flap(shortcutItem.shortcut).reduce((acc, shortcutKey) => {
     if (isArray(shortcutKey)) {
       for (const key of shortcutKey) {
-        acc[key] = shortcutItem.fn
+        acc[key] = shortcutItem.action
       }
     } else {
-      acc[shortcutKey] = shortcutItem.fn
+      acc[shortcutKey] = shortcutItem.action
     }
     return acc
   }, {})
@@ -91,9 +91,9 @@ export function useShortcutsRegister(
         targetElement: el,
         description: desc,
         shortcut: rule.shortcut,
-        fn() {
+        action() {
           if (isFeatureEnabled()) {
-            return rule.fn()
+            return rule.action()
           }
         },
       })

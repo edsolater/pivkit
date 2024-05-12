@@ -1,12 +1,6 @@
 import {
-  AnyObj,
-  WeakerMap,
-  WeakerSet,
-  createSubscribable,
   isArray,
-  isFunction,
-  isString,
-  shakeFalsy,
+  shakeFalsy
 } from "@edsolater/fnkit"
 import { KeyboardShortcutFn, KeyboardShortcutSettings, KeybordShortcutKeys } from "../domkit"
 
@@ -16,7 +10,7 @@ export type ShortcutItem = {
   description: string
   /** if not set, use documentElement */
   targetElement: HTMLElement
-  fn: KeyboardShortcutFn
+  action: KeyboardShortcutFn
   shortcut: KeybordShortcutKeys | KeybordShortcutKeys[]
 }
 
@@ -24,9 +18,9 @@ export type ShortcutRecord = Record<Description, ShortcutItem>
 
 export function parseShortcutConfigFromSettings(settings: ShortcutRecord) {
   const configLists = shakeFalsy(
-    Object.entries(settings).flatMap(([, { fn, shortcut }]) => {
+    Object.entries(settings).flatMap(([, { action, shortcut }]) => {
       if (!shortcut) return []
-      return isArray(shortcut) ? shortcut.map((key) => (key ? [key, fn] : undefined)) : [[shortcut, fn]]
+      return isArray(shortcut) ? shortcut.map((key) => (key ? [key, action] : undefined)) : [[shortcut, action]]
     }),
   )
   return Object.fromEntries(configLists) as KeyboardShortcutSettings

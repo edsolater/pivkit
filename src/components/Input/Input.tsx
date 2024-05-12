@@ -79,7 +79,7 @@ export function Input(rawProps: InputKitProps) {
     {
       "Input Enter": {
         shortcut: "Enter",
-        fn: () => {
+        action: () => {
           props.onEnter?.(innerText(), controller)
         },
       },
