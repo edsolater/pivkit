@@ -1,4 +1,4 @@
-import { Accessor, JSX, createEffect, createMemo, createSignal, splitProps, useContext } from "solid-js"
+import { Accessor, JSX, Show, createEffect, createMemo, createSignal, splitProps, useContext } from "solid-js"
 import { useKitProps, type KitProps } from "../../createKit"
 import useResizeObserver from "../../domkit/hooks/useResizeObserver"
 import { createDomRef } from "../../hooks"
@@ -18,7 +18,10 @@ export interface InfiniteScrollListItemController {
   isIntersecting: Accessor<boolean>
 }
 
-export type InfiniteScrollListItemProps = KitProps<InfiniteScrollListItemRawProps, { controller: InfiniteScrollListItemController }>
+export type InfiniteScrollListItemProps = KitProps<
+  InfiniteScrollListItemRawProps,
+  { controller: InfiniteScrollListItemController }
+>
 /**
  * context acceptor for `<List>` \
  * only used in `<List>`
@@ -51,15 +54,21 @@ export function InfiniteScrollListItem(originalProps: InfiniteScrollListItemProp
   //=== render children
   const childContent = createMemo(() => children())
 
+  createEffect(() => {
+    const el = itemDomRef()
+    if (!el) return
+    el.setAttribute("_intersecting", isIntersecting() ? "true" : "false")
+  })
+
   return (
     <Piv
       class="InfiniteScrollListItem"
       domRef={[setItemDom, setSizeDetectorTarget]} // FIXME: why ref not setted🤔?
       shadowProps={omitProps(props, "children")} // FIXME: should not use tedius omit
       style={isIntersecting() ? undefined : { height: `${innerHeight()}px`, width: `${innerWidth()}px` }}
-      icss={{ contentVisibility: isIntersecting() ? "visible" : "hidden", width: "100%" }}
+      icss={{ contentVisibility: isIntersecting() ? "visible" : "hidden" }}
     >
-      {childContent}
+      <Show when={isIntersecting()}>{childContent()}</Show>
     </Piv>
   )
 }

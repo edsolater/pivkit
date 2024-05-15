@@ -1,5 +1,4 @@
 import {
-  MayFn,
   getEntryKey,
   getEntryValue,
   shrinkFn,
@@ -8,11 +7,10 @@ import {
   type Entry,
   type GetCollectionKey,
   type GetCollectionValue,
+  type MayFn,
 } from "@edsolater/fnkit"
 import {
-  Accessor,
   For,
-  JSXElement,
   Show,
   createContext,
   createDeferred,
@@ -20,9 +18,11 @@ import {
   createMemo,
   createSignal,
   on,
+  type Accessor,
+  type JSXElement,
 } from "solid-js"
-import { KitProps, useKitProps } from "../../createKit"
-import { ObserveFn, useIntersectionObserver } from "../../domkit/hooks/useIntersectionObserver"
+import { useKitProps, type KitProps } from "../../createKit"
+import { useIntersectionObserver, type ObserveFn } from "../../domkit/hooks/useIntersectionObserver"
 import { useScrollDegreeDetector } from "../../domkit/hooks/useScrollDegreeDetector"
 import { createAsyncMemo } from "../../hooks/createAsyncMemo"
 import { createRef } from "../../hooks/createRef"
@@ -133,6 +133,8 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
   // [actually showed item count]
   const [renderItemLength, setRenderItemLength] = createSignal(initRenderCount())
 
+  const allRenderableItems = createMemo(() => allItems().slice(0, renderItemLength() + initRenderCount()))
+
   // [list ref]
   const [listRef, setRef] = createRef<HTMLElement>()
 
@@ -173,7 +175,10 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
     return (
       <Show when={needRender()}>
         <InfiniteScrollListItem>
-          {() => props.children(getEntryValue(entry), getEntryKey(entry), idx)}
+          {() => {
+            console.log('render children')
+            return props.children(getEntryValue(entry), getEntryKey(entry), idx)
+          }}
         </InfiniteScrollListItem>
       </Show>
     )
@@ -182,7 +187,7 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
   return (
     <InfiniteScrollListContext.Provider value={{ observeFunction: observe, renderItemLength }}>
       <Piv domRef={setRef} shadowProps={props} icss={{ overflow: "auto", contain: "paint" }}>
-        <For each={allItems()}>{renderListItems}</For>
+        <For each={allRenderableItems()}>{renderListItems}</For>
       </Piv>
     </InfiniteScrollListContext.Provider>
   )
