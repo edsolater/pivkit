@@ -29,7 +29,7 @@ export function createDisclosure(
 ): CreateDisclosureReturn {
   const defaultOptions = { delay: 24 }
   const opts = addDefaultProps(options, defaultOptions)
-  const [isOn, _setIsOn] = createSignal(shrinkFn(initValue))
+  const [isOn, _setIsOn] = createSignal(Boolean(shrinkFn(initValue)))
 
   createEffect(() => {
     const propsOn = shrinkFn(initValue)
