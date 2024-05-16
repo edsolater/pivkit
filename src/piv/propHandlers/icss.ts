@@ -13,6 +13,7 @@ import {
   shrinkFn,
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
+import "csstype" 
 // just for type, just use goober is not enough
 import { ConfigableFunction, createConfigableFunction } from "../../fnkit/configableFunction"
 
@@ -42,10 +43,11 @@ export type TaggedICSS<T extends AnyFn> = ConfigableFunction<T> & {
 
 // TODO: imply it !!!
 export function injectRuleToGlobal(rule: ICSS) {}
+
 export function createICSS<T extends RuleCreatorFn>(
   rule: T,
   options?: { name?: string; defaultSettings?: Partial<AnyObj>; globalSyle?: ICSS },
-): TaggedICSS<any> {
+): TaggedICSS<T> {
   const factory = createConfigableFunction(
     (settings?: AnyObj) => rule(settings),
     options?.defaultSettings,
@@ -73,7 +75,7 @@ export function handleICSSProps<Controller extends ValidController | unknown = u
   debug?: boolean,
 ) {
   if (debug) {
-    return ''
+    return ""
   }
   let outputClassName = ""
   for (const i of flapDeep(cssProp)) {
