@@ -1,4 +1,4 @@
-import { Accessor, createEffect, on } from "solid-js"
+import { Accessor, createEffect, on, onCleanup } from "solid-js"
 import { ElementRefs, getElementFromRefs } from "../../utils"
 
 /**
@@ -26,6 +26,9 @@ export default function useResizeObserver<El extends HTMLElement>(
     for (const el of getElementFromRefs(refs())) {
       if (el) {
         resizeObserver.observe(el)
+        onCleanup(() => {
+          resizeObserver.unobserve(el)
+        })
       }
     }
   })

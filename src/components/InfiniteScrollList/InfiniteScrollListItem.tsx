@@ -66,7 +66,6 @@ export function InfiniteScrollListItem(originalProps: InfiniteScrollListItemProp
       domRef={[setItemDom, setSizeDetectorTarget]} // FIXME: why ref not setted🤔?
       shadowProps={omitProps(props, "children")} // FIXME: should not use tedius omit
       style={isIntersecting() ? undefined : { height: `${innerHeight()}px`, width: `${innerWidth()}px` }}
-      icss={{ contentVisibility: isIntersecting() ? "visible" : "hidden" }}
     >
       <Show when={isIntersecting()}>{childContent()}</Show>
     </Piv>
@@ -89,11 +88,10 @@ function useElementSizeDetector() {
     if (!isClientSide()) return
 
     if (!("clientWidth" in el)) return
-    // console.log('el: ', el)
-    // setInnerWidth(el.clientWidth) //FIXME: why set is will cause error?🤔
+    setInnerWidth(el.clientWidth)
 
     if (!("clientHeight" in el)) return
-    // setInnerHeight(el.clientHeight) //FIXME: why set is will cause error?🤔
+    setInnerHeight(el.clientHeight)
   }
   return { setRef, innerWidth, innerHeight }
 }

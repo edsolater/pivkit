@@ -171,9 +171,9 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
   lazyLoadController(controller)
 
   const renderListItems = (entry: Entry, idx: () => number) => {
-    const needRender = createMemo(() => checkNeedRenderByIndex(idx(), renderItemLength()))
+    const needRenderDom = createMemo(() => checkNeedRenderByIndex(idx(), renderItemLength()))
     return (
-      <Show when={needRender()}>
+      <Show when={needRenderDom()}>
         <InfiniteScrollListItem>
           {() => {
             console.log('render children')
