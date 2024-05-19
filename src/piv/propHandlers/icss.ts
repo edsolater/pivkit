@@ -69,6 +69,12 @@ function invokeTaggedICSS<T extends RuleCreatorFn>(v: TaggedICSS<T>, params?: An
   return v.config(params as any)()
 }
 
+// sometimes we need to use icss in a non-component-show-time
+export function attachIcssToElement(el: HTMLElement, icss: ICSS) {
+  el.classList.add(handleICSSProps(icss))
+  return { dispose: () => el.classList.remove(handleICSSProps(icss)) }
+}
+
 /** for piv to parse icss props */
 export function handleICSSProps<Controller extends ValidController | unknown = unknown>(
   cssProp: ICSS<Controller>,

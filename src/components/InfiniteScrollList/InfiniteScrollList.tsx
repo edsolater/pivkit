@@ -175,10 +175,7 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
     return (
       <Show when={needRenderDom()}>
         <InfiniteScrollListItem>
-          {() => {
-            console.log('render children')
-            return props.children(getEntryValue(entry), getEntryKey(entry), idx)
-          }}
+          {() => props.children(getEntryValue(entry), getEntryKey(entry), idx)}
         </InfiniteScrollListItem>
       </Show>
     )

@@ -1,12 +1,14 @@
 import type { AnyFn } from "@edsolater/fnkit"
-import { createEffect } from "solid-js"
+import { createEffect, onCleanup } from "solid-js"
 import { attachPointerGrag, listenDomEvent, type OnMoveEnd, type OnMoveStart, type OnMoving } from "../domkit"
 import { emitCustomEvent, listenCustomEvent } from "../domkit/utils/customEvent"
 import { moveElementDOMToNewContiner } from "../domkit/utils/moveElementDOMToNewContiner"
 import { createStateClass } from "../domkit/utils/stateClass"
 import { createDomRef } from "../hooks"
-import { createPlugin, type CSSObject, type Plugin } from "../piv/propHandlers"
+import { attachIcssToElement, createPlugin, type CSSObject, type Plugin } from "../piv/propHandlers"
 import { cssOpacity } from "../styles"
+import { getElementFromRefs, type ElementRefs } from "../utils"
+import type { ICSS } from "@edsolater/pivkit"
 
 export type GestureDragCustomedEventInfo = {
   dragElement: HTMLElement
@@ -40,29 +42,48 @@ export type DraggablePluginOptions = {
   draggingIcss?: CSSObject
 } & DragFeatureOptions
 
-export type DraggablePlugin = Plugin<{ draggableIcss?: CSSObject; draggingIcss?: CSSObject } & DragFeatureOptions>
+export type DraggablePlugin = Plugin<DraggablePluginOptions>
 
 export const draggablePlugin: DraggablePlugin = createPlugin((options) => () => {
-  const { dom, setDom } = createDomRef()
+  const { dom: selfEl, setDom: setSelfDom } = createDomRef()
   createEffect(() => {
-    const selfElement = dom()
+    const selfElement = selfEl()
     if (!selfElement) return
     attachDragFeature(selfElement, options)
   })
+  const draggableIcssRules: ICSS = {
+    ":is(&._draggable, ._draggable &)": {
+      cursor: "grab",
+      ...options.draggableIcss,
+    },
+  }
+
+  if (options.handlerElement) {
+    createEffect(() => {
+      const els = getElementFromRefs(options.handlerElement)
+      els.forEach((el) => {
+        const { dispose } = attachIcssToElement(el, draggableIcssRules)
+        onCleanup(dispose)
+      })
+    })
+  } else {
+    createEffect(() => {
+      const el = selfEl()
+      if (!el) return
+      const { dispose } = attachIcssToElement(el, draggableIcssRules)
+      onCleanup(dispose)
+    })
+  }
   return {
+    domRef: setSelfDom,
     icss: {
-      "&._draggable": {
-        cursor: "grab",
-        "&._dragging": {
-          cursor: "grabbing",
-          userSelect: "none",
-          pointerEvents: "none",
-          ...options.draggingIcss,
-        },
-        ...options.draggableIcss,
+      "&._dragging": {
+        cursor: "grabbing",
+        userSelect: "none",
+        pointerEvents: "none",
+        ...options.draggingIcss,
       },
-    } as const,
-    domRef: setDom,
+    },
   }
 })
 
@@ -102,12 +123,14 @@ export const droppablePlugin = createPlugin(
 let isDragging = false
 
 type DragFeatureOptions = {
-  onDrop?: (payloads: { dragElement: HTMLElement; droppableAreas: HTMLElement[] }) => void
+  onDrop?: (payloads: { handlerElement: HTMLElement; droppableAreas: HTMLElement[] }) => void
   onMoving?: OnMoving
   onMoveStart?: OnMoveStart
   onMoveEnd?: OnMoveEnd
   /** only replace work when target canOnlyContent is also on*/
   canOnlyContent?: boolean
+  /** draggable is default self element, but can also detect a hander */
+  handlerElement?: ElementRefs
 }
 
 /**
@@ -120,35 +143,49 @@ function attachDragFeature(selfElement: HTMLElement, options?: DragFeatureOption
   const { add: addDraggingStateClass, remove: removeDraggingStateClass } = createStateClass("_dragging")(selfElement)
   addDraggableStateClass()
   cleanFns.push(removeDraggableStateClass)
-  const { cancel: cancelPresetGestureGrag } = attachPointerGrag(selfElement, {
-    onMoving(cev) {
-      options?.onMoving?.(cev)
-    },
-    onMoveStart(cev) {
-      addDraggingStateClass()
-      isDragging = true
-      options?.onMoveStart?.(cev)
-    },
-    onMoveEnd(cev) {
-      const { ev, el: dragElement, totalDeltaInPx } = cev
-      removeDraggingStateClass()
-      isDragging = false
-      const selectedDroppableAreas = findValidDroppableAreas()
-      options?.onDrop?.({ dragElement, droppableAreas: selectedDroppableAreas })
-      selectedDroppableAreas.forEach((el) => {
-        emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", {
-          dragElement: dragElement,
-          shouldSwitch: options?.canOnlyContent,
-          dragTranslate: {
-            x: totalDeltaInPx.dx,
-            y: totalDeltaInPx.dy,
-          },
-        })
+
+  // ---------------- attach gesture move ----------------
+  function moveHandler(wrapElement: HTMLElement, handlers: HTMLElement[]) {
+    handlers.forEach((handlerElement) => {
+      const { cancel: cancelPresetGestureGrag } = attachPointerGrag(handlerElement, {
+        moveElement: wrapElement,
+        onMoving(cev) {
+          options?.onMoving?.(cev)
+        },
+        onMoveStart(cev) {
+          addDraggingStateClass()
+          isDragging = true
+          options?.onMoveStart?.(cev)
+        },
+        onMoveEnd(cev) {
+          const { ev, el: dragElement, totalDeltaInPx } = cev
+          removeDraggingStateClass()
+          isDragging = false
+          const selectedDroppableAreas = findValidDroppableAreas()
+          options?.onDrop?.({ handlerElement, droppableAreas: selectedDroppableAreas })
+          selectedDroppableAreas.forEach((el) => {
+            emitCustomEvent<GestureDragCustomedEventInfo>(el, "customed-drop", {
+              dragElement: dragElement,
+              shouldSwitch: options?.canOnlyContent,
+              dragTranslate: {
+                x: totalDeltaInPx.dx,
+                y: totalDeltaInPx.dy,
+              },
+            })
+          })
+          options?.onMoveEnd?.(cev)
+        },
       })
-      options?.onMoveEnd?.(cev)
-    },
-  })
-  cleanFns.push(cancelPresetGestureGrag)
+      cleanFns.push(cancelPresetGestureGrag)
+    })
+  }
+
+  if (options?.handlerElement) {
+    moveHandler(selfElement, getElementFromRefs(options.handlerElement))
+  } else {
+    moveHandler(selfElement, [selfElement])
+  }
+
   cleanFns.push(() => {
     isDragging = false
   })

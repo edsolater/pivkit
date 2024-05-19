@@ -145,27 +145,32 @@ export function listenGestureMove(el: HTMLElement | undefined | null, options: G
 
 /** use translate by --x and --y */
 export function attachPointerGrag(
-  el: HTMLElement,
-  cbs?: {
+  selfElement: HTMLElement,
+  options?: {
+    // by default, it is selfElement
+    moveElement?: HTMLElement
     onMoveStart?: OnMoveStart
     onMoving?: OnMoving
     onMoveEnd?: OnMoveEnd
   },
 ): { cancel: () => void } {
-  const { cancel } = listenGestureMove(el, {
+  const { cancel } = listenGestureMove(selfElement, {
     onMoveStart: (iev) => {
-      cbs?.onMoveStart?.(iev)
-      iev.el.style.transform = "translate(var(--x, 0), var(--y, 0))"
+      options?.onMoveStart?.(iev)
+      const moveElement = options?.moveElement ?? iev.el
+      moveElement.style.transform = "translate(var(--x, 0), var(--y, 0))"
     },
     onMoving: (iev) => {
-      cbs?.onMoving?.(iev)
-      iev.el.style.setProperty("--x", `${iev.totalDeltaInPx.dx}px`)
-      iev.el.style.setProperty("--y", `${iev.totalDeltaInPx.dy}px`)
+      options?.onMoving?.(iev)
+      const moveElement = options?.moveElement ?? iev.el
+      moveElement.style.setProperty("--x", `${iev.totalDeltaInPx.dx}px`)
+      moveElement.style.setProperty("--y", `${iev.totalDeltaInPx.dy}px`)
     },
     onMoveEnd: (iev) => {
-      cbs?.onMoveEnd?.(iev)
-      iev.el.style.removeProperty("--x")
-      iev.el.style.removeProperty("--y")
+      options?.onMoveEnd?.(iev)
+      const moveElement = options?.moveElement ?? iev.el
+      moveElement.style.removeProperty("--x")
+      moveElement.style.removeProperty("--y")
     },
   })
   return { cancel }
