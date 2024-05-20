@@ -36,7 +36,7 @@ export const icssCardPanel = createICSS(
     padding: `.5em ${cssVar("--px", "1em")}`,
   }),
   {
-    globalSyle: {
+    globalStyle: {
       ":root": {
         "--px": "1em",
       },
