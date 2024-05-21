@@ -12,6 +12,7 @@ export interface IconProps {
 /**
  * if for layout , don't render important content in Box
  * @todo add fallbackSrc
+ * @todo fallback
  */
 export function Icon(rawProps: KitProps<IconProps>) {
   const { props, shadowProps } = useKitProps(rawProps, { name: "Icon" })
