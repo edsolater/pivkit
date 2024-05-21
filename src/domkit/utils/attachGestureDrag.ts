@@ -29,8 +29,8 @@ export function attachGestureDrag(selfElement: HTMLElement, options?: GestureDra
       const moveElement = options?.moveElement ?? iev.el
       const newDeltaX = oldDeltaX ? oldDeltaX + iev.totalDeltaInPx.dx : iev.totalDeltaInPx.dx
       const newDeltaY = oldDeltaY ? oldDeltaY + iev.totalDeltaInPx.dy : iev.totalDeltaInPx.dy
-      moveElement.style.setProperty("--x", `${newDeltaX}px`)
-      moveElement.style.setProperty("--y", `${newDeltaY}px`)
+      moveElement.style.setProperty("--x", `${(newDeltaX).toFixed(3)}px`)
+      moveElement.style.setProperty("--y", `${newDeltaY.toFixed(3)}px`)
     },
     onMoveEnd: (iev) => {
       options?.onMoveEnd?.(iev)

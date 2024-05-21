@@ -46,7 +46,7 @@ export type DraggablePluginOptions = {
 
 export type DraggablePlugin = Plugin<DraggablePluginOptions>
 
-export const draggablePlugin: DraggablePlugin = createPlugin((options) => () => {
+export const draggablePlugin: DraggablePlugin = createPlugin((options) => {
   const { dom: selfEl, setDom: setSelfDom } = createDomRef()
   createEffect(() => {
     const selfElement = selfEl()
@@ -76,7 +76,7 @@ export const draggablePlugin: DraggablePlugin = createPlugin((options) => () => 
       onCleanup(dispose)
     })
   }
-  return {
+  return () => ({
     domRef: setSelfDom,
     icss: {
       "&._dragging": {
@@ -86,7 +86,7 @@ export const draggablePlugin: DraggablePlugin = createPlugin((options) => () => 
         ...options.draggingIcss,
       },
     },
-  }
+  })
 })
 
 export const droppablePlugin = createPlugin(
@@ -97,29 +97,28 @@ export const droppablePlugin = createPlugin(
     noPresetIcss?: boolean
     droppableIcss?: CSSObject
     dragoverIcss?: CSSObject
-  }) =>
-    () => {
-      const { dom, setDom } = createDomRef()
-      createEffect(() => {
-        const selfElement = dom()
-        if (!selfElement) return
-        attachDropFeature(selfElement, {
-          canOnlyContent: options?.canOnlyContent,
-        })
+  }) => {
+    const { dom, setDom } = createDomRef()
+    createEffect(() => {
+      const selfElement = dom()
+      if (!selfElement) return
+      attachDropFeature(selfElement, {
+        canOnlyContent: options?.canOnlyContent,
       })
-      return {
-        domRef: setDom,
-        icss: {
-          "&._droppable": {
-            "&._dragover": {
-              boxShadow: options?.noPresetIcss ? undefined : `inset 0 0 32px 16px ${cssOpacity("currentcolor", 0.1)}`,
-              ...options?.dragoverIcss,
-            },
-            ...options?.droppableIcss,
+    })
+    return () => ({
+      domRef: setDom,
+      icss: {
+        "&._droppable": {
+          "&._dragover": {
+            boxShadow: options?.noPresetIcss ? undefined : `inset 0 0 32px 16px ${cssOpacity("currentcolor", 0.1)}`,
+            ...options?.dragoverIcss,
           },
+          ...options?.droppableIcss,
         },
-      }
-    },
+      },
+    })
+  },
 )
 
 let isDragging = false
