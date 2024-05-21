@@ -1,5 +1,6 @@
 import type { AnyFn } from "@edsolater/fnkit"
 import { listenDomEvent } from "./addDomEventListener"
+import { GestureDragOptions } from "./attachGestureDrag"
 
 /** used by gesture: pointer move */
 export type Delta2dTranslate = {
@@ -46,11 +47,7 @@ export type OnMoveEnd = (ev: {
   currentSpeed: SpeedVector
 }) => void
 
-export type GestureMoveOptions = {
-  onMoveStart?: OnMoveStart
-  onMoving?: OnMoving
-  onMoveEnd?: OnMoveEnd
-}
+export type GestureMoveOptions = GestureDragOptions
 
 /**
  * listen to element' pointermove（pointerDown + pointerMove + pointerUp）clean event automaticly
@@ -143,35 +140,4 @@ export function listenGestureMove(el: HTMLElement | undefined | null, options: G
   return { cancel }
 }
 
-/** use translate by --x and --y */
-export function attachPointerGrag(
-  selfElement: HTMLElement,
-  options?: {
-    // by default, it is selfElement
-    moveElement?: HTMLElement
-    onMoveStart?: OnMoveStart
-    onMoving?: OnMoving
-    onMoveEnd?: OnMoveEnd
-  },
-): { cancel: () => void } {
-  const { cancel } = listenGestureMove(selfElement, {
-    onMoveStart: (iev) => {
-      options?.onMoveStart?.(iev)
-      const moveElement = options?.moveElement ?? iev.el
-      moveElement.style.transform = "translate(var(--x, 0), var(--y, 0))"
-    },
-    onMoving: (iev) => {
-      options?.onMoving?.(iev)
-      const moveElement = options?.moveElement ?? iev.el
-      moveElement.style.setProperty("--x", `${iev.totalDeltaInPx.dx}px`)
-      moveElement.style.setProperty("--y", `${iev.totalDeltaInPx.dy}px`)
-    },
-    onMoveEnd: (iev) => {
-      options?.onMoveEnd?.(iev)
-      const moveElement = options?.moveElement ?? iev.el
-      moveElement.style.removeProperty("--x")
-      moveElement.style.removeProperty("--y")
-    },
-  })
-  return { cancel }
-}
+

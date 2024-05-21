@@ -14,7 +14,7 @@ export interface IconProps {
  * @todo add fallbackSrc
  */
 export function Icon(rawProps: KitProps<IconProps>) {
-  const { props } = useKitProps(rawProps, { name: "Icon" })
+  const { props, shadowProps } = useKitProps(rawProps, { name: "Icon" })
   const sizePx =
     props.size === "xs"
       ? "12px"
@@ -41,7 +41,7 @@ export function Icon(rawProps: KitProps<IconProps>) {
         height: sizePx,
         objectFit: "cover",
       }}
-      shadowProps={props}
+      shadowProps={shadowProps}
     />
   )
 }

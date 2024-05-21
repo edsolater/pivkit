@@ -1,5 +1,5 @@
 import { createEffect, onCleanup } from "solid-js"
-import { attachPointerGrag, listenDomEvent } from "../domkit"
+import { listenDomEvent } from "../domkit"
 import { emitCustomEvent, listenCustomEvent } from "../domkit/utils/customEvent"
 import { moveElementNextToSibling } from "../domkit/utils/moveElementDOMToNewContiner"
 import { createStateClass } from "../domkit/utils/stateClass"
@@ -7,6 +7,7 @@ import { createDomRef } from "../hooks"
 import { createPlugin, type CSSObject } from "../piv/propHandlers"
 import { cssOpacity } from "../styles"
 import { GestureDragCustomedEventInfo } from "./draggable&droppable"
+import { attachGestureDrag } from "../domkit/utils/attachGestureDrag"
 type GestureSortCustomedEventInfo = {
   dragElement: HTMLElement
   dragTranslate: {
@@ -70,7 +71,7 @@ export const itemSortablePlugin = createPlugin(
         }
 
         // drag self
-        const { cancel: cancelPresetGestureGrag } = attachPointerGrag(selfElement, {
+        const { cancel: cancelPresetGestureGrag } = attachGestureDrag(selfElement, {
           onMoveStart() {
             addDraggingStateClass()
             isSorting = true

@@ -1,4 +1,4 @@
-import { WeakerSet } from "@edsolater/fnkit"
+import { WeakerSet, toFixedDecimal } from "@edsolater/fnkit"
 import { createEffect, createSignal, on, onCleanup, onMount, type Accessor, type Setter } from "solid-js"
 import {
   listenDomEvent,
@@ -97,8 +97,8 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => {
     let elementRecordHeightPx = 0
 
     function tempResizeTo(size: { x?: number; y?: number }) {
-      if (size.x) dom()?.style.setProperty("width", size.x + "px")
-      if (size.y) dom()?.style.setProperty("height", size.y + "px")
+      if (size.x) dom()?.style.setProperty("width", toFixedDecimal(size.x, 3) + "px")
+      if (size.y) dom()?.style.setProperty("height", toFixedDecimal(size.y, 3) + "px")
     }
 
     function clearTempResize() {
