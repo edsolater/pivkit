@@ -1,5 +1,4 @@
-import { flap, pipeDo, shakeFalsy, shrinkFn } from "@edsolater/fnkit"
-import { mutateByAdditionalObjectDescriptors } from "../../fnkit"
+import { flap, mutateByDescriptors, pipeDo, shakeFalsy, shrinkFn } from "@edsolater/fnkit"
 import { getPropsFromAddPropContext } from "../AddProps"
 import { PivProps } from "../Piv"
 import { getPropsFromPropContextContext } from "../PropContext"
@@ -159,7 +158,7 @@ export function createEmptyObject<T extends (keyof any)[]>(keys: T): { [K in T[n
  */
 function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "render:firstChild"> {
   return "render:firstChild" in props
-    ? mutateByAdditionalObjectDescriptors(props, {
+    ? mutateByDescriptors(props, {
         newGetters: { children: (props) => flap(props["render:firstChild"]).concat(props.children) },
         deletePropertyNames: ["render:firstChild"],
       })
@@ -174,7 +173,7 @@ function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(pr
  */
 function parsePivRenderAppendChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "render:lastChild"> {
   return "render:lastChild" in props
-    ? mutateByAdditionalObjectDescriptors(props, {
+    ? mutateByDescriptors(props, {
         newGetters: {
           children: (props) => flap(props.children).concat(flap(props["render:lastChild"])),
         },

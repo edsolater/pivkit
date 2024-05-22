@@ -1,10 +1,9 @@
-import { AnyObj, isFunction, overwriteFunctionName } from "@edsolater/fnkit"
+import { AnyObj, ConfigableFunction, createConfigableFunction, isFunction, overwriteFunctionName } from "@edsolater/fnkit"
 import { Accessor } from "solid-js"
-import { ConfigableFunction, createConfigableFunction } from "../../fnkit/configableFunction"
 import { KitProps } from "../../createKit/KitProps"
 import { Accessify } from "../../utils"
-import { ValidController, ValidProps } from "../typeTools"
 import { PivProps } from "../Piv"
+import { ValidController, ValidProps } from "../typeTools"
 
 export type GetPluginParams<T> =
   T extends Pluginable<infer Px1>

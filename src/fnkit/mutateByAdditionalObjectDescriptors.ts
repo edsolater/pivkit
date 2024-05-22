@@ -7,7 +7,7 @@ import { map } from "@edsolater/fnkit"
  * @param descriptorSummery - An object containing the new getters and property names to be deleted.
  * @returns A new object with the mutated properties.
  */
-export function mutateByAdditionalObjectDescriptors<T>(
+export function mutateByDescriptors<T>(
   obj: T,
   descriptorSummery: {
     newGetters: {

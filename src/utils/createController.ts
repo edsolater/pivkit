@@ -1,5 +1,4 @@
-import { MayFn, createObjectWhenAccess, isObject } from "@edsolater/fnkit"
-import { RuntimeObjectOption, runtimeObject } from "../fnkit/runtimeObject"
+import { MayFn, RuntimeObjectOption, createObjectWhenAccess, isObject, runtimeObject } from "@edsolater/fnkit"
 import { ValidController } from "../piv"
 
 /** even input () => Controller / Controller, it will always return Controller without invoke

@@ -17,11 +17,13 @@ export type RuntimeObjectOption<T extends object> = {
   originMethods?: (keyof T | ((skey: keyof any) => boolean))[]
 }
 
+//TODO: it should in {@link createObjectByGetters}
 /**
  * only run when value is accessed
  *
  * should want define a lazy property A, should use a function return the value A \
  * by default , this method doesn't accept function as value, but you can use this method's option:originMethods to avoid
+ * @todo it should in {@link createObjectByGetters}
  * @example
  * const obj = runtimeObj({
  *   a: 1,

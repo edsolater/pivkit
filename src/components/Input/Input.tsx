@@ -1,4 +1,4 @@
-import { hasProperty, mergeObjects } from "@edsolater/fnkit"
+import { hasProperty, mergeObjects, runtimeObject } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
 import { useElementFocus } from "../../domkit"
@@ -11,7 +11,6 @@ import { icssRow } from "../../styles"
 import { ElementRefs, getElementFromRefs } from "../../utils"
 import { DeAccessifyProps } from "../../utils/accessifyProps"
 import { Box } from "../Boxes"
-import { runtimeObject } from "../../fnkit/runtimeObject"
 
 export interface InputController {
   text: string

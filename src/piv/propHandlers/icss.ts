@@ -3,6 +3,7 @@ import {
   AnyObj,
   MayDeepArray,
   MayFn,
+  createConfigableFunction,
   filter,
   flap,
   flapDeep,
@@ -11,12 +12,11 @@ import {
   mergeObjectsWithConfigs,
   overwriteFunctionName,
   shrinkFn,
+  type ConfigableFunction,
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
-import type * as CSS from "csstype" // or it will have bug when `pnpm build`
-
 // just for type, just use goober is not enough
-import { ConfigableFunction, createConfigableFunction } from "../../fnkit/configableFunction"
+import type * as CSS from "csstype" // or it will have bug when `pnpm build`
 
 type ValidController = AnyObj
 type LoadController<Target, Controller extends ValidController | unknown = unknown> = MayFn<Target, [Controller]>

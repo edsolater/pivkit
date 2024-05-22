@@ -1,6 +1,5 @@
-import { AnyFn, AnyObj, isFunction, isObject, isString } from "@edsolater/fnkit"
+import { AnyFn, AnyObj, isFunction, isObject, isString, mutateObject } from "@edsolater/fnkit"
 import { ValidController } from "../piv/typeTools"
-import { mutateObject } from "../fnkit/mutateObject"
 
 export type Accessify<V, Controller extends ValidController | unknown = unknown> = V | ((controller: Controller) => V)
 export type DeAccessify<V> = V extends Accessify<infer T, any> ? T : V

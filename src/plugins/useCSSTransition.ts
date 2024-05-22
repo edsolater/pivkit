@@ -1,7 +1,7 @@
 import { flap, MayArray, MayFn, shrinkFn, switchCase } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
 import { listenDomEvent } from "../domkit"
-import { runtimeObject } from "../fnkit/runtimeObject"
+import { runtimeObject } from "@edsolater/fnkit"
 import { createDomRef } from "../hooks"
 import { createRef } from "../hooks/createRef"
 import { createPlugin, CSSObject, PivProps, type ICSS } from "../piv"
