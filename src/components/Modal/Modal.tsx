@@ -1,4 +1,4 @@
-import { mergeFunction } from "@edsolater/fnkit"
+import { createInvoker, mergeFunction } from "@edsolater/fnkit"
 import { Accessor, Show, createEffect, createSignal } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
 import { useClickOutside } from "../../domkit/hooks/useClickOutside"
@@ -11,7 +11,6 @@ import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
 import { createController2 } from "../../utils/createController"
 import { PopPortal } from "../PopPortal"
 import { Text } from "../Text"
-import { motivate } from "../../fnkit"
 
 export interface ModalController {
   dialogDOM: Accessor<HTMLDialogElement | undefined>
@@ -86,7 +85,7 @@ export function Modal(kitProps: ModalKitProps) {
   const { shouldRenderDOM } = useShouldRenderDOMDetector({ props, innerOpen })
 
   // sync dislog's  build-in close event with inner state
-  useDOMEventListener(dialogDOM, "close", motivate(close))
+  useDOMEventListener(dialogDOM, "close", createInvoker(close))
 
   // initly load modal show
   createEffect(() => {

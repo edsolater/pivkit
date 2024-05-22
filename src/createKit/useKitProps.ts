@@ -1,10 +1,17 @@
-import { hasProperty, MayArray, mergeObjects, pipe, pipeDo } from "@edsolater/fnkit"
-import { DeAccessifyProps, getUIKitTheme, hasUIKitTheme, accessifyProps } from ".."
+import {
+  LazyLoadObj,
+  MayArray,
+  createObjectWhenAccess,
+  hasProperty,
+  mergeObjects,
+  pipeDo
+} from "@edsolater/fnkit"
+import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
 import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
-import { registerControllerInCreateKit } from "../piv/hooks/useComponentController"
 import { PivProps } from "../piv/Piv"
 import { getPropsFromPropContextContext } from "../piv/PropContext"
+import { registerControllerInCreateKit } from "../piv/hooks/useComponentController"
 import { loadPropsControllerRef } from "../piv/propHandlers/children"
 import { handlePluginProps } from "../piv/propHandlers/handlePluginProps"
 import { handleMergifyOnCallbackProps } from "../piv/propHandlers/mergifyProps"
@@ -14,7 +21,6 @@ import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { mergeProps } from "../piv/utils"
 import { AddDefaultPivProps, addDefaultPivProps } from "../piv/utils/addDefaultProps"
 import { omitItem } from "./utils"
-import { LazyLoadObj, runtimeObjectFromAccess } from "../fnkit"
 
 /** used for {@link useKitProps}'s option */
 export type KitPropsOptions<
@@ -92,7 +98,7 @@ export function useKitProps<
 
   // TODO: should move to getParsedKitProps
   // wrap controllerContext based on props:innerController is only in `<Piv>`
-  const mergedContextController = runtimeObjectFromAccess(getControllerObjFromControllerContext)
+  const mergedContextController = createObjectWhenAccess(getControllerObjFromControllerContext)
 
   // if (propContextParsedProps.children === 'PropContext can pass to deep nested components') {
   //   console.log('kitProps raw: ', { ...propContextParsedProps })
@@ -130,9 +136,7 @@ function getParsedKitProps<
   methods: AddDefaultPivProps<RawProps, DefaultProps>
   shadowProps: any
 } {
-  const proxyController = options?.controller
-    ? runtimeObjectFromAccess(() => options.controller!(accessifiedProps))
-    : {}
+  const proxyController = options?.controller ? createObjectWhenAccess(() => options.controller!(accessifiedProps)) : {}
 
   // const startTime = performance.now()
   // merge kit props
@@ -155,7 +159,7 @@ function getParsedKitProps<
         () => hasProperty(options, "plugin"),
       ), // defined-time (parsing option)
     (props) => (hasProperty(options, "name") ? mergeProps(props, { class: options!.name }) : props), // defined-time (parsing option)
-    
+
     (props) => handleShadowProps(props, options?.selfProps), // outside-props-run-time(parsing props) // TODO: assume can't be promisify
     (props) => handlePluginProps(props), // outside-props-run-time(parsing props) // TODO: assume can't be promisify  //<-- bug is HERE!!, after this, class is doubled
     /**

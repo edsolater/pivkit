@@ -1,6 +1,5 @@
-import { MayArray, flapDeep, isArray, shakeNil } from "@edsolater/fnkit"
+import { MayArray, flapDeep, isArray, mergeObjects, shakeNil } from "@edsolater/fnkit"
 import { JSX } from "solid-js"
-import { objectMerge } from "../../fnkit"
 import { HTMLTag } from "../typeTools"
 
 export type HTMLProps<TagName extends HTMLTag = HTMLTag> = MayArray<JSX.IntrinsicElements[TagName] | undefined>
@@ -10,7 +9,7 @@ export type HTMLProps<TagName extends HTMLTag = HTMLTag> = MayArray<JSX.Intrinsi
  */
 export function parseHTMLProps(htmlProps: HTMLProps) {
   if (!htmlProps) return undefined
-  return objectMerge(...shakeNil(flapDeep(htmlProps)))
+  return mergeObjects(...shakeNil(flapDeep(htmlProps)))
 }
 
 /**

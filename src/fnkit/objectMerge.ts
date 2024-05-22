@@ -6,16 +6,16 @@ import { AnyObj, unifyItem } from "@edsolater/fnkit"
  * @param shallowCopy only accessed in runtime
  * @returns a proxy
  */
-export function objectMerge<T extends AnyObj>(...objects: [T]): T
-export function objectMerge<T extends AnyObj, U extends AnyObj>(...objects: [T, U]): T & U
-export function objectMerge<T extends AnyObj, U extends AnyObj, V extends AnyObj>(...objects: [T, U, V]): T & U & V
-export function objectMerge<T extends AnyObj, U extends AnyObj, V extends AnyObj, W extends AnyObj>(
+export function mergeObjects<T extends AnyObj>(...objects: [T]): T
+export function mergeObjects<T extends AnyObj, U extends AnyObj>(...objects: [T, U]): T & U
+export function mergeObjects<T extends AnyObj, U extends AnyObj, V extends AnyObj>(...objects: [T, U, V]): T & U & V
+export function mergeObjects<T extends AnyObj, U extends AnyObj, V extends AnyObj, W extends AnyObj>(
   ...objects: [T, U, V, W]
 ): T & U & V & W
-export function objectMerge<T extends AnyObj, U extends AnyObj, V extends AnyObj, W extends AnyObj, X extends AnyObj>(
+export function mergeObjects<T extends AnyObj, U extends AnyObj, V extends AnyObj, W extends AnyObj, X extends AnyObj>(
   ...objects: [T, U, V, W, X]
 ): T & U & V & W & X
-export function objectMerge<
+export function mergeObjects<
   T extends AnyObj,
   U extends AnyObj,
   V extends AnyObj,
@@ -23,7 +23,7 @@ export function objectMerge<
   X extends AnyObj,
   Y extends AnyObj,
 >(...objects: [T, U, V, W, X, Y]): T & U & V & W & X & Y
-export function objectMerge<
+export function mergeObjects<
   T extends AnyObj,
   U extends AnyObj,
   V extends AnyObj,
@@ -32,8 +32,8 @@ export function objectMerge<
   Y extends AnyObj,
   Z extends AnyObj,
 >(...objects: [T, U, V, W, X, Y, Z]): T & U & V & W & X & Y & Z
-export function objectMerge(...objects: AnyObj[]): AnyObj
-export function objectMerge(...objects: AnyObj[]) {
+export function mergeObjects(...objects: AnyObj[]): AnyObj
+export function mergeObjects(...objects: AnyObj[]) {
   return new Proxy(createEmptyObjectWithSpecificKeys(getKeys(objects)), {
     get: (_target, key) => getValue(objects, key),
   }) as any
@@ -59,4 +59,4 @@ function getValue(objs: AnyObj[], key: keyof any) {
   }
 }
 
-const a = objectMerge({ a: 1 }, { b: 2 }, { c: 3 })
+const a = mergeObjects({ a: 1 }, { b: 2 }, { c: 3 })

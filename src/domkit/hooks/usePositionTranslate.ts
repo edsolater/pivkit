@@ -1,7 +1,6 @@
-import { addDefault } from "@edsolater/fnkit"
+import { addDefault, mergeObjects} from "@edsolater/fnkit"
 import { Accessor, AccessorArray, createEffect, on, onCleanup } from "solid-js"
 import { createRef } from "../../hooks/createRef"
-import { objectMerge } from "../../fnkit"
 
 /**
  * Animates an element's movement when its position changes.

@@ -4,8 +4,8 @@ import { AnyFn } from "@edsolater/fnkit"
 export async function invoke<F extends AnyFn>(fn: F, ...params: Parameters<F>): Promise<ReturnType<F>> {
   return fn(...params)
 }
-/** for readibility, {@link motivate} will return a action function (function with zero params) */
-export function motivate<F extends AnyFn>(fn: F, ...params: Parameters<F>): () => ReturnType<F> {
+/** for readibility, {@link createInvoker} will return a action function (function with zero params) */
+export function createInvoker<F extends AnyFn>(fn: F, ...params: Parameters<F>): () => ReturnType<F> {
   return () => fn(...params)
 }
 

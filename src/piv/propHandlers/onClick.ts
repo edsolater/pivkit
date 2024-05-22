@@ -1,5 +1,4 @@
-import { AnyFn } from "@edsolater/fnkit"
-import { objectMerge } from "../../fnkit"
+import { AnyFn, mergeObjects } from "@edsolater/fnkit"
 import { ValidController } from "../typeTools"
 export type OnClickPayloads<C extends ValidController> = C & {
   ev: MouseEvent & {
@@ -17,7 +16,7 @@ export type OnClickPayloads<C extends ValidController> = C & {
 export function parseOnClick(onClick: AnyFn, controller: ValidController) {
   return (ev: Event) =>
     onClick?.(
-      objectMerge(controller, {
+      mergeObjects(controller, {
         ev,
         el: ev.currentTarget,
         isSelf: () => ev.currentTarget === ev.target,

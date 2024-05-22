@@ -1,8 +1,7 @@
+import { WeakerMap, WeakerSet, concat } from "@edsolater/fnkit"
 import { Context, createContext, useContext } from "solid-js"
 import { PivProps, ValidController, ValidProps, mergeProps } from "."
 import { Fragnment } from "./Fragnment"
-import { WeakerMap, WeakerSet } from "@edsolater/fnkit"
-import { contactIterableIterators } from "../fnkit/contactIterableIterators"
 
 type ControllerContext = Context<ValidController | undefined>
 type ComponentName = string
@@ -32,10 +31,7 @@ function getControllerContext(name?: ComponentName) {
 }
 
 const getAllControllerContext = () => {
-  const allIterators = contactIterableIterators(
-    controllerContextStore.values(),
-    anonymousComponentControllerContextStore.values(),
-  )
+  const allIterators = concat(controllerContextStore.values(), anonymousComponentControllerContextStore.values())
   return Array.from(allIterators)
 }
 

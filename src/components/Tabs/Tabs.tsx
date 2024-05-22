@@ -1,6 +1,6 @@
 import { mergeObjects } from "@edsolater/fnkit"
 import { Accessor, createContext } from "solid-js"
-import { callbackManager } from "../../fnkit/callbackManager"
+import { callbackManager } from "@edsolater/fnkit"
 import { useKitProps } from "../../createKit/useKitProps"
 import { KitProps } from "../../createKit/KitProps"
 import { createSyncSignal } from "../../hooks/createSyncSignal"
