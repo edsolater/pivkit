@@ -1,6 +1,7 @@
 import { createMemo } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
-import { Piv, type CSSObject } from "../piv"
+import { Piv, parseICSSToClassName, type CSSObject } from "../piv"
+import { cacheFn } from "@edsolater/fnkit"
 
 export interface TextRawProps {
   inline?: boolean
@@ -28,7 +29,7 @@ export type TextProps = KitProps<TextRawProps>
  * if for layout , inner content should only be text
  */
 export function Text(kitProps: TextProps) {
-  const { props } = useKitProps(kitProps, { name: "Text" })
+  const { props, shadowProps } = useKitProps(kitProps, { name: "Text" })
 
   const contentEditableValue = createMemo(() =>
     props.editable != null
@@ -58,14 +59,20 @@ export function Text(kitProps: TextProps) {
 
   return (
     <Piv
-      icss={icss()}
+      shadowProps={shadowProps}
+      icss={[icss(), defaultTextICSS]}
       // @ts-ignore no need this check
       htmlProps={{
         contentEditable: contentEditableValue(),
       }}
-      shadowProps={props}
     >
       {kitProps.children}
     </Piv>
   )
 }
+
+const defaultTextICSS = cacheFn(() =>
+  parseICSSToClassName({
+    alignContent: "center", // make text vertical center
+  }),
+)

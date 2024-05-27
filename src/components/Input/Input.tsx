@@ -1,13 +1,13 @@
-import { hasProperty, mergeObjects, runtimeObject } from "@edsolater/fnkit"
+import { cacheFn, hasProperty, mergeObjects, runtimeObject } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
 import { useElementFocus } from "../../domkit"
 import { createDomRef, useShortcutsRegister } from "../../hooks"
 import { createDisclosure } from "../../hooks/createDisclosure"
 import { createRef } from "../../hooks/createRef"
-import { Piv, PivChild, PivProps } from "../../piv"
+import { Piv, PivChild, PivProps, parseICSSToClassName } from "../../piv"
 import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
-import { icssRow } from "../../styles"
+import { cssOpacity, icssRow } from "../../styles"
 import { ElementRefs, getElementFromRefs } from "../../utils"
 import { DeAccessifyProps } from "../../utils/accessifyProps"
 import { Box } from "../Boxes"
@@ -90,19 +90,16 @@ export function Input(rawProps: InputKitProps) {
   if (props.autoFocus) useAutoFocus(inputBodyDom)
 
   return (
-    <Box
-      shadowProps={shadowProps}
-      icss={[icssRow({ align: "center" }), { padding: "4px", "&:focus-within": { outline: "solid" } }]}
-    >
+    <Box shadowProps={shadowProps} icss={basicInputICSS}>
       {props.renderPrefix}
       <Piv<"input">
+        shadowProps={additionalProps()}
         domRef={setInputBodyDom}
         htmlProps={{
           placeholder: props.placeholder,
           autofocus: props.autoFocus,
         }}
         render:self={(selfProps) => renderHTMLDOM("input", selfProps)}
-        shadowProps={additionalProps()}
         icss={[
           { flex: 1, background: "transparent", minWidth: props.isFluid ? undefined : "14em" },
           /* initialize */
@@ -113,6 +110,16 @@ export function Input(rawProps: InputKitProps) {
     </Box>
   )
 }
+
+const basicInputICSS = cacheFn(() =>
+  parseICSSToClassName({
+    display: "flex",
+    border: "solid",
+    borderColor: cssOpacity("currentcolor", 0.2),
+    transition: "200ms",
+    "&:focus-within": { borderColor: "currentcolor" },
+  }),
+)
 
 function useAutoFocus(refs: ElementRefs) {
   createEffect(() => {
