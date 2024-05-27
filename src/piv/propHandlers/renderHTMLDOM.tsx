@@ -44,35 +44,67 @@ export const renderHTMLDOM = (
   }
 }
 
-export const renderAsHTMLMain = (selfProps: any) => renderHTMLDOM("main", selfProps)
-export const renderAsHTMLDiv = (selfProps: any) => renderHTMLDOM("div", selfProps)
-export const renderAsHTMLSpan = (selfProps: any) => renderHTMLDOM("span", selfProps)
-export const renderAsHTMLP = (selfProps: any) => renderHTMLDOM("p", selfProps)
-export const renderAsHTMLButton = (selfProps: any) => renderHTMLDOM("button", selfProps)
-export const renderAsHTMLInput = (selfProps: any) => renderHTMLDOM("input", selfProps)
-export const renderAsHTMLForm = (selfProps: any) => renderHTMLDOM("form", selfProps)
-export const renderAsHTMLLabel = (selfProps: any) => renderHTMLDOM("label", selfProps)
-export const renderAsHTMLNav = (selfProps: any) => renderHTMLDOM("nav", selfProps)
-export const renderAsHTMLSection = (selfProps: any) => renderHTMLDOM("section", selfProps)
-export const renderAsHTMLHeader = (selfProps: any) => renderHTMLDOM("header", selfProps)
-export const renderAsHTMLFooter = (selfProps: any) => renderHTMLDOM("footer", selfProps)
-export const renderAsHTMLAside = (selfProps: any) => renderHTMLDOM("aside", selfProps)
-export const renderAsHTMLH1 = (selfProps: any) => renderHTMLDOM("h1", selfProps)
-export const renderAsHTMLH2 = (selfProps: any) => renderHTMLDOM("h2", selfProps)
-export const renderAsHTMLH3 = (selfProps: any) => renderHTMLDOM("h3", selfProps)
-export const renderAsHTMLH4 = (selfProps: any) => renderHTMLDOM("h4", selfProps)
-export const renderAsHTMLH5 = (selfProps: any) => renderHTMLDOM("h5", selfProps)
-export const renderAsHTMLH6 = (selfProps: any) => renderHTMLDOM("h6", selfProps)
-export const renderAsHTMLUl = (selfProps: any) => renderHTMLDOM("ul", selfProps)
-export const renderAsHTMLOl = (selfProps: any) => renderHTMLDOM("ol", selfProps)
-export const renderAsHTMLLi = (selfProps: any) => renderHTMLDOM("li", selfProps)
-export const renderAsHTMLTable = (selfProps: any) => renderHTMLDOM("table", selfProps)
-export const renderAsHTMLTr = (selfProps: any) => renderHTMLDOM("tr", selfProps)
-export const renderAsHTMLTd = (selfProps: any) => renderHTMLDOM("td", selfProps)
-export const renderAsHTMLTh = (selfProps: any) => renderHTMLDOM("th", selfProps)
-export const renderAsHTMLTbody = (selfProps: any) => renderHTMLDOM("tbody", selfProps)
-export const renderAsHTMLThead = (selfProps: any) => renderHTMLDOM("thead", selfProps)
-export const renderAsHTMLTfoot = (selfProps: any) => renderHTMLDOM("tfoot", selfProps)
-export const renderAsHTMLA = (selfProps: any) => renderHTMLDOM("a", selfProps)
-export const renderAsHTMLImg = (selfProps: any) => renderHTMLDOM("img", selfProps)
-export const renderAsHTMLSelect = (selfProps: any) => renderHTMLDOM("select", selfProps)
+export const renderAsHTMLMain = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("main", selfProps, additionalProps)
+export const renderAsHTMLDiv = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("div", selfProps, additionalProps)
+export const renderAsHTMLSpan = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("span", selfProps, additionalProps)
+export const renderAsHTMLP = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("p", selfProps, additionalProps)
+export const renderAsHTMLButton = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("button", selfProps, additionalProps)
+export const renderAsHTMLInput = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("input", selfProps, additionalProps)
+export const renderAsHTMLForm = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("form", selfProps, additionalProps)
+export const renderAsHTMLLabel = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("label", selfProps, additionalProps)
+export const renderAsHTMLNav = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("nav", selfProps, additionalProps)
+export const renderAsHTMLSection = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("section", selfProps, additionalProps)
+export const renderAsHTMLHeader = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("header", selfProps, additionalProps)
+export const renderAsHTMLFooter = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("footer", selfProps, additionalProps)
+export const renderAsHTMLAside = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("aside", selfProps, additionalProps)
+export const renderAsHTMLH1 = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("h1", selfProps, additionalProps)
+export const renderAsHTMLH2 = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("h2", selfProps, additionalProps)
+export const renderAsHTMLH3 = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("h3", selfProps, additionalProps)
+export const renderAsHTMLH4 = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("h4", selfProps, additionalProps)
+export const renderAsHTMLH5 = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("h5", selfProps, additionalProps)
+export const renderAsHTMLH6 = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("h6", selfProps, additionalProps)
+export const renderAsHTMLUl = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("ul", selfProps, additionalProps)
+export const renderAsHTMLOl = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("ol", selfProps, additionalProps)
+export const renderAsHTMLLi = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("li", selfProps, additionalProps)
+export const renderAsHTMLTable = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("table", selfProps, additionalProps)
+export const renderAsHTMLTr = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("tr", selfProps, additionalProps)
+export const renderAsHTMLTd = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("td", selfProps, additionalProps)
+export const renderAsHTMLTh = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("th", selfProps, additionalProps)
+export const renderAsHTMLTbody = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("tbody", selfProps, additionalProps)
+export const renderAsHTMLThead = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("thead", selfProps, additionalProps)
+export const renderAsHTMLTfoot = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("tfoot", selfProps, additionalProps)
+export const renderAsHTMLA = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("a", selfProps, additionalProps)
+export const renderAsHTMLImg = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("img", selfProps, additionalProps)
+export const renderAsHTMLSelect = (selfProps: any, additionalProps?: Record<any, any>) =>
+  renderHTMLDOM("select", selfProps, additionalProps)
