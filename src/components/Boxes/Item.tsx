@@ -1,5 +1,4 @@
 import { KitProps, useKitProps } from "../../createKit"
-import { icssNewCompositedLayer } from "../../styles"
 import { Box, BoxProps } from "./Box"
 
 export type ItemProps = BoxProps & {
@@ -13,5 +12,5 @@ export type ItemKitProps = KitProps<ItemProps>
  */
 export function Item(rawProps: ItemKitProps) {
   const { shadowProps, props } = useKitProps(rawProps, { name: "Item" })
-  return <Box class={props.name} shadowProps={shadowProps} icss={icssNewCompositedLayer} />
+  return <Box class={props.name} shadowProps={shadowProps} />
 }

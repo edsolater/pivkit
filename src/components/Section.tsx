@@ -1,5 +1,6 @@
 import { KitProps, useKitProps } from "../createKit"
 import { Piv } from "../piv"
+import { icssNewCompositedLayer } from "../styles"
 
 export type SectionProps = {
   name?: string
@@ -12,5 +13,5 @@ export type SectionKitProps = KitProps<SectionProps>
  */
 export function Section(rawProps: SectionKitProps) {
   const { shadowProps, props } = useKitProps(rawProps, { name: "Section" })
-  return <Piv class={props.name} shadowProps={shadowProps} />
+  return <Piv class={props.name} shadowProps={shadowProps} icss={icssNewCompositedLayer} />
 }
