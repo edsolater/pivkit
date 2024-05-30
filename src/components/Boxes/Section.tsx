@@ -1,6 +1,6 @@
-import { KitProps, useKitProps } from "../createKit"
-import { Piv } from "../piv"
-import { icssNewCompositedLayer } from "../styles"
+import { KitProps, useKitProps } from "../../createKit"
+import { Piv } from "../../piv"
+import { icssNewCompositedLayer } from "../../styles"
 
 export type SectionProps = {
   name?: string
