@@ -1,25 +1,6 @@
+import { assert } from "@edsolater/fnkit"
 import { createEffect, createSignal } from "solid-js"
-import { Portal } from "solid-js/web" // this is why
-import { Fragnment, createDomRef, createRef, useKitProps, type KitProps } from ".."
-import isClientSide from "../jFetch/utils/isSSR"
-import { RawChild } from "../piv/typeTools"
-import { assert, runtimeObject } from "@edsolater/fnkit"
-import { AddProps } from "@edsolater/pivkit"
-
-/** with the same id, new top-element will be created only-once  */
-/** @dreprecated prefer use native Popover API(https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) */
-export function PopPortal(props: { name: string; children?: RawChild }) {
-  const element = createPopStackHTMLElement(props.name)
-  const [ref, setRef] = createRef()
-  createEffect(() => {
-    ref()?.classList.add("self-pointer-events-none")
-  })
-  return (
-    <Portal mount={element} ref={setRef}>
-      {props.children}
-    </Portal>
-  )
-}
+import { Piv, createDomRef, useKitProps, type KitProps } from ".."
 
 export type PopoverPanelController = {
   open: () => void
@@ -80,39 +61,8 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   })
 
   return (
-    <div popover={props.canBackdropClose ? "auto" : "manual"} ref={setDom}>
-      <AddProps shadowProps={shadowProps}>{props.children}</AddProps>
-    </div>
+    <Piv shadowProps={shadowProps} htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }} domRef={setDom}>
+      {props.children}
+    </Piv>
   )
-}
-
-function createPopStackHTMLElement(name: string) {
-  if (!isClientSide()) return
-  const el = document.querySelector(`#${name}`)
-  if ("document" in globalThis && !el) {
-    const div = document.createElement("div")
-    div.id = name
-    document.body.appendChild(div)
-    div.style.position = "fixed"
-    div.style.inset = "0"
-    div.classList.add("self-pointer-events-none")
-    insertCSSPointerEventNone()
-    return div
-  } else {
-    return el ?? undefined
-  }
-}
-
-let haveSetPointerStyle = false
-function insertCSSPointerEventNone() {
-  if (!isClientSide()) return
-  if (haveSetPointerStyle) return
-  haveSetPointerStyle = true
-  const styleEl = document.createElement("style")
-
-  // Append <style> element to <head>
-  document.head.appendChild(styleEl)
-
-  styleEl.sheet?.insertRule(`:where(.self-pointer-events-none) {pointer-events:none}`)
-  styleEl.sheet?.insertRule(`:where(.self-pointer-events-none) * {pointer-events:initial}`) // :where() always has 0 specificity -- MDN
 }

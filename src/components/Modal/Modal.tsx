@@ -1,5 +1,5 @@
 import { createInvoker, mergeFunction } from "@edsolater/fnkit"
-import { Accessor, Show, createEffect, createSignal } from "solid-js"
+import { Accessor, createEffect, createSignal } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
 import { useClickOutside } from "../../domkit/hooks/useClickOutside"
 import { useDOMEventListener } from "../../domkit/hooks/useDOMEventListener"
@@ -9,7 +9,7 @@ import { createRef } from "../../hooks/createRef"
 import { ICSS, Piv, PivProps, createPlugin } from "../../piv"
 import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
 import { createController2 } from "../../utils/createController"
-import { PopPortal } from "../PopPortal"
+import { PopoverPanel } from "../PopPortal"
 import { Text } from "../Text"
 
 export interface ModalController {
@@ -111,29 +111,27 @@ export function Modal(kitProps: ModalKitProps) {
 
   return (
     <ModalContext.Provider value={modalController}>
-      <PopPortal name="dialog">
-        <Show when={shouldRenderDOM()}>
-          <Piv<"dialog">
-            render:self={(selfProps) => renderHTMLDOM("dialog", selfProps)}
-            domRef={setDialogDOM}
-            shadowProps={shadowProps}
-            htmlProps={{ role: "dialog" }}
-            icss={{
-              border: "none",
-              padding: "0",
-              background: "transparent",
-              overflowY: "visible",
-              maxHeight: "100dvh",
-              maxWidth: "100dvw",
-              "&::backdrop": props.backdropICSS,
-            }}
-          >
-            <Piv domRef={setDialogContentDOM} icss={{ display: "contents" }}>
-              {props.children}
-            </Piv>
+      <PopoverPanel open={shouldRenderDOM}>
+        <Piv<"dialog">
+          render:self={(selfProps) => renderHTMLDOM("dialog", selfProps)}
+          domRef={setDialogDOM}
+          shadowProps={shadowProps}
+          htmlProps={{ role: "dialog" }}
+          icss={{
+            border: "none",
+            padding: "0",
+            background: "transparent",
+            overflowY: "visible",
+            maxHeight: "100dvh",
+            maxWidth: "100dvw",
+            "&::backdrop": props.backdropICSS,
+          }}
+        >
+          <Piv domRef={setDialogContentDOM} icss={{ display: "contents" }}>
+            {props.children}
           </Piv>
-        </Show>
-      </PopPortal>
+        </Piv>
+      </PopoverPanel>
     </ModalContext.Provider>
   )
 }

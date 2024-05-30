@@ -1,10 +1,10 @@
-import { createSignal, Show } from "solid-js"
+import { createSignal } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { createRef } from "../../hooks/createRef"
 import { useClickOutside } from "../../domkit/hooks/useClickOutside"
+import { createRef } from "../../hooks/createRef"
 import { Piv } from "../../piv"
 import { drawerKeyboardShortcut } from "../../plugins/drawerKeyboardShortcut"
-import { PopPortal } from "../PopPortal"
+import { PopoverPanel } from "../PopPortal"
 
 export interface DrawerController {
   isOpen: boolean
@@ -58,38 +58,36 @@ export function Drawer(kitProps: DrawerKitProps) {
     },
   })
   return (
-    <PopPortal name="pop-stack">
-      <Show when={isOpen()}>
-        <Piv
-          domRef={setDrawerRef}
-          shadowProps={props}
-          icss={[
-            {
-              width: "300px",
-              height: "100dvh",
-              background: "dodgerblue",
-              "@starting-style": {
-                "&":
-                  props.placement === "from-left"
-                    ? { translate: "-100% 0" }
-                    : props.placement === "from-right"
-                      ? { translate: "100% 0" }
-                      : props.placement === "from-top"
-                        ? { translate: "0 -100%" }
-                        : { translate: "0 100%" },
-              },
-              transition: "300ms",
+    <PopoverPanel open={isOpen}>
+      <Piv
+        domRef={setDrawerRef}
+        shadowProps={props}
+        icss={[
+          {
+            width: "300px",
+            height: "100dvh",
+            background: "dodgerblue",
+            "@starting-style": {
+              "&":
+                props.placement === "from-left"
+                  ? { translate: "-100% 0" }
+                  : props.placement === "from-right"
+                    ? { translate: "100% 0" }
+                    : props.placement === "from-top"
+                      ? { translate: "0 -100%" }
+                      : { translate: "0 100%" },
             },
-            {
-              position: "absolute",
-              top: props.placement === "from-top" ? "0" : undefined,
-              left: props.placement === "from-left" ? "0" : undefined,
-              right: props.placement === "from-right" ? "0" : undefined,
-              bottom: props.placement === "from-bottom" ? "0" : undefined,
-            },
-          ]}
-        />
-      </Show>
-    </PopPortal>
+            transition: "300ms",
+          },
+          {
+            position: "absolute",
+            top: props.placement === "from-top" ? "0" : undefined,
+            left: props.placement === "from-left" ? "0" : undefined,
+            right: props.placement === "from-right" ? "0" : undefined,
+            bottom: props.placement === "from-bottom" ? "0" : undefined,
+          },
+        ]}
+      />
+    </PopoverPanel>
   )
 }
