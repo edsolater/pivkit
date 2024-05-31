@@ -2,7 +2,7 @@ import { MayFn, shrinkFn } from "@edsolater/fnkit"
 import { For, JSXElement, createMemo, type Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { createRef } from "../hooks/createRef"
-import { AddProps, Fragnment, PivChild, parsePivChildren } from "../piv"
+import { Fragnment, Piv, PivChild, parsePivChildren } from "../piv"
 import { Box } from "./Boxes"
 
 export interface ListController {}
@@ -30,7 +30,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
     name: "List",
     noNeedDeAccessifyChildren: true,
   })
-  const Wrapper = kitProps.wrapper ?? AddProps //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
+  const Wrapper = kitProps.wrapper ?? Piv //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
 
   // [configs]
   const allItems = createMemo(() => {
