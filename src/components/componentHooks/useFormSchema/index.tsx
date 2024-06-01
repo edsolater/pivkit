@@ -1,16 +1,17 @@
+import { isObjectLike } from "@edsolater/fnkit"
 import { Match, Switch, createEffect, createSignal, on } from "solid-js"
-import { Row } from "../Boxes"
-import { Input, isInputDescription, type InputDescription } from "../Input"
-import { List } from "../List"
-import { Text } from "../Text"
+export * from "./type"
+import { Row } from "../../Boxes"
+import { Input, isInputDescription } from "../../Input"
+import { List } from "../../List"
+import { Text } from "../../Text"
+import { FormDescription, FormSchema, GetSchemaData } from "./type"
 
-type FormRecursiveDescription = {
-  widgetType: "_recursive"
-  innerForm: FormDescription
+export const formDescriptionSymbol = Symbol("formDescription")
+
+export function isFormDescription(description: any): description is FormDescription {
+  return isObjectLike(description) && description[formDescriptionSymbol] === true
 }
-type FormDescription = InputDescription | FormRecursiveDescription
-
-export type FormSchema = { [key: string]: FormDescription }
 
 function WidgetByFormDescription(props: {
   description: FormDescription
@@ -51,10 +52,10 @@ function FormSchemaObject(props: { schema: FormSchema; onDataChange?(payload: { 
 
 export function useFormSchema<T extends FormSchema>(
   schema: T,
-  options?: { onDataChange?(payload: { newSchema: unknown }): void }, // TODO: type unknown
+  options?: { onDataChange?(payload: { newSchema: GetSchemaData<T> }): void }, // TODO: type unknown
 ) {
-  const initSchemaData = {}
-  const [schemaData, setSchemaData] = createSignal<object>(initSchemaData)
+  const initSchemaData = {} as GetSchemaData<T>
+  const [schemaData, setSchemaData] = createSignal<GetSchemaData<T>>(initSchemaData)
   const schemaParsedElement = () => (
     <FormSchemaObject
       schema={schema}
@@ -68,7 +69,7 @@ export function useFormSchema<T extends FormSchema>(
     schemaParsedElement,
     schemaData,
     reset() {
-      setSchemaData(initSchemaData)
+      setSchemaData(() => initSchemaData)
     },
   }
 }

@@ -1,8 +1,10 @@
 import { isObjectLike } from "@edsolater/fnkit"
 import type { PivChild } from "../../../piv"
-import { Input } from "../Input"
+import { Input } from "../../Input/Input"
+import type { BasicFormDescription } from "./type"
+import { formDescriptionSymbol, isFormDescription } from "."
 
-export type InputDescription = {
+export interface InputDescription extends BasicFormDescription {
   widgetType: "input"
   resultType: string // just for typescript to infer
 }
@@ -10,7 +12,7 @@ export type InputDescription = {
 export type InputSchemaOption = {}
 
 export function createInputDescription(options?: InputSchemaOption): InputDescription {
-  return { widgetType: "input", resultType: "" }
+  return { [formDescriptionSymbol]: true, widgetType: "input", resultType: "" }
 }
 
 export function createInputFromDescription(description: InputDescription): PivChild {
@@ -18,5 +20,5 @@ export function createInputFromDescription(description: InputDescription): PivCh
 }
 
 export function isInputDescription(description: any): description is InputDescription {
-  return isObjectLike(description) && (description as any).widgetType === "input"
+  return isFormDescription(description) && (description as any).widgetType === "input"
 }
