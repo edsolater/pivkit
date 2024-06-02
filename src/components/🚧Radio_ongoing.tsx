@@ -10,36 +10,36 @@ import { cssVar } from "../styles"
 import { cssColors } from "../styles/cssColors"
 import { CSSColorString } from "../styles/type"
 
-export interface ButtonController {
+export interface RadioController {
   click?: () => void
   focus?: () => void
 }
 
-export const ButtonCSSVariables = {
-  mainBgColor: "--Button-main-bg-color",
-  mainTextColor: "--Button-main-text-color",
-  outlineWidth: "--Button-outline-width",
+export const RadioCSSVariables = {
+  mainBgColor: "--Radio-main-bg-color",
+  mainTextColor: "--Radio-main-text-color",
+  outlineWidth: "--Radio-outline-width",
 }
 
-export const ButtonState = {
+export const RadioState = {
   interactive: "_interactive",
   disabled: "_disabled",
 }
 
-export const ButtonSize = {
+export const RadioSize = {
   lg: "_lg",
   md: "_md",
   sm: "_sm",
   xs: "_xs",
 }
 
-export const ButtonVariant = {
+export const RadioVariant = {
   solid: "_solid",
   outline: "_outline",
   text: "_text",
 }
 
-export interface ButtonProps {
+export interface RadioProps {
   /**
    * @default 'solid'
    */
@@ -56,22 +56,22 @@ export interface ButtonProps {
   validators?: MayArray<{
     /** must return true to pass this validator */
     should: MayFn<Booleanable>
-    // used in "connect wallet" button, it's order is over props: disabled
+    // used in "connect wallet" radio, it's order is over props: disabled
     forceInteractive?: boolean
-    /**  items are button's setting which will apply when corresponding validator has failed */
-    fallbackProps?: Omit<ButtonProps, "validators" | "disabled" | "enabled">
+    /**  items are radio's setting which will apply when corresponding validator has failed */
+    fallbackProps?: Omit<RadioProps, "validators" | "disabled" | "enabled">
   }>
 }
 
-export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonController }>
+export type RadioKitProps = KitProps<RadioProps, { controller: RadioController }>
 
 /**
  * feat: build-in click ui effect
  */
-export function Button(kitProps: ButtonKitProps) {
-  const [dom, setDom] = createRef<HTMLButtonElement>()
-  loadButtonDefaultICSS()
-  const innerController: ButtonController = {
+export function Radio(kitProps: RadioKitProps) {
+  const [dom, setDom] = createRef<HTMLInputElement>()
+  loadRadioDefaultICSS()
+  const innerController: RadioController = {
     click: () => {
       dom()?.click()
     },
@@ -83,7 +83,7 @@ export function Button(kitProps: ButtonKitProps) {
   // ---------------- props ----------------
   const { props } = useKitProps(kitProps, {
     controller: () => innerController,
-    name: "Button",
+    name: "Radio",
     defaultProps: { variant: "solid", size: "md" },
   })
 
@@ -117,14 +117,14 @@ export function Button(kitProps: ButtonKitProps) {
   const { setClassRef: setStateClassRef } = useClassRef(
     Object.assign(
       {
-        [ButtonState.interactive]: isInteractive,
-        [ButtonState.disabled]: isDisabled,
+        [RadioState.interactive]: isInteractive,
+        [RadioState.disabled]: isDisabled,
       },
       Object.fromEntries(
-        Object.entries(ButtonSize).map(([key, sizeClass]) => [sizeClass, () => (props.size ?? "md") === key]),
+        Object.entries(RadioSize).map(([key, sizeClass]) => [sizeClass, () => (props.size ?? "md") === key]),
       ),
       Object.fromEntries(
-        Object.entries(ButtonVariant).map(([key, variantClass]) => [
+        Object.entries(RadioVariant).map(([key, variantClass]) => [
           variantClass,
           () => (props.variant ?? "solid") === key,
         ]),
@@ -138,10 +138,11 @@ export function Button(kitProps: ButtonKitProps) {
     "innerController" in props ? mergeObjects(props.innerController!, innerController) : innerController
 
   return (
-    <Piv<"button">
-      render:self={(selfProps) => renderHTMLDOM("button", selfProps)}
+    <Piv<"input">
+      render:self={(selfProps) => renderHTMLDOM("input", selfProps)}
       shadowProps={omitProps(props, "onClick")} // omit onClick for need to invoke the function manually, see below 👇
       onClick={(...args) => isInteractive() && props.onClick?.(...args)}
+      htmlProps={{ type: "radio" }}
       domRef={[setDom, setStateClassRef]}
     >
       {parsePivChildren(props.children, mergedController)}
@@ -156,16 +157,16 @@ export function opacityCSSColor(cssColor: CSSColorString, /* 0~1 */ opacity: num
   return cssColor === cssColors.component_button_bg_primary ? "#7c859826" /* 0.15 */ : `${cssColor}${opacity}` //TODO: temp
 }
 
-let hasLoadButtonDefaultICSS = false
+let hasLoadRadioDefaultICSS = false
 
 /**
- * use global css to style basic button theme
+ * use global css to style basic radio theme
  */
-function loadButtonDefaultICSS() {
-  if (!hasLoadButtonDefaultICSS) {
+function loadRadioDefaultICSS() {
+  if (!hasLoadRadioDefaultICSS) {
     glob({
       "@layer kit-theme": {
-        ".Button": {
+        ".Radio": {
           transition: "50ms cubic-bezier(0.22, 0.61, 0.36, 1)", // make it's change smooth
           border: "none",
           color: cssColors.component_button_text_primary, // light mode
@@ -178,35 +179,35 @@ function loadButtonDefaultICSS() {
           fontSize: "16px",
           borderRadius: "8px",
           fontWeight: "500",
-          [`&.${ButtonState.disabled}`]: {
+          [`&.${RadioState.disabled}`]: {
             opacity: ".3",
             cursor: "not-allowed",
           },
-          [`&.${ButtonSize.xs}`]: {
+          [`&.${RadioSize.xs}`]: {
             padding: "2px 6px",
             fontSize: "12px",
             borderRadius: "4px",
-            [ButtonCSSVariables.outlineWidth]: "0.5px",
+            [RadioCSSVariables.outlineWidth]: "0.5px",
           },
-          [`&.${ButtonSize.sm}`]: {
+          [`&.${RadioSize.sm}`]: {
             padding: "8px 16px",
             fontSize: "14px",
             borderRadius: "8px",
-            [ButtonCSSVariables.outlineWidth]: "1px",
+            [RadioCSSVariables.outlineWidth]: "1px",
           },
-          [`&.${ButtonSize.md}`]: {
+          [`&.${RadioSize.md}`]: {
             padding: "10px 16px",
             fontSize: "16px",
             borderRadius: "8px",
-            [ButtonCSSVariables.outlineWidth]: "2px",
+            [RadioCSSVariables.outlineWidth]: "2px",
           },
-          [`&.${ButtonSize.xs}`]: {
+          [`&.${RadioSize.xs}`]: {
             padding: "2px 6px",
             fontSize: "12px",
             borderRadius: "4px",
-            [ButtonCSSVariables.outlineWidth]: "0.5px",
+            [RadioCSSVariables.outlineWidth]: "0.5px",
           },
-          [`&.${ButtonVariant.solid}`]: {
+          [`&.${RadioVariant.solid}`]: {
             backgroundColor: cssColors.component_button_bg_primary,
             "&:hover": {
               filter: "brightness(95%)",
@@ -216,15 +217,15 @@ function loadButtonDefaultICSS() {
               filter: "brightness(90%)",
             },
           },
-          [`&.${ButtonVariant.outline}`]: {
+          [`&.${RadioVariant.outline}`]: {
             backgroundColor: cssColors.transparent,
-            outline: `${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssColors.component_button_bg_primary}`,
-            outlineOffset: `calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)})`,
+            outline: `${cssVar(RadioCSSVariables.outlineWidth)} solid ${cssColors.component_button_bg_primary}`,
+            outlineOffset: `calc(-1 * ${cssVar(RadioCSSVariables.outlineWidth)})`,
             "&:hover": {
               backgroundColor: opacityCSSColor(cssColors.component_button_bg_primary, 0.15),
             },
           },
-          [`&.${ButtonVariant.text}`]: {
+          [`&.${RadioVariant.text}`]: {
             backgroundColor: cssColors.transparent,
             "&:hover": {
               backgroundColor: opacityCSSColor(cssColors.component_button_bg_primary, 0.15),
@@ -233,6 +234,6 @@ function loadButtonDefaultICSS() {
         },
       },
     })
-    hasLoadButtonDefaultICSS = true
+    hasLoadRadioDefaultICSS = true
   }
 }
