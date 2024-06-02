@@ -76,7 +76,7 @@ export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonControlle
  */
 export function Button(kitProps: ButtonKitProps) {
   const [dom, setDom] = createRef<HTMLButtonElement>()
-  loadDefaultButtonICSS()
+  loadButtonDefaultICSS()
   const innerController: ButtonController = {
     click: () => {
       dom()?.click()
@@ -154,13 +154,13 @@ export function opacityCSSColor(cssColor: CSSColorString, /* 0~1 */ opacity: num
   return cssColor === cssColors.component_button_bg_primary ? "#7c859826" /* 0.15 */ : `${cssColor}${opacity}` //TODO: temp
 }
 
-let hasLoadDefaultButtonICSS = false
+let hasLoadButtonDefaultICSS = false
 
 /**
  * use global css to style basic button theme
  */
-function loadDefaultButtonICSS() {
-  if (!hasLoadDefaultButtonICSS) {
+function loadButtonDefaultICSS() {
+  if (!hasLoadButtonDefaultICSS) {
     glob({
       "@layer kit-theme": {
         ".Button": {
@@ -231,6 +231,6 @@ function loadDefaultButtonICSS() {
         },
       },
     })
-    hasLoadDefaultButtonICSS = true
+    hasLoadButtonDefaultICSS = true
   }
 }
