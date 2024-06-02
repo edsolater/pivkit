@@ -1,12 +1,15 @@
-import { flap, isMeanfulArray, MayArray, MayFn, shrinkFn } from "@edsolater/fnkit"
+import { flap, isMeanfulArray, MayArray, MayFn, mergeObjects, shrinkFn } from "@edsolater/fnkit"
+import { glob } from "goober"
 import { createMemo } from "solid-js"
-import { mergeObjects } from "@edsolater/fnkit"
-import { createRef } from "../hooks/createRef"
-import { compressICSSToObj, ICSS, mergeProps, omitProps, parsePivChildren, Piv, PivChild } from "../piv"
-import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
-import { cssColors } from "../styles/cssColors"
-import { CSSColorString, CSSStyle } from "../styles/type"
 import { KitProps, useKitProps } from "../createKit"
+import { useClassRef } from "../domkit"
+import { createRef } from "../hooks/createRef"
+import { mergeProps, omitProps, parsePivChildren, Piv, PivChild } from "../piv"
+import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
+import { cssVar } from "../styles"
+import { cssColors } from "../styles/cssColors"
+import { CSSColorString } from "../styles/type"
+
 type BooleanLike = unknown
 
 export interface ButtonController {
@@ -14,7 +17,29 @@ export interface ButtonController {
   focus?: () => void
 }
 
-const cssTransitionTimeFnOutCubic = "cubic-bezier(0.22, 0.61, 0.36, 1)"
+export const ButtonCSSVariables = {
+  mainBgColor: "--Button-main-bg-color",
+  mainTextColor: "--Button-main-text-color",
+  outlineWidth: "--Button-outline-width",
+}
+
+export const ButtonState = {
+  interactive: "_interactive",
+  disabled: "_disabled",
+}
+
+export const ButtonSize = {
+  lg: "_lg",
+  md: "_md",
+  sm: "_sm",
+  xs: "_xs",
+}
+
+export const ButtonVariant = {
+  solid: "_solid",
+  outline: "_outline",
+  text: "_text",
+}
 
 export interface ButtonProps {
   /**
@@ -25,28 +50,18 @@ export interface ButtonProps {
    * @default 'md'
    */
   size?: "xs" | "sm" | "md" | "lg"
-  /**
-   * !only for app's uikit <Button>
-   * button's mean  color (apply to all variant of button)
-   * default {@link cssColors.component_button_bg_primary } when in darkMode
-   */
-  theme?: {
-    mainBgColor?: MayFn<CSSColorString, [props: Omit<ButtonProps, "theme" | "validators">]>
-    mainTextColor?: MayFn<CSSColorString, [props: Omit<ButtonProps, "theme" | "validators">]>
-    contentGap?: MayFn<CSSStyle["gap"], [props: Omit<ButtonProps, "theme" | "validators">]>
-    disableOpacity?: MayFn<CSSStyle["opacity"], [props: Omit<ButtonProps, "theme" | "validators">]>
-    cssProps?: MayFn<ICSS, [props: Omit<ButtonProps, "theme" | "validators">]>
-  }
+
   /** a short cut for validator */
   disabled?: boolean
+  enabled?: boolean
   /** must all condition passed */
   validators?: MayArray<{
     /** must return true to pass this validator */
     should: MayFn<BooleanLike>
     // used in "connect wallet" button, it's order is over props: disabled
-    forceActive?: boolean
+    forceInteractive?: boolean
     /**  items are button's setting which will apply when corresponding validator has failed */
-    fallbackProps?: Omit<ButtonProps, "validators" | "disabled">
+    fallbackProps?: Omit<ButtonProps, "validators" | "disabled" | "enabled">
   }>
   /** normally, it's an icon  */
   prefix?: PivChild
@@ -60,22 +75,25 @@ export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonControlle
  * feat: build-in click ui effect
  */
 export function Button(kitProps: ButtonKitProps) {
+  const [dom, setDom] = createRef<HTMLButtonElement>()
+  loadDefaultButtonICSS()
   const innerController: ButtonController = {
     click: () => {
-      ref()?.click()
+      dom()?.click()
     },
     focus: () => {
-      ref()?.focus()
+      dom()?.focus()
     },
   }
-  /* ---------------------------------- props --------------------------------- */
+
+  // ---------------- props ----------------
   const { props } = useKitProps(kitProps, {
     controller: () => innerController,
     name: "Button",
     defaultProps: { variant: "solid", size: "md" },
   })
 
-  /* ------------------------------- validation ------------------------------- */
+  // ---------------- validation ----------------
   const failedTestValidator = createMemo(() =>
     isMeanfulArray(props.validators) || props.validators
       ? flap(props.validators!).find(({ should }) => !shrinkFn(should))
@@ -83,100 +101,43 @@ export function Button(kitProps: ButtonKitProps) {
   )
   const mergedProps = mergeProps(props, failedTestValidator()?.fallbackProps)
 
-  const isActive = createMemo(
-    () => failedTestValidator()?.forceActive || (!failedTestValidator() && !mergedProps.disabled),
+  const isInteractive = createMemo(
+    () =>
+      failedTestValidator()?.forceInteractive ||
+      (!failedTestValidator() && "enabled" in mergeProps ? mergedProps.enabled : !mergedProps.disabled),
   )
 
-  const mainBgColor = props.theme?.mainBgColor ?? cssColors.component_button_bg_primary
-  const mainTextColor = props.theme?.mainTextColor ?? cssColors.component_button_text_primary
-  const contentGap = props.theme?.contentGap ?? 4
-  const disableOpacity = props.theme?.disableOpacity ?? 0.3
-  const cssProps = props.theme?.cssProps
+  // ---------------- stateClass sizeClass and variantClass ----------------
+  const { setClassRef: setStateClassRef } = useClassRef(
+    Object.assign(
+      {
+        [ButtonState.interactive]: isInteractive,
+        [ButtonState.disabled]: () => !isInteractive(),
+      },
+      Object.fromEntries(
+        Object.entries(ButtonSize).map(([key, sizeClass]) => [sizeClass, () => (props.size ?? "md") === key]),
+      ),
+      Object.fromEntries(
+        Object.entries(ButtonVariant).map(([key, variantClass]) => [
+          variantClass,
+          () => (props.variant ?? "solid") === key,
+        ]),
+      ),
+    ),
+  )
+  // const { setClassRef: setSizeStateClassRef } = useClassRef({md:, }, isActive)
 
-  const [ref, setRef] = createRef<HTMLButtonElement>()
-
-  const size = props.size
-  const cssPadding = {
-    lg: "14px 24px",
-    md: "10px 16px",
-    sm: "8px 16px",
-    xs: "2px 6px",
-  }[size]
-  const cssFontSize = {
-    lg: "16px",
-    md: "16px",
-    sm: "14px",
-    xs: "12px",
-  }[size]
-  const cssBorderRadius = {
-    lg: "12px",
-    md: "8px",
-    sm: "8px",
-    xs: "4px",
-  }[size]
-  const cssOutlineWidth = {
-    lg: "2px",
-    md: "2px",
-    sm: "1px",
-    xs: "0.5px",
-  }[size]
-
+  // ---------------- controller ----------------
   const mergedController =
     "innerController" in props ? mergeObjects(props.innerController!, innerController) : innerController
+
   return (
     <Piv<"button">
       render:self={(selfProps) => renderHTMLDOM("button", selfProps)}
       shadowProps={omitProps(props, "onClick")} // omit onClick for need to invoke the function manually, see below 👇
-      onClick={(...args) => isActive() && props.onClick?.(...args)}
+      onClick={(...args) => isInteractive() && props.onClick?.(...args)}
       htmlProps={{ type: "button" }}
-      icss={[
-        {
-          transition: `50ms ${cssTransitionTimeFnOutCubic}`, // make it's change smooth
-          border: "none",
-          color: shrinkFn(mainTextColor, [mergedProps]), // light mode
-          cursor: "pointer",
-          userSelect: "none",
-          width: "max-content",
-        },
-        {
-          display: "inline-flex",
-          gap: shrinkFn(contentGap, [mergedProps]) + "px",
-          alignItems: "center",
-          justifyContent: "center",
-        }, // center the items
-        !isActive() && {
-          opacity: shrinkFn(disableOpacity, [mergedProps]),
-          cursor: "not-allowed",
-        },
-        {
-          padding: cssPadding,
-          fontSize: cssFontSize,
-          borderRadius: cssBorderRadius,
-          fontWeight: "500",
-        },
-        (!props.variant || props.variant === "solid") && {
-          backgroundColor: shrinkFn(mainBgColor, [mergedProps]),
-          "&:hover": {
-            filter: "brightness(95%)",
-          },
-          "&:active": {
-            transform: "scale(0.98)",
-            filter: "brightness(90%)",
-          },
-        },
-        props.variant === "outline" && {
-          background: cssColors.transparent,
-          outline: `${cssOutlineWidth} solid ${mainBgColor}`,
-          outlineOffset: `-${cssOutlineWidth}`,
-        },
-        props.variant === "text" && {
-          "&:hover": {
-            backgroundColor: opacityCSSColor(shrinkFn(mainBgColor, [mergedProps]), 0.15),
-          },
-        },
-        compressICSSToObj(shrinkFn(cssProps, [mergedProps])),
-      ]}
-      domRef={setRef}
+      domRef={[setDom, setStateClassRef]}
     >
       {parsePivChildren(props.prefix, mergedController)}
       {/* TODO: no need. this is because kitProp don't support Access and Deaccess */}
@@ -191,4 +152,85 @@ export function Button(kitProps: ButtonKitProps) {
  */
 export function opacityCSSColor(cssColor: CSSColorString, /* 0~1 */ opacity: number) {
   return cssColor === cssColors.component_button_bg_primary ? "#7c859826" /* 0.15 */ : `${cssColor}${opacity}` //TODO: temp
+}
+
+let hasLoadDefaultButtonICSS = false
+
+/**
+ * use global css to style basic button theme
+ */
+function loadDefaultButtonICSS() {
+  if (!hasLoadDefaultButtonICSS) {
+    glob({
+      "@layer kit-theme": {
+        ".Button": {
+          transition: "50ms cubic-bezier(0.22, 0.61, 0.36, 1)", // make it's change smooth
+          border: "none",
+          color: cssColors.component_button_text_primary, // light mode
+          cursor: "pointer",
+          userSelect: "none",
+          width: "max-content",
+          display: "inline-grid",
+          gap: "4px",
+          placeContent: "center",
+          fontSize: "16px",
+          borderRadius: "8px",
+          fontWeight: "500",
+          [`&.${ButtonState.disabled}`]: {
+            opacity: ".3",
+            cursor: "not-allowed",
+          },
+          [`&.${ButtonSize.xs}`]: {
+            padding: "2px 6px",
+            fontSize: "12px",
+            borderRadius: "4px",
+            [ButtonCSSVariables.outlineWidth]: "0.5px",
+          },
+          [`&.${ButtonSize.sm}`]: {
+            padding: "8px 16px",
+            fontSize: "14px",
+            borderRadius: "8px",
+            [ButtonCSSVariables.outlineWidth]: "1px",
+          },
+          [`&.${ButtonSize.md}`]: {
+            padding: "10px 16px",
+            fontSize: "16px",
+            borderRadius: "8px",
+            [ButtonCSSVariables.outlineWidth]: "2px",
+          },
+          [`&.${ButtonSize.xs}`]: {
+            padding: "2px 6px",
+            fontSize: "12px",
+            borderRadius: "4px",
+            [ButtonCSSVariables.outlineWidth]: "0.5px",
+          },
+          [`&.${ButtonVariant.solid}`]: {
+            backgroundColor: cssColors.component_button_bg_primary,
+            "&:hover": {
+              filter: "brightness(95%)",
+            },
+            "&:active": {
+              transform: "scale(0.98)",
+              filter: "brightness(90%)",
+            },
+          },
+          [`&.${ButtonVariant.outline}`]: {
+            backgroundColor: cssColors.transparent,
+            outline: `${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssColors.component_button_bg_primary}`,
+            outlineOffset: `calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)})`,
+            "&:hover": {
+              backgroundColor: opacityCSSColor(cssColors.component_button_bg_primary, 0.15),
+            },
+          },
+          [`&.${ButtonVariant.text}`]: {
+            backgroundColor: cssColors.transparent,
+            "&:hover": {
+              backgroundColor: opacityCSSColor(cssColors.component_button_bg_primary, 0.15),
+            },
+          },
+        },
+      },
+    })
+    hasLoadDefaultButtonICSS = true
+  }
 }
