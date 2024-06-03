@@ -1,7 +1,9 @@
 import { isObjectLike } from "@edsolater/fnkit"
 import { Match, Switch, createEffect, createSignal, on } from "solid-js"
-import { Row } from "../../Boxes"
-import { Input } from "../../Input"
+import { useKitProps, type KitProps } from "../../../createKit"
+import { createControllerRef, createRef } from "../../../hooks"
+import { Box, Row } from "../../Boxes"
+import { Input, type InputController } from "../../Input"
 import { List } from "../../List"
 import { Text } from "../../Text"
 import { isInputDescription } from "./inputFormDescription"
@@ -16,14 +18,32 @@ export function isFormDescription(description: any): description is FormDescript
   return isObjectLike(description) && description[formDescriptionSymbol] === true
 }
 
-function WidgetByFormDescription(props: {
+type WidgetByDescriptionProps = {
   description: FormDescription
   onWidgetDataChange?: (payload: { data: unknown }) => void
-}) {
+}
+type WidgetByDescriptionController = {
+  reset(): void
+}
+
+function WidgetByDescription(
+  kitProps: KitProps<WidgetByDescriptionProps, { controller: WidgetByDescriptionController }>,
+) {
+  const { props, shadowProps, lazyLoadController } = useKitProps(kitProps)
+  const [widgetRef, setRef] = createControllerRef<InputController>()
+  const controller: WidgetByDescriptionController = {
+    reset() {
+      console.log("reset")
+      widgetRef.setText?.(undefined)
+    },
+  }
+  lazyLoadController(() => controller)
   return (
     <Switch fallback={null}>
       <Match when={isInputDescription(props.description)}>
         <Input
+          shadowProps={shadowProps}
+          controllerRef={setRef}
           onInput={(inputText) => {
             props.onWidgetDataChange?.({ data: inputText })
           }}
@@ -33,23 +53,53 @@ function WidgetByFormDescription(props: {
   )
 }
 
-function FormSchemaObject(props: { schema: FormSchema; onDataChange?(payload: { newSchemaData: any }): void }) {
-  const [innerSchemaData, setSchemaData] = createSignal<object>({})
+type SchemaOjectProps = {
+  schema: FormSchema
+  onDataChange?(payload: { newSchemaData: any }): void
+}
+type SchemaOjectController = {
+  reset(): void
+}
+
+function SchemaObject(KitProps: KitProps<SchemaOjectProps, { controller: SchemaOjectController }>) {
+  const { props, shadowProps, lazyLoadController } = useKitProps(KitProps)
+  const [innerSchemaData, setInnerSchemaData] = createSignal<object>({})
+  const [widgetControllerRefs, setRef] = createRef<WidgetByDescriptionController[]>({ defaultValue: [] })
+
   createEffect(on(innerSchemaData, (newSchemaData) => props.onDataChange?.({ newSchemaData })))
+
+  const controller: SchemaOjectController = {
+    reset() {
+      setInnerSchemaData(() => ({}))
+      widgetControllerRefs().forEach((ref) => ref.reset())
+    },
+  }
+
+  lazyLoadController(controller)
+
   return (
-    <List items={Object.entries(props.schema)} icss={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-      {([key, value]) => (
-        <Row icss={{ gap: "4px" }}>
-          <Text>{key}: </Text>
-          <WidgetByFormDescription
-            description={value}
-            onWidgetDataChange={({ data }) => {
-              setSchemaData((d) => ({ ...d, [key]: data }))
-            }}
-          />
-        </Row>
-      )}
-    </List>
+    <Box>
+      <List
+        shadowProps={shadowProps}
+        items={Object.entries(props.schema)}
+        icss={{ display: "flex", flexDirection: "column", gap: "4px" }}
+      >
+        {([key, value]) => (
+          <Row icss={{ gap: "4px" }}>
+            <Text>{key}: </Text>
+            <WidgetByDescription
+              controllerRef={(controller) => {
+                setRef([...widgetControllerRefs(), controller])
+              }}
+              description={value}
+              onWidgetDataChange={({ data }) => {
+                setInnerSchemaData((d) => ({ ...d, [key]: data }))
+              }}
+            />
+          </Row>
+        )}
+      </List>
+    </Box>
   )
 }
 
@@ -59,9 +109,15 @@ export function useFormSchema<T extends FormSchema>(
 ) {
   const initSchemaData = {} as GetSchemaData<T>
   const [schemaData, setSchemaData] = createSignal<GetSchemaData<T>>(initSchemaData)
+  const [schemaObjectRef, setRef] = createRef<SchemaOjectController>()
   const schemaParsedElement = () => (
-    <FormSchemaObject
+    <SchemaObject
       schema={schema}
+      controllerRef={(c) => {
+        // load controller but not worked
+        console.log("schemaObject controller ref: ", Object.keys(c))
+        return setRef(c)
+      }}
       onDataChange={({ newSchemaData }) => {
         setSchemaData(newSchemaData)
         options?.onDataChange?.({ newSchema: newSchemaData })
@@ -73,6 +129,8 @@ export function useFormSchema<T extends FormSchema>(
     schemaData,
     reset() {
       setSchemaData(() => initSchemaData)
+      console.log("start reset 0", schemaObjectRef())
+      schemaObjectRef()?.reset()
     },
   }
 }

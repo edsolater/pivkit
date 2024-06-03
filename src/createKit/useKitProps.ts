@@ -1,11 +1,4 @@
-import {
-  LazyLoadObj,
-  MayArray,
-  createObjectWhenAccess,
-  hasProperty,
-  mergeObjects,
-  pipeDo
-} from "@edsolater/fnkit"
+import { LazyLoadObj, MayArray, createObjectWhenAccess, hasProperty, mergeObjects, pipeDo } from "@edsolater/fnkit"
 import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
 import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
@@ -199,6 +192,7 @@ function createComponentController<RawProps extends ValidProps, Controller exten
   const controllerFaker = new LazyLoadObj<(props: ParsedKitProps<RawProps>) => Controller>()
   const loadController = (inputController: Controller | ((props: ParsedKitProps<RawProps>) => Controller)) => {
     const controllerCreator = typeof inputController === "function" ? inputController : () => inputController
+    console.log("load controller", inputController)
     //@ts-expect-error unknown ?
     controllerFaker.load(controllerCreator)
   }
@@ -206,9 +200,9 @@ function createComponentController<RawProps extends ValidProps, Controller exten
     loadController,
     getControllerCreator: (props: ParsedKitProps<RawProps>) =>
       controllerFaker.hasLoaded()
-        ? controllerFaker.spawn()(props)
+        ? controllerFaker.spawn()?.(props)
         : {
-            /* if don't invoke lazyLoadController, use this default empty  */
+            hello: "say",
           },
   }
 }

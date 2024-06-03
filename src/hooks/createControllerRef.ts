@@ -2,6 +2,7 @@ import { createEffect, createSignal, on } from "solid-js"
 import { createSmartStore } from "./createContextStore"
 
 /**
+ * @deprecated just use createRef to get control of component
  * faster for using controller
  * @returns a object with proxy
  */

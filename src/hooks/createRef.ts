@@ -16,6 +16,7 @@ export type CreateCallbackRefOptions2<T> = {
   onChange?: (current: T, prev: Accessor<T>) => void
 }
 
+//TODO: should use Setter<T>
 /** for semantic API is like `createSignal()`  */
 export function createRef<T extends HTMLOrSVGElement | ValidController = any>(
   options: CreateCallbackRefOptions2<T>,
@@ -41,3 +42,4 @@ export function createRef<T extends HTMLOrSVGElement | ValidController = any>(
   }
   return [ref, setRef]
 }
+
