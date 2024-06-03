@@ -25,6 +25,7 @@ export * from "./Switch"
 export * from "./Tabs"
 export * from "./Text"
 export * from "./InfiniteScrollList"
+export * from "./TagInput"
 
 // special
 export * from "./componentHooks"
