@@ -1,8 +1,7 @@
-import { isObjectLike } from "@edsolater/fnkit"
+import { formDescriptionSymbol, isFormDescription } from "."
 import type { PivChild } from "../../../piv"
 import { Input } from "../../Input/Input"
 import type { BasicFormDescription } from "./type"
-import { formDescriptionSymbol, isFormDescription } from "."
 
 export interface InputDescription extends BasicFormDescription {
   widgetType: "input"

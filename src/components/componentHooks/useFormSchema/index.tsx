@@ -1,11 +1,14 @@
 import { isObjectLike } from "@edsolater/fnkit"
 import { Match, Switch, createEffect, createSignal, on } from "solid-js"
-export * from "./type"
 import { Row } from "../../Boxes"
-import { Input, isInputDescription } from "../../Input"
+import { Input } from "../../Input"
 import { List } from "../../List"
 import { Text } from "../../Text"
+import { isInputDescription } from "./inputFormDescription"
 import { FormDescription, FormSchema, GetSchemaData } from "./type"
+export * from "./inputFormDescription"
+export * from "./recursiveFormDescription"
+export * from "./type"
 
 export const formDescriptionSymbol = Symbol("formDescription")
 
