@@ -188,7 +188,9 @@ function loadButtonDefaultICSS() {
             borderRadius: "8px",
             [ButtonCSSVariables.outlineWidth]: "1px",
           },
-          [`:is(&.${ButtonSize.md}, &:not(${Object.values(ButtonSize)}))`]: {
+          [`:is(&.${ButtonSize.md}, &${Object.values(ButtonSize)
+            .map((c) => `:not(.${c})`)
+            .join("")})`]: {
             padding: "10px 16px",
             fontSize: "16px",
             borderRadius: "8px",
@@ -200,7 +202,9 @@ function loadButtonDefaultICSS() {
             borderRadius: "4px",
             [ButtonCSSVariables.outlineWidth]: "0.5px",
           },
-          [`:is(&.${ButtonVariant.solid}, &:not(${Object.values(ButtonVariant)}))`]: {
+          [`:is(&.${ButtonVariant.solid}, &${Object.values(ButtonVariant)
+            .map((c) => `:not(.${c})`)
+            .join("")})`]: {
             backgroundColor: cssColors.component_button_bg_primary,
             "&:hover": {
               filter: "brightness(95%)",

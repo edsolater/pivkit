@@ -132,5 +132,9 @@ export function useFormSchema<T extends FormSchema>(
       console.log("start reset 0", schemaObjectRef())
       schemaObjectRef()?.reset()
     },
+    // TODO: validation should have a function
+    canSubmit() {
+      return schemaData() !== initSchemaData && Object.keys(schemaData()).length > 0
+    },
   }
 }
