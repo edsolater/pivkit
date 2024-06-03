@@ -29,13 +29,12 @@ export const useStateClass = (name: string) => {
   }
 }
 
-
 export function useClassRef(config: Record<string, Accessor<boolean>>) {
   const { dom, setDom } = createDomRef()
 
-  for (const [name, stateSignal] of Object.entries(config)) {
+  for (const [name, stateAccessor] of Object.entries(config)) {
     const manager = createStateClass(name)(dom)
-    createEffect(on(stateSignal, (state) => (state ? manager.add() : manager.remove())))
+    createEffect(on(stateAccessor, (state) => (state ? manager.add() : manager.remove())))
   }
 
   return {

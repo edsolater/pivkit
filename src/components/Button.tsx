@@ -22,19 +22,19 @@ export const ButtonCSSVariables = {
 }
 
 export const ButtonState = {
-  interactive: "_interactive",
+  interactive: "_interactive", // default
   disabled: "_disabled",
 }
 
 export const ButtonSize = {
   lg: "_lg",
-  md: "_md",
+  md: "_md", // default
   sm: "_sm",
   xs: "_xs",
 }
 
 export const ButtonVariant = {
-  solid: "_solid",
+  solid: "_solid", // default
   outline: "_outline",
   text: "_text",
 }
@@ -84,7 +84,6 @@ export function Button(kitProps: ButtonKitProps) {
   const { props } = useKitProps(kitProps, {
     controller: () => innerController,
     name: "Button",
-    defaultProps: { variant: "solid", size: "md" },
   })
 
   // ---------------- validation ----------------
@@ -117,17 +116,12 @@ export function Button(kitProps: ButtonKitProps) {
   const { setClassRef: setStateClassRef } = useClassRef(
     Object.assign(
       {
-        [ButtonState.interactive]: isInteractive,
+        // [ButtonState.interactive]: isInteractive,
         [ButtonState.disabled]: isDisabled,
       },
+      Object.fromEntries(Object.entries(ButtonSize).map(([key, sizeClass]) => [sizeClass, () => props.size === key])),
       Object.fromEntries(
-        Object.entries(ButtonSize).map(([key, sizeClass]) => [sizeClass, () => (props.size ?? "md") === key]),
-      ),
-      Object.fromEntries(
-        Object.entries(ButtonVariant).map(([key, variantClass]) => [
-          variantClass,
-          () => (props.variant ?? "solid") === key,
-        ]),
+        Object.entries(ButtonVariant).map(([key, variantClass]) => [variantClass, () => props.variant === key]),
       ),
     ),
   )
@@ -194,7 +188,7 @@ function loadButtonDefaultICSS() {
             borderRadius: "8px",
             [ButtonCSSVariables.outlineWidth]: "1px",
           },
-          [`&.${ButtonSize.md}`]: {
+          [`:is(&.${ButtonSize.md}, &:not(${Object.values(ButtonSize)}))`]: {
             padding: "10px 16px",
             fontSize: "16px",
             borderRadius: "8px",
@@ -206,7 +200,7 @@ function loadButtonDefaultICSS() {
             borderRadius: "4px",
             [ButtonCSSVariables.outlineWidth]: "0.5px",
           },
-          [`&.${ButtonVariant.solid}`]: {
+          [`:is(&.${ButtonVariant.solid}, &:not(${Object.values(ButtonVariant)}))`]: {
             backgroundColor: cssColors.component_button_bg_primary,
             "&:hover": {
               filter: "brightness(95%)",
