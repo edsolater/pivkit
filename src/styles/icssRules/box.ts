@@ -1,6 +1,6 @@
 import { CSSObject, createICSS } from "../../piv"
 import { cssColors } from "../cssColors"
-import { cssOpacity } from "../cssValues"
+import { cssOpacity, cssVar } from "../cssValues"
 import { ICSSFontSize, icssFontSize } from "./fondation"
 
 export interface ICSSRowOption {
@@ -245,7 +245,7 @@ export interface ICSSCardOption {
 export const icssCard = createICSS((options?: ICSSCardOption) => ({
   display: "grid",
   // backgroundColor: 'color-mix(in srgb, currentColor, transparent 95%)',
-  background: options?.bg ?? "var(--app-bg)",
+  background: options?.bg ?? cssVar("--card-bg"),
   /* generate by https://shadows.brumm.af/ */
   boxShadow:
     options?.styleType === "ghost"
@@ -264,7 +264,7 @@ export interface ICSSClickableOption {}
  */
 export const icssClickable = createICSS((options?: ICSSClickableOption) => ({
   cursor: "pointer",
-  userSelect:'none',
+  userSelect: "none",
   transition: "100ms",
   // backdropFilter: "brightness(1)", // backdrop-filter will cause render performance issue, avoid to use
   filter: "brightness(1)",

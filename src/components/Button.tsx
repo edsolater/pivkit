@@ -183,7 +183,7 @@ function loadButtonDefaultICSS() {
             [ButtonCSSVariables.outlineWidth]: "0.5px",
           },
           [`&.${ButtonSize.sm}`]: {
-            padding: "8px 16px",
+            padding: "6px 12px",
             fontSize: "14px",
             borderRadius: "8px",
             [ButtonCSSVariables.outlineWidth]: "1px",

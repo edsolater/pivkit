@@ -10,7 +10,7 @@ export interface ListController {}
 type ComponentStructure = (...anys: any[]) => JSXElement
 
 export type ListProps<T> = {
-  wrapper?: ComponentStructure
+  renderWrapper?: ComponentStructure
   items?: MayFn<Iterable<T>>
 
   Divider?: MayFn<PivChild, [payload: { prevIndex: Accessor<number>; currentIndex: Accessor<number> }]>
@@ -30,7 +30,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
     name: "List",
     noNeedDeAccessifyChildren: true,
   })
-  const Wrapper = kitProps.wrapper ?? Piv //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
+  const Wrapper = kitProps.renderWrapper ?? Piv //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
 
   // [configs]
   const allItems = createMemo(() => {
@@ -49,7 +49,9 @@ export function List<T>(kitProps: ListKitProps<T>) {
     <For each={allItems()}>
       {(item, idx) => (
         <Fragnment>
-          <Box class="list-item">{parsePivChildren(props.children(item, idx))}</Box>
+          <Box class="list-item" icss={{ alignContent: "center" }}>
+            {parsePivChildren(props.children(item, idx))}
+          </Box>
           {idx() < itemLength() - 1 &&
             "Divider" in kitProps &&
             parsePivChildren(shrinkFn(kitProps.Divider, [{ prevIndex: idx, currentIndex: () => idx() + 1 }]))}
