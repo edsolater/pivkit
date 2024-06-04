@@ -1,14 +1,14 @@
-import { flap, isMeanfulArray, MayArray, MayFn, mergeObjects, shrinkFn, Booleanable } from "@edsolater/fnkit"
-import { glob } from "goober"
+import { Booleanable, MayArray, MayFn, flap, isMeanfulArray, mergeObjects, shrinkFn } from "@edsolater/fnkit"
 import { createEffect, createMemo } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { useClassRef } from "../domkit"
 import { createRef } from "../hooks/createRef"
-import { mergeProps, omitProps, parsePivChildren, Piv, PivChild } from "../piv"
+import { Piv, mergeProps, omitProps, parsePivChildren } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
 import { cssVar } from "../styles"
 import { cssColors } from "../styles/cssColors"
 import { CSSColorString } from "../styles/type"
+import { addGlobalCSS } from "../utils/cssGlobalStyle"
 
 export interface ButtonController {
   click?: () => void
@@ -22,32 +22,32 @@ export const ButtonCSSVariables = {
 }
 
 export const ButtonState = {
-  interactive: "_interactive", // default
-  disabled: "_disabled",
+  interactive: "interactive", // default
+  disabled: "disabled",
 }
 
 export const ButtonSize = {
-  lg: "_lg",
-  md: "_md", // default
-  sm: "_sm",
-  xs: "_xs",
+  lg: "lg",
+  md: "md", // default
+  sm: "sm",
+  xs: "xs",
 }
 
 export const ButtonVariant = {
-  solid: "_solid", // default
-  outline: "_outline",
-  text: "_text",
+  solid: "solid", // default
+  outline: "outline",
+  ghost: "ghost",
 }
 
 export interface ButtonProps {
   /**
    * @default 'solid'
    */
-  variant?: "solid" | "outline" | "text"
+  variant?: keyof typeof ButtonVariant
   /**
    * @default 'md'
    */
-  size?: "xs" | "sm" | "md" | "lg"
+  size?: keyof typeof ButtonSize
 
   /** a short cut for validator */
   disabled?: boolean
@@ -135,7 +135,14 @@ export function Button(kitProps: ButtonKitProps) {
     <Piv<"button">
       render:self={(selfProps) => renderHTMLDOM("button", selfProps)}
       shadowProps={omitProps(props, "onClick")} // omit onClick for need to invoke the function manually, see below 👇
-      onClick={(...args) => isInteractive() && props.onClick?.(...args)}
+      onClick={(...args) => {
+        if (!isInteractive()) return
+        if ("onClick" in props) {
+          const { ev } = args[0]
+          ev.stopPropagation()
+          props.onClick?.(...args)
+        }
+      }}
       domRef={[setDom, setStateClassRef]}
     >
       {parsePivChildren(props.children, mergedController)}
@@ -157,80 +164,79 @@ let hasLoadButtonDefaultICSS = false
  */
 function loadButtonDefaultICSS() {
   if (!hasLoadButtonDefaultICSS) {
-    glob({
-      "@layer kit-theme": {
-        ".Button": {
-          transition: "50ms cubic-bezier(0.22, 0.61, 0.36, 1)", // make it's change smooth
-          border: "none",
-          color: cssColors.component_button_text_primary, // light mode
-          cursor: "pointer",
-          userSelect: "none",
-          width: "max-content",
-          display: "inline-grid",
-          gap: "4px",
-          placeContent: "center",
-          fontSize: "16px",
-          borderRadius: "8px",
-          fontWeight: "500",
-          [`&.${ButtonState.disabled}`]: {
-            opacity: ".3",
-            cursor: "not-allowed",
-          },
-          [`&.${ButtonSize.xs}`]: {
-            padding: "2px 6px",
-            fontSize: "12px",
-            borderRadius: "4px",
-            [ButtonCSSVariables.outlineWidth]: "0.5px",
-          },
-          [`&.${ButtonSize.sm}`]: {
-            padding: "6px 12px",
-            fontSize: "14px",
-            borderRadius: "8px",
-            [ButtonCSSVariables.outlineWidth]: "1px",
-          },
-          [`:is(&.${ButtonSize.md}, &${Object.values(ButtonSize)
+    addGlobalCSS(`
+      @layer kit-theme {
+        .Button {
+          transition: 50ms cubic-bezier(0.22, 0.61, 0.36, 1); 
+          border: none;
+          color: ${cssColors.component_button_text_primary};
+          cursor: pointer;
+          user-select: none;
+          width: max-content;
+          display: inline-grid;
+          gap: 4px;
+          place-content: center;
+          font-size: 16px;
+          border-radius: 8px;
+          font-weight: 500;
+          &.${ButtonState.disabled} {
+            opacity: .3;
+            cursor: not-allowed;
+          }
+          &.${ButtonSize.xs} {
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 4px;
+            ${ButtonCSSVariables.outlineWidth}: 0.5px;
+          }
+          &.${ButtonSize.sm} {
+            padding: 6px 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            ${ButtonCSSVariables.outlineWidth}: 1px;
+          }
+          :is(&.${ButtonSize.md}, &${Object.values(ButtonSize)
             .map((c) => `:not(.${c})`)
-            .join("")})`]: {
-            padding: "10px 16px",
-            fontSize: "16px",
-            borderRadius: "8px",
-            [ButtonCSSVariables.outlineWidth]: "2px",
-          },
-          [`&.${ButtonSize.xs}`]: {
-            padding: "2px 6px",
-            fontSize: "12px",
-            borderRadius: "4px",
-            [ButtonCSSVariables.outlineWidth]: "0.5px",
-          },
-          [`:is(&.${ButtonVariant.solid}, &${Object.values(ButtonVariant)
+            .join("")}) {
+            padding: 10px 16px;
+            font-size: 16px;
+            border-radius: 8px;
+            ${ButtonCSSVariables.outlineWidth}: 2px;
+          }
+          &.${ButtonSize.lg} {
+            //TODO: fixme
+            padding: 14px 24px;
+            font-size: 16px;
+            border-radius: 12px;
+            ${ButtonCSSVariables.outlineWidth}: 2px;
+          }
+          &:is(&.${ButtonVariant.solid}, &${Object.values(ButtonVariant)
             .map((c) => `:not(.${c})`)
-            .join("")})`]: {
-            backgroundColor: cssColors.component_button_bg_primary,
-            "&:hover": {
-              filter: "brightness(95%)",
-            },
-            "&:active": {
-              transform: "scale(0.98)",
-              filter: "brightness(90%)",
-            },
-          },
-          [`&.${ButtonVariant.outline}`]: {
-            backgroundColor: cssColors.transparent,
-            outline: `${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssColors.component_button_bg_primary}`,
-            outlineOffset: `calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)})`,
-            "&:hover": {
-              backgroundColor: opacityCSSColor(cssColors.component_button_bg_primary, 0.15),
-            },
-          },
-          [`&.${ButtonVariant.text}`]: {
-            backgroundColor: cssColors.transparent,
-            "&:hover": {
-              backgroundColor: opacityCSSColor(cssColors.component_button_bg_primary, 0.15),
-            },
-          },
-        },
-      },
-    })
+            .join("")}) {
+            background-color: ${cssColors.component_button_bg_primary};
+            &:hover {
+              filter: brightness(95%);
+            }
+            &:active {
+              transform: scale(0.98);
+              filter: brightness(90%);
+            }
+          }
+          &.${ButtonVariant.outline} {
+            background-color: ${cssColors.transparent};
+            outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssColors.component_button_bg_primary};
+            outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
+            &:hover {
+              background-color: ${opacityCSSColor(cssColors.component_button_bg_primary, 0.15)};
+            }
+          }
+          &.${ButtonVariant.ghost} {
+            background-color: ${cssColors.transparent};
+            color: currentcolor;
+          }
+        }
+      }
+    `)
     hasLoadButtonDefaultICSS = true
   }
 }
