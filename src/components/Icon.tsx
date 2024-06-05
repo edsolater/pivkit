@@ -1,5 +1,5 @@
-import { glob } from "goober"
 import { KitProps, useKitProps } from "../createKit"
+import { useClassRef } from "../domkit"
 import { Piv } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
 import { cssVar } from "../styles"
@@ -9,6 +9,8 @@ export interface IconProps {
   name?: string
   /** sx: 12px; sm: 16px; smi: 20px; md: 24px; lg: 32px (default: md) */
   size?: keyof typeof IconSize
+  variant?: keyof typeof IconVariant
+
   src?: string
 }
 
@@ -22,7 +24,14 @@ export const IconSize = {
 }
 
 export const IconVariant = {
-  broken: "broken", // default
+  /** default has opacity,  */
+  btn: "btn",
+  /**pure, used in text content, set this will change icon width to 1em, and display is inline */
+  betweenText: "betweenText",
+}
+
+export const IconState = {
+  broken: "broken",
 }
 
 /**
@@ -36,6 +45,20 @@ export function Icon(rawProps: KitProps<IconProps>) {
 
   /** if not set src, no need to render wired broken image */
   const shouldRender = () => Boolean(props.src)
+
+  // ---------------- stateClass sizeClass and variantClass ----------------
+  const { setClassRef: setStateClassRef } = useClassRef(
+    Object.assign(
+      {
+        [IconState.broken]: () => !shouldRender(),
+      },
+      Object.fromEntries(Object.entries(IconSize).map(([key, sizeClass]) => [sizeClass, () => props.size === key])),
+      Object.fromEntries(
+        Object.entries(IconVariant).map(([key, variantClass]) => [variantClass, () => props.variant === key]),
+      ),
+    ),
+  )
+
   const image = () => (
     <Piv<"img">
       render:self={(selfProps) => renderHTMLDOM("img", selfProps)}
@@ -48,7 +71,7 @@ export function Icon(rawProps: KitProps<IconProps>) {
       shadowProps={shadowProps}
     />
   )
-  return <Piv shadowProps={shadowProps} icss={{ "--icon-image": `url(${props.src})` }} />
+  return <Piv shadowProps={shadowProps} domRef={setStateClassRef} icss={{ "--icon-image": `url(${props.src})` }} />
 }
 
 let hasLoadIconDefaultICSS = false
@@ -63,7 +86,7 @@ function loadIconDefaultICSS() {
         .Icon {
           display: block;
           object-fit: cover;
-          background-color: currentColor;
+          background-color: currentcolor;
           mask: ${cssVar("--icon-image")} no-repeat center;
 
           &.${IconSize.xs} {
@@ -78,9 +101,10 @@ function loadIconDefaultICSS() {
             width: 20px;
             height: 20px;
           }
-          :is(&.${IconSize.md}, &${Object.values(IconSize)
+          &.${IconSize.md}, 
+          &${Object.values(IconSize)
             .map((c) => `:not(.${c})`)
-            .join("")}) {
+            .join("")} {
             width: 24px;
             height: 24px;
           }
@@ -91,6 +115,13 @@ function loadIconDefaultICSS() {
           &.${IconSize.full} {
             width: 100%;
             height: 100%;
+          }
+          &.${IconVariant.betweenText} {
+            width: 1em;
+            display: inline-block;
+          }
+          &.${IconVariant.btn} {
+            opacity: 0.8;
           }
         }
       }

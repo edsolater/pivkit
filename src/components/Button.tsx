@@ -125,7 +125,6 @@ export function Button(kitProps: ButtonKitProps) {
       ),
     ),
   )
-  // const { setClassRef: setSizeStateClassRef } = useClassRef({md:, }, isActive)
 
   // ---------------- controller ----------------
   const mergedController =
@@ -195,9 +194,10 @@ function loadButtonDefaultICSS() {
             border-radius: 8px;
             ${ButtonCSSVariables.outlineWidth}: 1px;
           }
-          :is(&.${ButtonSize.md}, &${Object.values(ButtonSize)
+          &.${ButtonSize.md},
+          &${Object.values(ButtonSize)
             .map((c) => `:not(.${c})`)
-            .join("")}) {
+            .join("")} {
             padding: 10px 16px;
             font-size: 16px;
             border-radius: 8px;

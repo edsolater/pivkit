@@ -39,9 +39,7 @@ function getPropsInfoOfRawPivProps(raw: Partial<PivProps>) {
       ? () => Boolean(shrinkFn(parsedPivProps.ifSelfShown))
       : undefined
   const selfCoverNode =
-    "render:self" in raw
-      ? parsedPivProps["render:self"]?.(omitProps(parsedPivProps, ["render:self"]))
-      : undefined
+    "render:self" in raw ? parsedPivProps["render:self"]?.(omitProps(parsedPivProps, ["render:self"])) : undefined
   return {
     parsedPivProps,
     controller,
@@ -97,10 +95,7 @@ function getNativeHTMLPropsFromParsedPivProp(props: any, controller: ValidContro
             return parseIStyles(props.style, controller)
           },
           get onClick() {
-            if (props.debug) {
-              console.log("props", props)
-            }
-            return "onClick" in props ? props.onClick : undefined
+            return "onClick" in props ? parseOnClick(props.onClick!, {}) : undefined
           },
           get children() {
             return parsePivChildren(props.children, controller)

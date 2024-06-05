@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import type { AnyObj } from "@edsolater/fnkit"
 import type { NativeProps } from ".."
 
@@ -6,7 +8,6 @@ const divCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <div
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -19,7 +20,6 @@ const divCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <div
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -33,7 +33,6 @@ const spanCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <span
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -46,7 +45,6 @@ const spanCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <span
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -60,7 +58,6 @@ const pCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <p
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -73,7 +70,6 @@ const pCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <p
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -87,7 +83,6 @@ const buttonCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <button
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -100,7 +95,6 @@ const buttonCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <button
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -114,7 +108,6 @@ const inputCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =
     <input
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -125,7 +118,6 @@ const inputCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =
     <input
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -137,7 +129,6 @@ const textareaCreator = (props: NativeProps, additionalProps: AnyObj | undefined
     <textarea
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -148,7 +139,6 @@ const textareaCreator = (props: NativeProps, additionalProps: AnyObj | undefined
     <textarea
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -160,7 +150,6 @@ const selectCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <select
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -173,7 +162,6 @@ const selectCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <select
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -187,7 +175,6 @@ const formCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <form
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -200,7 +187,6 @@ const formCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <form
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -214,7 +200,6 @@ const sectionCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <section
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -227,7 +212,6 @@ const sectionCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <section
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -241,7 +225,6 @@ const articleCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <article
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -254,7 +237,6 @@ const articleCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <article
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -268,7 +250,6 @@ const headerCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <header
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -281,7 +262,6 @@ const headerCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <header
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -295,7 +275,6 @@ const footerCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <footer
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -308,7 +287,6 @@ const footerCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <footer
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -322,7 +300,6 @@ const mainCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <main
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -335,7 +312,6 @@ const mainCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <main
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -349,7 +325,6 @@ const asideCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =
     <aside
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -362,7 +337,6 @@ const asideCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =
     <aside
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -376,7 +350,6 @@ const labelCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =
     <label
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -389,7 +362,6 @@ const labelCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =
     <label
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -403,7 +375,6 @@ const h1Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h1
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -416,7 +387,6 @@ const h1Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h1
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -430,7 +400,6 @@ const h2Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h2
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -443,7 +412,6 @@ const h2Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h2
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -457,7 +425,6 @@ const h3Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h3
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -470,7 +437,6 @@ const h3Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h3
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -484,7 +450,6 @@ const h4Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h4
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -497,7 +462,6 @@ const h4Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h4
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -511,7 +475,6 @@ const h5Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h5
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -524,7 +487,6 @@ const h5Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h5
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -538,7 +500,6 @@ const h6Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h6
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -551,7 +512,6 @@ const h6Creator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <h6
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -565,7 +525,6 @@ const navCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <nav
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -578,7 +537,6 @@ const navCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <nav
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -592,7 +550,6 @@ const ulCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <ul
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -605,7 +562,6 @@ const ulCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <ul
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -619,7 +575,6 @@ const liCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <li
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -632,7 +587,6 @@ const liCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <li
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -646,7 +600,6 @@ const imgCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <img
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -657,7 +610,6 @@ const imgCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <img
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -666,7 +618,6 @@ const imgCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
 
 const svgCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
   "htmlProps" in props || additionalProps ? (
-    // @ts-ignore no need to check
     <svg
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
@@ -695,7 +646,6 @@ const aCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <a
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -708,7 +658,6 @@ const aCreator = (props: NativeProps, additionalProps: AnyObj | undefined) =>
     <a
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -722,7 +671,6 @@ const iframeCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <iframe
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -733,7 +681,6 @@ const iframeCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <iframe
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -745,7 +692,6 @@ const summaryCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <summary
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -758,7 +704,6 @@ const summaryCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <summary
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -772,7 +717,6 @@ const datailsCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <details
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -785,7 +729,6 @@ const datailsCreator = (props: NativeProps, additionalProps: AnyObj | undefined)
     <details
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -799,7 +742,6 @@ const dialogCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <dialog
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
@@ -812,7 +754,6 @@ const dialogCreator = (props: NativeProps, additionalProps: AnyObj | undefined) 
     <dialog
       // solidjs prefer static props for variable reactive
       onClick={props.onClick}
-      // @ts-ignore no need to check
       ref={props.ref}
       class={props.class}
       style={props.style}
