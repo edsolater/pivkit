@@ -1,4 +1,14 @@
-import { LazyLoadObj, MayArray, createObjectWhenAccess, hasProperty, mergeObjects, pipeDo } from "@edsolater/fnkit"
+import {
+  LazyLoadObj,
+  MayArray,
+  createObjectWhenAccess,
+  flap,
+  hasProperty,
+  mergeObjects,
+  pipeDo,
+  shrinkFn,
+  type AnyFn,
+} from "@edsolater/fnkit"
 import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
 import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
@@ -23,6 +33,7 @@ export type KitPropsOptions<
 > = {
   name?: string
 
+  /** just use loadController of output of useKitProps */
   controller?: (
     props: ParsedKitProps<KitProps>,
   ) => any /* use any to avoid this type check (type check means type infer) */
@@ -69,7 +80,7 @@ export function useKitProps<
   DefaultProps extends Partial<DeAccessifyProps<P>> = {},
 >(
   kitProps: P,
-  options?: KitPropsOptions<DeAccessifyProps<P>, Controller, DefaultProps>,
+  rawOptions?: KitPropsOptions<DeAccessifyProps<P>, Controller, DefaultProps>,
 ): {
   /** not declared self props means it's shadowProps */
   shadowProps: any
@@ -82,6 +93,8 @@ export function useKitProps<
    * will not inject controller(input function will still be function, not auto-invoke, often used in `on-like` or )
    */
   methods: AddDefaultPivProps<P, DefaultProps>
+  loadController(controller: Controller): void
+  /** @deprecated */
   lazyLoadController(controller: Controller | ((props: ParsedKitProps<DeAccessifyProps<P>>) => Controller)): void
   contextController: any // no need to infer this type for you always force it !!!
   // TODO: imply it !!! For complicated DOM API always need this, this is a fast shortcut
@@ -96,18 +109,28 @@ export function useKitProps<
   // if (propContextParsedProps.children === 'PropContext can pass to deep nested components') {
   //   console.log('kitProps raw: ', { ...propContextParsedProps })
   // }
-  const { loadController, getControllerCreator } = createComponentController<RawProps, Controller>()
-  const newOptions = mergeObjects(
-    { controller: (props: ParsedKitProps<RawProps>) => getControllerCreator(props) },
-    options,
+  const { loadController: lazyLoadController, getControllerCreator } = createComponentController<RawProps, Controller>(
+    rawOptions,
   )
-  const { props, methods, shadowProps } = getParsedKitProps(kitProps, newOptions) as any
+
+  const options = mergeObjects(
+    { controller: (props: ParsedKitProps<RawProps>) => getControllerCreator(props) },
+    rawOptions,
+  )
+  const { props, methods, shadowProps, loadController } = useKitPropParser(kitProps, options)
+
+  // for options' controller
+  if (hasProperty(rawOptions, "controller")) loadController(shrinkFn(rawOptions!.controller))
 
   return {
     props,
     methods,
     shadowProps,
-    lazyLoadController: loadController,
+    loadController,
+    lazyLoadController: (controller: Controller | ((props: ParsedKitProps<RawProps>) => Controller)) => {
+      lazyLoadController(controller)
+      loadController(controller)
+    },
     contextController: mergedContextController,
   }
 }
@@ -115,26 +138,29 @@ export function useKitProps<
 /**
  * parse some special props of component. such as shadowProps, plugin, controller, etc.
  */
-function getParsedKitProps<
+//TODO: should not build-in parse controllerRef
+// TODO: should optional props accept promisify input
+function useKitPropParser<
   RawProps extends ValidProps,
   Controller extends ValidController = ValidController,
   DefaultProps extends Partial<RawProps> = {},
 >(
   // too difficult to type here
-  rawProps: any,
+  kitProps: any,
   options?: KitPropsOptions<RawProps, Controller, DefaultProps>,
 ): {
   props: ParsedKitProps<AddDefaultPivProps<RawProps, DefaultProps>> &
     Omit<PivProps<HTMLTag, Controller>, keyof RawProps>
   methods: AddDefaultPivProps<RawProps, DefaultProps>
   shadowProps: any
+  loadController: AnyFn
 } {
-  const proxyController = options?.controller ? createObjectWhenAccess(() => options.controller!(accessifiedProps)) : {}
+  const controller1 = options?.controller ? createObjectWhenAccess(() => options.controller!(parsedProps2)) : {}
 
   // const startTime = performance.now()
   // merge kit props
-  const methods = pipeDo(
-    rawProps,
+  const parsedProps1 = pipeDo(
+    kitProps,
     //handle context props
     (props) => mergeProps(props, getPropsFromPropContextContext({ componentName: options?.name })),
     // handle addPropContext props
@@ -143,7 +169,8 @@ function getParsedKitProps<
     (props) => (options?.name && hasUIKitTheme(options.name) ? mergeProps(getUIKitTheme(options.name), props) : props),
     // get default props
     (props) => (options?.defaultProps ? addDefaultPivProps(props, options.defaultProps) : props),
-    (props) => handleShadowProps(props, options?.selfProps), // outside-props-run-time // TODO: assume can't be promisify
+    // parse shadowProps of **options**
+    (props) => handleShadowProps(props, options?.selfProps), // TODO: assume can't be promisify
     // parse plugin of **options**
     (props) =>
       handlePluginProps(
@@ -151,6 +178,7 @@ function getParsedKitProps<
         () => options?.plugin,
         () => hasProperty(options, "plugin"),
       ), // defined-time (parsing option)
+    // parse component name of **options**
     (props) => (hasProperty(options, "name") ? mergeProps(props, { class: options!.name }) : props), // defined-time (parsing option)
 
     (props) => handleShadowProps(props, options?.selfProps), // outside-props-run-time(parsing props) // TODO: assume can't be promisify
@@ -162,48 +190,60 @@ function getParsedKitProps<
     (props) => handleMergifyOnCallbackProps(props),
   ) as any /* too difficult to type */
 
-  const controller = methods.innerController ? mergeObjects(proxyController, methods.innerController) : proxyController
+  let loadController: AnyFn = () => {}
+  if (hasProperty(kitProps, "ref")) {
+    loadController = (controller) => {
+      flap(kitProps.ref).forEach((ref) => ref?.(shrinkFn(controller)))
+    }
+  }
+
+  // TODO: don't use controllerRef, use ref instead
+  const controller = parsedProps1.innerController
+    ? mergeObjects(controller1, parsedProps1.innerController)
+    : controller1
   // inject controller to props:innerController (📝!!!important notice, for lazyLoadController props:innerController will always be a prop of any component useKitProps)
-  const shadowProps = mergeObjects(methods, { innerController: controller } as PivProps)
-  const accessifiedProps = pipeDo(methods, (props) => {
-    const verboseAccessifyProps =
+  const shadowProps = mergeObjects(parsedProps1, { innerController: controller } as PivProps)
+  const parsedProps2 = pipeDo(parsedProps1, (props) => {
+    const verboseAccessifyPropNames =
       options?.needAccessify ??
       (options?.noNeedDeAccessifyChildren
         ? omitItem(Object.getOwnPropertyNames(props), ["children"])
         : Object.getOwnPropertyNames(props))
     const needAccessifyProps = options?.noNeedDeAccessifyProps
-      ? omitItem(verboseAccessifyProps, options.noNeedDeAccessifyProps)
-      : verboseAccessifyProps
+      ? omitItem(verboseAccessifyPropNames, options.noNeedDeAccessifyProps)
+      : verboseAccessifyPropNames
     return accessifyProps(props, controller, needAccessifyProps, Boolean(options?.debugName))
   }) as any /* too difficult to type */
 
   // fullfill input props:controllerRef
-  if (controller) loadPropsControllerRef(accessifiedProps, proxyController)
+  if (hasProperty(kitProps, "controllerRef") && controller) loadPropsControllerRef(parsedProps2, controller)
 
-  registerControllerInCreateKit(proxyController, rawProps.id)
+  // in design, is it good?🤔
+  // registerControllerInCreateKit(proxyController, rawProps.id)
 
-  return { props: accessifiedProps, methods, shadowProps }
+  return { props: parsedProps2, methods: parsedProps1, shadowProps, loadController }
 }
 
 /**
  * section 2: load controller
  */
-function createComponentController<RawProps extends ValidProps, Controller extends ValidController | unknown>() {
+function createComponentController<
+  RawProps extends ValidProps,
+  Controller extends ValidController | unknown,
+>(options?: { debugName?: string }) {
   const controllerFaker = new LazyLoadObj<(props: ParsedKitProps<RawProps>) => Controller>()
   const loadController = (inputController: Controller | ((props: ParsedKitProps<RawProps>) => Controller)) => {
     const controllerCreator = typeof inputController === "function" ? inputController : () => inputController
-    console.log("load controller", inputController)
+    if (options?.debugName === "debug") console.log("controllerCreator: ", inputController)
     //@ts-expect-error unknown ?
     controllerFaker.load(controllerCreator)
+    if (options?.debugName === "debug")
+      console.log("2: ", controllerFaker.spawn(), controllerFaker.spawn() === controllerCreator)
   }
   return {
     loadController,
     getControllerCreator: (props: ParsedKitProps<RawProps>) =>
-      controllerFaker.hasLoaded()
-        ? controllerFaker.spawn()?.(props)
-        : {
-            hello: "say",
-          },
+      controllerFaker.hasLoaded() ? controllerFaker.spawn()?.(props) : { hello: "say" },
   }
 }
 

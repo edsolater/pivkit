@@ -13,6 +13,7 @@ export type AccessifyProps<P extends AnyObj, Controller extends ValidController 
     | `render${string}` // renderXXX should no auto-accessified, if need pass subcomponent and have controller, just pass Captilazed prop name like Dot={}
     | `${string}:${string}` // any namespaced props should no auto-accessified
     | `domRef`
+    | `ref`
     | `controllerRef`
     | "children"
     ? P[K]
@@ -27,6 +28,7 @@ export type DeAccessifyProps<P> = {
     | `render${string}` // renderXXX should no auto-accessified
     | `${string}:${string}` // any namespaced props should no auto-accessified
     | `domRef`
+    | `ref`
     | `controllerRef`
     | "children"
     ? P[K]
@@ -52,6 +54,7 @@ export function accessifyProps<P extends AnyObj, Controller extends ValidControl
         key.startsWith("render:") ||
         key.startsWith("merge:") ||
         key === "domRef" ||
+        key === "ref" ||
         key === "controllerRef" ||
         key === "plugin" ||
         key === "shadowProps")

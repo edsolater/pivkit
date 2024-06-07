@@ -1,13 +1,13 @@
 import { MayArray, MayFn, flap, pipeDo } from "@edsolater/fnkit"
-import { JSX, JSXElement, createEffect } from "solid-js"
+import { JSX, JSXElement } from "solid-js"
 import {
   ClassName,
   HTMLProps,
   ICSS,
   IStyle,
   OnClickPayloads,
-  Pluginable,
   PluginCoreFn,
+  Pluginable,
   handlePluginProps,
   handleShadowProps,
 } from "./propHandlers"
@@ -27,8 +27,12 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
 
   /**
    * auto merge by shadowProps
+   * @todo: use ref instead of domRef
+   * @deprecated just use ref
    */
   domRef?: MayArray<CallbackRef<any> | null | undefined>
+
+  ref?: MayArray<CallbackRef<Controller> | null | undefined>
 
   /**
    * auto merge by shadowProps
@@ -85,6 +89,9 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
   // -------- special prop --------
 
   /** only passed in parent component */
+  /**
+   * @deprecated
+   */
   innerController?: Controller
 
   /** @example
@@ -114,6 +121,7 @@ export const pivPropsNames = [
   "ifSelfShown",
 
   "domRef",
+  "ref",
   "class",
   "htmlProps",
   "icss",

@@ -30,6 +30,7 @@ type KitPropsInstance<
       // shadowProps?: MayArray<KitPropsInstance<RawProps, Controller, Plugins, TagName, NeedAccessifyProps> | undefined> // component must merged before `<Div>`
       // -------- additional --------
       // auto inject controller to it
+      /** @deprecated just use ref */
       controllerRef?: CallbackRef<Controller>
     },
     keyof RawProps

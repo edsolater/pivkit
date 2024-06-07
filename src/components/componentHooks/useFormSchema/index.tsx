@@ -1,13 +1,13 @@
 import { isObjectLike } from "@edsolater/fnkit"
 import { Match, Switch, createEffect, createSignal, on } from "solid-js"
 import { useKitProps, type KitProps } from "../../../createKit"
-import { createControllerRef, createRef } from "../../../hooks"
-import { Box, Row } from "../../Boxes"
+import { createRef } from "../../../hooks"
+import { Row } from "../../Boxes"
 import { Input, type InputController } from "../../Input"
 import { List } from "../../List"
 import { Text } from "../../Text"
 import { isInputDescription } from "./inputFormDescription"
-import { FormDescription, FormSchema, GetSchemaData } from "./type"
+import { FormDescription, GetSchemaData, type FormSchema } from "./type"
 export * from "./inputFormDescription"
 export * from "./recursiveFormDescription"
 export * from "./type"
@@ -23,27 +23,26 @@ type WidgetByDescriptionProps = {
   onWidgetDataChange?: (payload: { data: unknown }) => void
 }
 type WidgetByDescriptionController = {
-  reset(): void
+  resetInnerDeep(): void
 }
 
 function WidgetByDescription(
   kitProps: KitProps<WidgetByDescriptionProps, { controller: WidgetByDescriptionController }>,
 ) {
-  const { props, shadowProps, lazyLoadController } = useKitProps(kitProps)
-  const [widgetRef, setRef] = createControllerRef<InputController>()
+  const { props, shadowProps, lazyLoadController, loadController } = useKitProps(kitProps)
+  const [widgetRef, setRef] = createRef<InputController>()
   const controller: WidgetByDescriptionController = {
-    reset() {
-      console.log("reset")
-      widgetRef.setText?.(undefined)
+    resetInnerDeep() {
+      widgetRef()?.setText?.(undefined)
     },
   }
-  lazyLoadController(() => controller)
+  loadController(controller)
   return (
     <Switch fallback={null}>
       <Match when={isInputDescription(props.description)}>
         <Input
           shadowProps={shadowProps}
-          controllerRef={setRef}
+          ref={setRef}
           onInput={(inputText) => {
             props.onWidgetDataChange?.({ data: inputText })
           }}
@@ -55,86 +54,96 @@ function WidgetByDescription(
 
 type SchemaOjectProps = {
   schema: FormSchema
+
   onDataChange?(payload: { newSchemaData: any }): void
 }
 type SchemaOjectController = {
-  reset(): void
+  resetInner(): void
 }
 
-function SchemaObject(KitProps: KitProps<SchemaOjectProps, { controller: SchemaOjectController }>) {
-  const { props, shadowProps, lazyLoadController } = useKitProps(KitProps)
+function SchemaObject(kitProps: KitProps<SchemaOjectProps, { controller: SchemaOjectController }>) {
+  const { props, shadowProps, loadController } = useKitProps(kitProps, {
+    name: "SchemaObject",
+    debugName: "debug",
+  })
   const [innerSchemaData, setInnerSchemaData] = createSignal<object>({})
   const [widgetControllerRefs, setRef] = createRef<WidgetByDescriptionController[]>({ defaultValue: [] })
 
-  createEffect(on(innerSchemaData, (newSchemaData) => props.onDataChange?.({ newSchemaData })))
-
   const controller: SchemaOjectController = {
-    reset() {
+    resetInner() {
       setInnerSchemaData(() => ({}))
-      widgetControllerRefs().forEach((ref) => ref.reset())
+      widgetControllerRefs().forEach((ref) => ref.resetInnerDeep())
     },
   }
 
-  lazyLoadController(controller)
+  loadController(controller)
+  // kitProps.ref?.(controller)
+  createEffect(on(innerSchemaData, (newSchemaData) => props.onDataChange?.({ newSchemaData })))
 
   return (
-    <Box>
-      <List
-        shadowProps={shadowProps}
-        items={Object.entries(props.schema)}
-        icss={{ display: "flex", flexDirection: "column", gap: "4px" }}
-      >
-        {([key, value]) => (
-          <Row icss={{ gap: "4px" }}>
-            <Text>{key}: </Text>
-            <WidgetByDescription
-              controllerRef={(controller) => {
-                setRef([...widgetControllerRefs(), controller])
-              }}
-              description={value}
-              onWidgetDataChange={({ data }) => {
-                setInnerSchemaData((d) => ({ ...d, [key]: data }))
-              }}
-            />
-          </Row>
-        )}
-      </List>
-    </Box>
+    <List
+      shadowProps={shadowProps}
+      items={Object.entries(props.schema)}
+      icss={{ display: "flex", flexDirection: "column", gap: "4px" }}
+    >
+      {([key, value]) => (
+        <Row icss={{ gap: "4px" }}>
+          <Text>{key}: </Text>
+          <WidgetByDescription
+            ref={(controller) => {
+              setRef([...widgetControllerRefs(), controller])
+            }}
+            description={value}
+            onWidgetDataChange={({ data }) => {
+              setInnerSchemaData((d) => ({ ...d, [key]: data }))
+            }}
+          />
+        </Row>
+      )}
+    </List>
   )
 }
 
-export function useFormSchema<T extends FormSchema>(
-  schema: T,
-  options?: { onDataChange?(payload: { newSchema: GetSchemaData<T> }): void }, // TODO: type unknown
+export type SchemaParserProps<T extends FormSchema> = {
+  schema: T
+  onDataChange?(payload: { newSchema: any }): void
+}
+
+export type SchemaParserController<T extends FormSchema> = {
+  schemaData(): GetSchemaData<T>
+  reset(): void
+  canSubmit(): boolean
+}
+
+export function SchemaParser<T extends FormSchema>(
+  kitProps: KitProps<SchemaParserProps<T>, { controller: SchemaParserController<T> }>,
 ) {
+  const { props, shadowProps, loadController } = useKitProps(kitProps, { name: "FormCreator" })
   const initSchemaData = {} as GetSchemaData<T>
   const [schemaData, setSchemaData] = createSignal<GetSchemaData<T>>(initSchemaData)
   const [schemaObjectRef, setRef] = createRef<SchemaOjectController>()
-  const schemaParsedElement = () => (
-    <SchemaObject
-      schema={schema}
-      controllerRef={(c) => {
-        // load controller but not worked
-        console.log("schemaObject controller ref: ", Object.keys(c))
-        return setRef(c)
-      }}
-      onDataChange={({ newSchemaData }) => {
-        setSchemaData(newSchemaData)
-        options?.onDataChange?.({ newSchema: newSchemaData })
-      }}
-    />
-  )
-  return {
-    schemaParsedElement,
+
+  const controller: SchemaParserController<T> = {
     schemaData,
     reset() {
       setSchemaData(() => initSchemaData)
-      console.log("start reset 0", schemaObjectRef())
-      schemaObjectRef()?.reset()
+      schemaObjectRef()?.resetInner()
     },
-    // TODO: validation should have a function
     canSubmit() {
       return schemaData() !== initSchemaData && Object.keys(schemaData()).length > 0
     },
   }
+
+  loadController(controller)
+  return (
+    <SchemaObject
+      shadowProps={shadowProps}
+      schema={props.schema}
+      ref={setRef}
+      onDataChange={({ newSchemaData }) => {
+        setSchemaData(newSchemaData)
+        props?.onDataChange?.({ newSchema: newSchemaData })
+      }}
+    />
+  )
 }

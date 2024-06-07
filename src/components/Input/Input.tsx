@@ -67,10 +67,12 @@ export function Input(rawProps: InputKitProps) {
     isFocused: () => isFocused,
   })
 
-  const { props, shadowProps } = useKitProps(rawProps, {
+
+  const { props, shadowProps, loadController } = useKitProps(rawProps, {
     name: "Input",
     controller: () => controller,
   })
+  loadController(controller)
 
   const [additionalProps, { innerText, updateText }] = useInputInnerValue(props, controller)
   useShortcutsRegister(
