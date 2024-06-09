@@ -1,4 +1,4 @@
-import { isObjectLike, type Optional } from "@edsolater/fnkit"
+import { isObjectLike } from "@edsolater/fnkit"
 import { Match, Switch, createEffect, createSignal, on } from "solid-js"
 import { useKitProps, type KitProps } from "../../../createKit"
 import { createRef } from "../../../hooks"
@@ -24,16 +24,20 @@ type WidgetByDescriptionProps = {
 }
 type WidgetByDescriptionController = {
   resetInnerDeep(): void
+  setValue(value: any): void
 }
 
 function WidgetByDescription(
   kitProps: KitProps<WidgetByDescriptionProps, { controller: WidgetByDescriptionController }>,
 ) {
-  const { props, shadowProps, lazyLoadController, loadController } = useKitProps(kitProps)
+  const { props, shadowProps, loadController } = useKitProps(kitProps)
   const [widgetRef, setRef] = createRef<InputController>()
   const controller: WidgetByDescriptionController = {
     resetInnerDeep() {
       widgetRef()?.setText?.(undefined)
+    },
+    setValue(value) {
+      widgetRef()?.setText?.(value)
     },
   }
   loadController(controller)
@@ -49,58 +53,6 @@ function WidgetByDescription(
         />
       </Match>
     </Switch>
-  )
-}
-
-type SchemaOjectProps = {
-  schema: FormSchema
-
-  onDataChange?(payload: { newSchemaData: any }): void
-}
-type SchemaOjectController = {
-  resetInner(): void
-}
-
-function SchemaObject(kitProps: KitProps<SchemaOjectProps, { controller: SchemaOjectController }>) {
-  const { props, shadowProps, loadController } = useKitProps(kitProps, {
-    name: "SchemaObject",
-    debugName: "debug",
-  })
-  const [innerSchemaData, setInnerSchemaData] = createSignal<object>({})
-  const [widgetControllerRefs, setRef] = createRef<WidgetByDescriptionController[]>({ defaultValue: [] })
-
-  const controller: SchemaOjectController = {
-    resetInner() {
-      setInnerSchemaData(() => ({}))
-      widgetControllerRefs().forEach((ref) => ref.resetInnerDeep())
-    },
-  }
-
-  loadController(controller)
-  // kitProps.ref?.(controller)
-  createEffect(on(innerSchemaData, (newSchemaData) => props.onDataChange?.({ newSchemaData })))
-
-  return (
-    <List
-      shadowProps={shadowProps}
-      items={Object.entries(props.schema)}
-      icss={{ display: "flex", flexDirection: "column", gap: "4px" }}
-    >
-      {([key, value]) => (
-        <Row icss={{ gap: "4px" }}>
-          <Text>{key}: </Text>
-          <WidgetByDescription
-            ref={(controller) => {
-              setRef([...widgetControllerRefs(), controller])
-            }}
-            description={value}
-            onWidgetDataChange={({ data }) => {
-              setInnerSchemaData((d) => ({ ...d, [key]: data }))
-            }}
-          />
-        </Row>
-      )}
-    </List>
   )
 }
 
@@ -121,33 +73,49 @@ export function SchemaParser<T extends FormSchema>(
 ) {
   const { props, shadowProps, loadController } = useKitProps(kitProps, { name: "FormCreator" })
   const initSchemaData = {} as GetSchemaData<T>
-  const [schemaData, setSchemaData] = createSignal<GetSchemaData<T>>(initSchemaData)
-  const [schemaObjectRef, setRef] = createRef<SchemaOjectController>()
+  const [schemaData, setSchemaData] = createSignal(initSchemaData)
+  const [widgetControllerRefs, setRef] = createRef<{ key: string; controller: WidgetByDescriptionController }[]>({
+    defaultValue: [],
+  })
 
   const controller: SchemaParserController<T> = {
     schemaData,
     reset() {
       setSchemaData(() => initSchemaData)
-      schemaObjectRef()?.resetInner()
+      widgetControllerRefs().forEach((ref) => ref.controller.resetInnerDeep())
     },
     canSubmit() {
       return schemaData() !== initSchemaData && Object.keys(schemaData()).length > 0
     },
     setData(data) {
-      setSchemaData((c) => ({ ...c, data })) // CONTINUE HERE
+      setSchemaData((c) => ({ ...c, data }))
+      widgetControllerRefs().forEach((ref) => ref.controller.setValue(data[ref.key]))
     },
   }
 
   loadController(controller)
+
+  createEffect(on(schemaData, (newSchema) => props.onDataChange?.({ newSchema })))
   return (
-    <SchemaObject
+    <List
       shadowProps={shadowProps}
-      schema={props.schema}
-      ref={setRef}
-      onDataChange={({ newSchemaData }) => {
-        setSchemaData(newSchemaData)
-        props?.onDataChange?.({ newSchema: newSchemaData })
-      }}
-    />
+      items={Object.entries(props.schema)}
+      icss={{ display: "flex", flexDirection: "column", gap: "4px" }}
+    >
+      {([key, value]) => (
+        <Row icss={{ gap: "4px" }}>
+          <Text>{key}: </Text>
+          <WidgetByDescription
+            ref={(controller) => {
+              setRef([...widgetControllerRefs(), { key, controller }])
+            }}
+            description={value}
+            onWidgetDataChange={({ data }) => {
+              setSchemaData((d) => ({ ...d, [key]: data }))
+            }}
+          />
+        </Row>
+      )}
+    </List>
   )
 }
