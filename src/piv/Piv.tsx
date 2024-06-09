@@ -32,7 +32,7 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
    */
   domRef?: MayArray<CallbackRef<any> | null | undefined>
 
-  ref?: MayArray<CallbackRef<Controller> | null | undefined>
+  ref?: MayArray<CallbackRef<any> | null | undefined>
 
   /**
    * auto merge by shadowProps

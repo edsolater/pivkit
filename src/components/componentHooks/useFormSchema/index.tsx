@@ -1,4 +1,4 @@
-import { isObjectLike } from "@edsolater/fnkit"
+import { isObjectLike, type Optional } from "@edsolater/fnkit"
 import { Match, Switch, createEffect, createSignal, on } from "solid-js"
 import { useKitProps, type KitProps } from "../../../createKit"
 import { createRef } from "../../../hooks"
@@ -113,6 +113,7 @@ export type SchemaParserController<T extends FormSchema> = {
   schemaData(): GetSchemaData<T>
   reset(): void
   canSubmit(): boolean
+  setData(data: Partial<GetSchemaData<T>>): void
 }
 
 export function SchemaParser<T extends FormSchema>(
@@ -131,6 +132,9 @@ export function SchemaParser<T extends FormSchema>(
     },
     canSubmit() {
       return schemaData() !== initSchemaData && Object.keys(schemaData()).length > 0
+    },
+    setData(data) {
+      setSchemaData((c) => ({ ...c, data })) // CONTINUE HERE
     },
   }
 
