@@ -1,6 +1,6 @@
 import { formDescriptionSymbol, isFormDescription } from "."
-import type { PivChild } from "../../../piv"
-import { Input } from "../../Input/Input"
+import type { PivChild } from "../../piv"
+import { Input } from "../Input/Input"
 import type { BasicFormDescription } from "./type"
 
 export interface InputDescription extends BasicFormDescription {
