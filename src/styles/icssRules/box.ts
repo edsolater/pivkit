@@ -1,4 +1,4 @@
-import { CSSObject, createICSS } from "../../piv"
+import { CSSObject, createICSS, createStaticICSS } from "../../piv"
 import { cssColors } from "../cssColors"
 import { cssOpacity, cssVar } from "../cssValues"
 import { ICSSFontSize, icssFontSize } from "./fondation"
@@ -262,13 +262,14 @@ export interface ICSSClickableOption {}
 /**
  * build-in icss for make element looks clickable
  */
-export const icssClickable = createICSS((options?: ICSSClickableOption) => ({
+export const icssClickable = createStaticICSS("clickable", () => ({
   cursor: "pointer",
   userSelect: "none",
   transition: "100ms",
   // backdropFilter: "brightness(1)", // backdrop-filter will cause render performance issue, avoid to use
   filter: "brightness(1)",
-  "&:is(:hover,:active,:focus)": { filter: "brightness(0.85)" },
+  ".dark &": { filter: "brightness(0.9)" },
+  "&:is(:hover,:active,:focus)": { filter: "brightness(0.85)", ".dark &": { filter: "brightness(1.5)" } },
   "&:active": { transform: "scale(0.9)" },
 }))
 

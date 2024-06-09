@@ -5,7 +5,7 @@ import { useClassRef } from "../domkit"
 import { createRef } from "../hooks/createRef"
 import { Piv, mergeProps, omitProps, parsePivChildren } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
-import { cssVar } from "../styles"
+import { cssOpacity, cssVar, icssClickable } from "../styles"
 import { cssColors } from "../styles/cssColors"
 import { CSSColorString } from "../styles/type"
 import { addGlobalCSS } from "../utils/cssGlobalStyle"
@@ -142,6 +142,7 @@ export function Button(kitProps: ButtonKitProps) {
           props.onClick?.(...args)
         }
       }}
+      icss={icssClickable}
       domRef={[setDom, setStateClassRef]}
     >
       {parsePivChildren(props.children, mergedController)}
@@ -168,7 +169,9 @@ function loadButtonDefaultICSS() {
         .Button {
           transition: 50ms cubic-bezier(0.22, 0.61, 0.36, 1); 
           border: none;
-          color: ${cssColors.component_button_text_primary};
+          --Button-text: ${cssColors.component_button_text_primary};
+          --Button-bg: ${cssColors.component_button_bg_primary};
+          color: ${cssVar("--Button-text")};
           cursor: pointer;
           user-select: none;
           width: max-content;
@@ -180,6 +183,7 @@ function loadButtonDefaultICSS() {
           font-weight: 500;
           &.${ButtonState.disabled} {
             opacity: .3;
+            filter: grayscale(.8) brightness(.6);
             cursor: not-allowed;
           }
           &.${ButtonSize.xs} {
@@ -213,7 +217,7 @@ function loadButtonDefaultICSS() {
           &:is(&.${ButtonVariant.solid}, &${Object.values(ButtonVariant)
             .map((c) => `:not(.${c})`)
             .join("")}) {
-            background-color: ${cssColors.component_button_bg_primary};
+            background-color: ${cssVar("--Button-bg")};
             &:hover {
               filter: brightness(95%);
             }
@@ -224,14 +228,17 @@ function loadButtonDefaultICSS() {
           }
           &.${ButtonVariant.outline} {
             background-color: ${cssColors.transparent};
-            outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssColors.component_button_bg_primary};
+            outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar("--Button-bg")};
             outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
             &:hover {
-              background-color: ${opacityCSSColor(cssColors.component_button_bg_primary, 0.15)};
+              background-color: ${cssOpacity(cssVar("--Button-bg"), 0.85)};
             }
           }
           &.${ButtonVariant.ghost} {
             background-color: ${cssColors.transparent};
+             &:hover {
+              background-color: ${cssOpacity(cssVar("--Button-bg"), 0.1)};
+            }
             color: currentcolor;
           }
         }

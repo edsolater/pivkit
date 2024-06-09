@@ -42,9 +42,32 @@ export type TaggedICSS<T extends AnyFn> = ConfigableFunction<T> & {
   [toICSSSymbol](...additionalSettings: Parameters<T>): ICSS
 }
 
+const icssClassNameMap = new Map<string, string>()
+// if build css already, it will not rebuild again
+export function createStaticICSS<T extends RuleCreatorFn>(
+  name: string,
+  rule: T,
+  defaultSettings?: Partial<AnyObj>,
+): () => string {
+  return () => {
+    if (icssClassNameMap.has(name)) {
+      return icssClassNameMap.get(name)!
+    } else {
+      const className = handleICSSProps(rule(defaultSettings))
+      icssClassNameMap.set(name, className)
+      return className
+    }
+  }
+}
+
 export function createICSS<T extends RuleCreatorFn>(
   rule: T,
-  options?: { name?: string; defaultSettings?: Partial<AnyObj>; globalStyle?: ICSS },
+  options?: {
+    /** if set, use fixed icss */
+    name?: string
+    defaultSettings?: Partial<AnyObj>
+    globalStyle?: ICSS
+  },
 ): TaggedICSS<T> {
   const factory = createConfigableFunction(
     (settings?: AnyObj) => rule(settings),
@@ -87,7 +110,7 @@ export function handleICSSProps<Controller extends ValidController | unknown = u
     const shrinked = shrinkFn(fn, [controller])
     if (!shrinked || (!isString(shrinked) && !isObject(shrinked))) continue
 
-    const className = isString(shrinked) ? shrinked : css(shrinked as any as any)
+    const className = isString(shrinked) ? shrinked : css(shrinked as any)
     outputClassName += (outputClassName ? " " : "") + className
   }
 
@@ -101,7 +124,7 @@ export function handleICSSProps<Controller extends ValidController | unknown = u
 export function parseICSSToClassName<Controller extends ValidController | unknown = unknown>(
   icss: ICSS<Controller>,
   controller?: Controller,
-) {
+): string {
   return handleICSSProps(icss, controller)
 }
 

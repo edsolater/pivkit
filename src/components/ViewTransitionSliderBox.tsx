@@ -96,14 +96,14 @@ export function ViewTransitionSliderBox(kitProps: ViewTransitionSliderBoxKitProp
     >
       {/* to hold prev node  */}
       <Box
-        ref={setPrevBoxDom}
+        domRef={setPrevBoxDom}
         icss={{ position: "absolute", inset: 0 }}
         style={{ transform: "translateX(-100%)", transition: "inherit" }}
       ></Box>
 
       {/* to hold current node  */}
       <Box
-        ref={setCurrBoxDom}
+        domRef={setCurrBoxDom}
         icss={{ display: "flex", flexDirection: "column", contain: "size", flex: 1 }}
         style={{ transform: "translateX(0%)", transition: "inherit" }}
       >
@@ -112,7 +112,7 @@ export function ViewTransitionSliderBox(kitProps: ViewTransitionSliderBoxKitProp
 
       {/* to hold next node  */}
       <Box
-        ref={setNextBoxDom}
+        domRef={setNextBoxDom}
         icss={{ position: "absolute", inset: 0 }}
         style={{ transform: "translateX(100%)", transition: "inherit" }}
       ></Box>

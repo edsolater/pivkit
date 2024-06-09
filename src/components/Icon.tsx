@@ -24,10 +24,8 @@ export const IconSize = {
 }
 
 export const IconVariant = {
-  /** default has opacity,  */
-  btn: "btn",
   /**pure, used in text content, set this will change icon width to 1em, and display is inline */
-  betweenText: "betweenText",
+  inline: "inline",
 }
 
 export const IconState = {
@@ -116,12 +114,9 @@ function loadIconDefaultICSS() {
             width: 100%;
             height: 100%;
           }
-          &.${IconVariant.betweenText} {
+          &.${IconVariant.inline} {
             width: 1em;
             display: inline-block;
-          }
-          &.${IconVariant.btn} {
-            opacity: 0.8;
           }
         }
       }
