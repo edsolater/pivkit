@@ -5,9 +5,7 @@ import { useClassRef } from "../domkit"
 import { createRef } from "../hooks/createRef"
 import { Piv, mergeProps, omitProps, parsePivChildren } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
-import { cssOpacity, cssVar, icssClickable } from "../styles"
-import { cssColors } from "../styles/cssColors"
-import { CSSColorString } from "../styles/type"
+import { cssOpacity, cssVar, icssClickable, tailwindPaletteColors } from "../styles"
 import { addGlobalCSS } from "../utils/cssGlobalStyle"
 
 export interface ButtonController {
@@ -150,13 +148,6 @@ export function Button(kitProps: ButtonKitProps) {
   )
 }
 
-/**
- * @todo TEMP, currently force it, should use NPM css color utils
- */
-export function opacityCSSColor(cssColor: CSSColorString, /* 0~1 */ opacity: number) {
-  return cssColor === cssColors.component_button_bg_primary ? "#7c859826" /* 0.15 */ : `${cssColor}${opacity}` //TODO: temp
-}
-
 let hasLoadButtonDefaultICSS = false
 
 /**
@@ -169,9 +160,9 @@ function loadButtonDefaultICSS() {
         .Button {
           transition: 50ms cubic-bezier(0.22, 0.61, 0.36, 1); 
           border: none;
-          --Button-text: ${cssColors.component_button_text_primary};
-          --Button-bg: ${cssColors.component_button_bg_primary};
-          color: ${cssVar("--Button-text")};
+          ${ButtonCSSVariables.mainTextColor}: ${cssOpacity(cssVar("--text-primary", tailwindPaletteColors.gray700), 0.75)};
+          ${ButtonCSSVariables.mainBgColor}: ${cssVar("--secondary", tailwindPaletteColors.gray300)};
+          color: ${cssVar(ButtonCSSVariables.mainTextColor)};
           cursor: pointer;
           user-select: none;
           width: max-content;
@@ -208,7 +199,6 @@ function loadButtonDefaultICSS() {
             ${ButtonCSSVariables.outlineWidth}: 2px;
           }
           &.${ButtonSize.lg} {
-            //TODO: fixme
             padding: 14px 24px;
             font-size: 16px;
             border-radius: 12px;
@@ -217,7 +207,7 @@ function loadButtonDefaultICSS() {
           &:is(&.${ButtonVariant.solid}, &${Object.values(ButtonVariant)
             .map((c) => `:not(.${c})`)
             .join("")}) {
-            background-color: ${cssVar("--Button-bg")};
+            background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
             &:hover {
               filter: brightness(95%);
             }
@@ -227,17 +217,17 @@ function loadButtonDefaultICSS() {
             }
           }
           &.${ButtonVariant.outline} {
-            background-color: ${cssColors.transparent};
-            outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar("--Button-bg")};
+            background-color: transparent;
+            outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar(ButtonCSSVariables.mainBgColor)};
             outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
             &:hover {
-              background-color: ${cssOpacity(cssVar("--Button-bg"), 0.85)};
+              background-color: ${cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85)};
             }
           }
           &.${ButtonVariant.ghost} {
-            background-color: ${cssColors.transparent};
+            background-color: transparent;
              &:hover {
-              background-color: ${cssOpacity(cssVar("--Button-bg"), 0.1)};
+              background-color: ${cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4)};
             }
             color: currentcolor;
           }

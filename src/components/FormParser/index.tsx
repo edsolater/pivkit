@@ -23,7 +23,7 @@ type WidgetByDescriptionProps = {
   onWidgetDataChange?: (payload: { data: unknown }) => void
 }
 type WidgetByDescriptionController = {
-  resetInnerDeep(): void
+  reset(): void
   setValue(value: any): void
 }
 
@@ -33,7 +33,7 @@ function WidgetByDescription(
   const { props, shadowProps, loadController } = useKitProps(kitProps)
   const [widgetRef, setRef] = createRef<InputController>()
   const controller: WidgetByDescriptionController = {
-    resetInnerDeep() {
+    reset() {
       widgetRef()?.setText?.(undefined)
     },
     setValue(value) {
@@ -82,13 +82,13 @@ export function SchemaParser<T extends FormSchema>(
     schemaData,
     reset() {
       setSchemaData(() => initSchemaData)
-      widgetControllerRefs().forEach((ref) => ref.controller.resetInnerDeep())
+      widgetControllerRefs().forEach((ref) => ref.controller.reset())
     },
     canSubmit() {
       return schemaData() !== initSchemaData && Object.keys(schemaData()).length > 0
     },
     setData(data) {
-      setSchemaData((c) => ({ ...c, data }))
+      setSchemaData((c) => ({ ...c, ...data }))
       widgetControllerRefs().forEach((ref) => ref.controller.setValue(data[ref.key]))
     },
   }

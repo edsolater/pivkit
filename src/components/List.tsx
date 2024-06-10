@@ -2,7 +2,7 @@ import { MayFn, shrinkFn } from "@edsolater/fnkit"
 import { For, JSXElement, createMemo, type Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { createRef } from "../hooks/createRef"
-import { Fragnment, Piv, PivChild, parsePivChildren } from "../piv"
+import { Fragnment, Piv, PivChild, parsePivChildren, type PivProps } from "../piv"
 import { Box } from "./Boxes"
 
 export interface ListController {}
@@ -11,6 +11,8 @@ type ComponentStructure = (...anys: any[]) => JSXElement
 
 export type ListProps<T> = {
   renderWrapper?: ComponentStructure
+  renderListItemWrapper?: ComponentStructure
+  
   items?: MayFn<Iterable<T>>
 
   Divider?: MayFn<PivChild, [payload: { prevIndex: Accessor<number>; currentIndex: Accessor<number> }]>
@@ -31,6 +33,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
     noNeedDeAccessifyChildren: true,
   })
   const Wrapper = kitProps.renderWrapper ?? Piv //TODO: 🤔 maybe kitProps just export  Wrapper instead of shadowProps
+  const ListItemWrapper = kitProps.renderWrapper ?? Fragnment
 
   // [configs]
   const allItems = createMemo(() => {
@@ -49,9 +52,7 @@ export function List<T>(kitProps: ListKitProps<T>) {
     <For each={allItems()}>
       {(item, idx) => (
         <Fragnment>
-          <Box class="list-item" icss={{ alignContent: "center" }}>
-            {parsePivChildren(props.children(item, idx))}
-          </Box>
+          <ListItemWrapper>{parsePivChildren(props.children(item, idx))}</ListItemWrapper>
           {idx() < itemLength() - 1 &&
             "Divider" in kitProps &&
             parsePivChildren(shrinkFn(kitProps.Divider, [{ prevIndex: idx, currentIndex: () => idx() + 1 }]))}

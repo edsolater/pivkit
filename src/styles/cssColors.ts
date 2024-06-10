@@ -28,8 +28,8 @@ export const cssColors = {
 
   //---- button
   // theme:solid
-  component_button_bg_primary: tailwindPaletteColors.gray300,
-  component_button_text_primary: tailwindPaletteColors.gray700,
+  component_button_bg_primary: cssVar("--secondary", tailwindPaletteColors.gray300),
+  component_button_text_primary: cssVar("--text-secondary", tailwindPaletteColors.gray700),
 
   //---- label
   component_label_bg_default: "#e1e3e769",

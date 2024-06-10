@@ -267,10 +267,15 @@ export const icssClickable = createStaticICSS("clickable", () => ({
   userSelect: "none",
   transition: "100ms",
   // backdropFilter: "brightness(1)", // backdrop-filter will cause render performance issue, avoid to use
-  filter: "brightness(1)",
-  ".dark &": { filter: "brightness(0.9)" },
-  "&:is(:hover,:active,:focus)": { filter: "brightness(0.85)", ".dark &": { filter: "brightness(1.5)" } },
+  filter: "brightness(1)", // for transition
+  "&:is(:hover,:active,:focus)": { filter: "brightness(0.85)", ".dark &": { filter: "brightness(1.3)" } },
   "&:active": { transform: "scale(0.9)" },
+}))
+
+/** content is half opacity, but it will be not transparent if element is active */
+export const icssContentClickableOpacity = createICSS(() => ({
+  opacity: 0.5,
+  "&:is(:hover,:active,:focus,:active)": { opacity: 1 },
 }))
 
 export const icssFocusDetector = createICSS(() => ({
