@@ -12,9 +12,13 @@ export type PopoverPanelController = {
 export type PopoverPanelProps = {
   defaultOpen?: boolean
   open?: boolean
-  canBackdropClose?: boolean
+  needBackDrop?: boolean
 }
 
+/**
+ *
+ * NOTE: inner children will always be rendered, if you want to lazy load children, you should use `<Show>` to wrap your child
+ */
 export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller: PopoverPanelController }>) {
   const { props, lazyLoadController, shadowProps } = useKitProps(kitProps, { name: "Popover" })
   const { dom, setDom } = createDomRef()
@@ -61,7 +65,7 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   })
 
   return (
-    <Piv shadowProps={shadowProps} htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }} domRef={setDom}>
+    <Piv shadowProps={shadowProps} htmlProps={{ popover: props.needBackDrop ? "auto" : "manual" }} domRef={setDom}>
       {props.children}
     </Piv>
   )

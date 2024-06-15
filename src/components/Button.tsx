@@ -14,8 +14,9 @@ export interface ButtonController {
 }
 
 export const ButtonCSSVariables = {
-  mainBgColor: "--Button-main-bg-color",
-  mainTextColor: "--Button-main-text-color",
+  mainBgColor: "--Button-bg",
+  mainTextColor: "--Button-text",
+  hoverBgColor: "--Button-hover-bg",
   outlineWidth: "--Button-outline-width",
 }
 
@@ -35,6 +36,7 @@ export const ButtonVariant = {
   solid: "solid", // default
   outline: "outline",
   ghost: "ghost",
+  transparent: "transparent", // have button's feature but no outside appearance
 }
 
 export interface ButtonProps {
@@ -221,14 +223,18 @@ function loadButtonDefaultICSS() {
             outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar(ButtonCSSVariables.mainBgColor)};
             outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
             &:hover {
-              background-color: ${cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85)};
+              background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85))};
             }
           }
           &.${ButtonVariant.ghost} {
             background-color: transparent;
-             &:hover {
-              background-color: ${cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4)};
+            &:hover {
+              background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4))};
             }
+            color: currentcolor;
+          }
+          &.${ButtonVariant.transparent} {
+            background-color: transparent;
             color: currentcolor;
           }
         }

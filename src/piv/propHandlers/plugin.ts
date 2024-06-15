@@ -1,4 +1,10 @@
-import { AnyObj, ConfigableFunction, createConfigableFunction, isFunction, overwriteFunctionName } from "@edsolater/fnkit"
+import {
+  AnyObj,
+  ConfigableFunction,
+  createConfigableFunction,
+  isFunction,
+  overwriteFunctionName,
+} from "@edsolater/fnkit"
 import { Accessor } from "solid-js"
 import { KitProps } from "../../createKit/KitProps"
 import { Accessify } from "../../utils"
