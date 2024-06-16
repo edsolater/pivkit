@@ -1,24 +1,24 @@
-import { cacheFn, hasProperty, mergeObjects, runtimeObject } from "@edsolater/fnkit"
-import { Accessor, createEffect, createMemo, createSignal, on } from "solid-js"
+import { cacheFn, hasProperty, mergeObjects, runtimeObject, shrinkFn } from "@edsolater/fnkit"
+import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { useElementFocus } from "../../domkit"
-import { createDomRef, useShortcutsRegister } from "../../hooks"
-import { createDisclosure } from "../../hooks/createDisclosure"
+import { listenDomEvent, useElementFocus } from "../../domkit"
+import { createDomRef, createHistoryAccessor, useHistoryComparer, useShortcutsRegister } from "../../hooks"
 import { createRef } from "../../hooks/createRef"
-import { Piv, PivChild, PivProps, parseICSSToClassName } from "../../piv"
+import { Piv, parseICSSToClassName } from "../../piv"
 import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
 import { cssOpacity } from "../../styles"
 import { ElementRefs, getElementFromRefs } from "../../utils"
-import { DeAccessifyProps } from "../../utils/accessifyProps"
+import { type Accessify } from "../../utils/accessifyProps"
 import { Box } from "../Boxes"
 
 export interface InputController {
-  text: string
+  text: string | undefined
   /** set Input Value */
   setText(newText: string | undefined | ((oldText: string | undefined) => string | undefined)): void
   isFocused: Accessor<boolean>
 }
 
+// TODO: too complicated!! should easier
 export type InputProps = {
   /**
    * will not apply default icss: `min-width: 10em`
@@ -32,23 +32,13 @@ export type InputProps = {
   /** when change, affact to ui*/
   value?: string
   autoFocus?: boolean
+
   placeholder?: string
-  /** default is true */
-  disableOutsideValueUpdateWhenUserInput?: boolean
-  disableUserInput?: boolean
-  // TODO: imply it !!!
-  disableOutSideValue?: boolean
   /** disabled = disableOutSideValue + disableUserInput */
   disabled?: boolean
-  // only user can trigger this callback
-  onUserInput?(text: string | undefined, controller: InputController): void
-  // only program can trigger this callback
-  onProgramInput?(text: string | undefined, controller: InputController): void
   // onUserInput + onProgramInput
   onInput?(text: string | undefined, controller: InputController & { byUser: boolean }): void
   onEnter?(text: string | undefined, controller: InputController): void
-  renderPrefix?: PivChild
-  renderSuffix?: PivChild
 }
 
 export type InputKitProps = KitProps<InputProps, { controller: InputController }>
@@ -63,18 +53,23 @@ export function Input(rawProps: InputKitProps) {
 
   const controller = runtimeObject<InputController>({
     text: () => innerText(),
-    setText: () => updateText,
+    setText: () => setText,
     isFocused: () => isFocused,
   })
 
-
-  const { props, shadowProps, loadController } = useKitProps(rawProps, {
-    name: "Input",
-    controller: () => controller,
-  })
+  const { props, shadowProps, loadController } = useKitProps(rawProps, { name: "Input" })
   loadController(controller)
 
-  const [additionalProps, { innerText, updateText }] = useInputInnerValue(props, controller)
+  const { innerText, setText, setDomRef } = useInputValue({
+    value: () => props.value,
+    defaultValue: () => props.defaultValue,
+    onInput: (text, { byUser }) => props.onInput?.(text, mergeObjects(controller, { byUser })),
+    onEnter: (text) => props.onEnter?.(text, controller),
+  })
+
+  // ---------------- auto focus ----------------
+  if (props.autoFocus) useAutoFocus(inputBodyDom)
+
   useShortcutsRegister(
     inputBodyDom,
     {
@@ -88,15 +83,10 @@ export function Input(rawProps: InputKitProps) {
     { when: isFocused, enabled: !hasProperty(props, "onEnter") },
   )
 
-  // ---------------- auto focus ----------------
-  if (props.autoFocus) useAutoFocus(inputBodyDom)
-
   return (
     <Box shadowProps={shadowProps} icss={basicInputICSS}>
-      {props.renderPrefix}
       <Piv<"input">
-        shadowProps={additionalProps()}
-        domRef={setInputBodyDom}
+        domRef={[setInputBodyDom, setDomRef]}
         htmlProps={{
           placeholder: props.placeholder,
           autofocus: props.autoFocus,
@@ -108,7 +98,6 @@ export function Input(rawProps: InputKitProps) {
           { border: "none", outline: "none", padding: "4px", fontSize: "0.8333em" },
         ]}
       />
-      {props.renderSuffix}
     </Box>
   )
 }
@@ -138,119 +127,215 @@ function focusElement(el: HTMLElement) {
   el.focus()
 }
 
-/**
- *  handle `<Input>`'s value
- */
-function useInputInnerValue(props: DeAccessifyProps<InputKitProps>, controller: InputController) {
+// /**
+//  *  handle `<Input>`'s value(merge from bonsai)
+//  */
+// function useInputValue(props: DeAccessifyProps<InputKitProps>, controller: InputController) {
+//   const [inputRef, setInputRef] = createRef<HTMLInputElement>()
+//   // if user is inputing or just input, no need to update upon out-side value
+//   const [isFocused, { open: focusInput, close: unfocusInput }] = createDisclosure()
+
+//   const inputDefaultValue = props.defaultValue ?? props.value
+//   console.log('inputDefaultValue: ', inputDefaultValue)
+//   // store inner value for
+//   const [cachedOutsideValue, setCachedOutsideValue] = createSignal(inputDefaultValue)
+
+//   /** DOM content */
+//   const [innerText, setInnerText] = createSignal(inputDefaultValue)
+
+//   const updateTextDOMContent = (newText: string | undefined) => {
+//     const el = inputRef()
+//     if (el) {
+//       el.value = newText ?? ""
+//       setInnerText(newText)
+//       props.onProgramInput?.(newText, controller)
+//       props.onInput?.(newText, mergeObjects(controller, { byUser: false }))
+//     }
+//   }
+
+//   // handle outside value change (will stay selection offset effect)
+//   const updateTextDOM = (newValue: string | undefined) => {
+//     const el = inputRef()
+//     const canChangeInnerValue = !(isFocused() && props.disableOutsideValueUpdateWhenUserInput)
+//     if (canChangeInnerValue && el) {
+//       const prevCursorOffsetStart = el.selectionStart ?? 0
+//       const prevCursorOffsetEnd = el.selectionEnd ?? 0
+//       const prevRangeDirection = el.selectionDirection ?? undefined
+//       const prevValue = cachedOutsideValue()
+//       // set real value by DOM API, for restore selectionRange
+//       updateTextDOMContent(newValue)
+//       const needUpdate = prevValue !== newValue && prevValue && newValue
+
+//       // restore selectionRange
+//       if (needUpdate) {
+//         const isCursor = prevCursorOffsetEnd === prevCursorOffsetStart
+//         const isCursorAtTail = isCursor && prevCursorOffsetEnd === prevValue.length
+//         const hasSelectAll = prevCursorOffsetStart === 0 && prevCursorOffsetEnd === prevValue.length
+//         if (isCursorAtTail) {
+//           // stay  end
+//           el.setSelectionRange(newValue.length, newValue.length) // to end
+//         } else if (hasSelectAll) {
+//           // stay select all
+//           el.setSelectionRange(prevCursorOffsetStart, newValue.length, prevRangeDirection) // to end
+//         } else {
+//           // stay same range offset
+//           el.setSelectionRange(prevCursorOffsetStart, prevCursorOffsetEnd, prevRangeDirection)
+//         }
+//       }
+//     }
+//     // in any case, it will update inner's js cachedOutsideValue
+//     setCachedOutsideValue(newValue)
+//   }
+
+//   // reflect default text in init lifecycle
+//   createEffect(on(inputRef, () => updateTextDOMContent(innerText())))
+
+//   // handle outside value change (consider selection offset)
+//   createEffect(
+//     on(
+//       () => props.value,
+//       (newValue) => {
+//         updateTextDOM(newValue)
+//       },
+//     ),
+//   )
+
+//   // update when lose focus
+//   createEffect(
+//     on(
+//       () => isFocused() === false,
+//       () => {
+//         setCachedOutsideValue(props.value)
+//       },
+//     ),
+//   )
+
+//   const additionalProps = createMemo(
+//     () =>
+//       ({
+//         domRef: setInputRef,
+//         htmlProps: {
+//           disabled: props.disabled,
+//           onBeforeInput: (ev: Event) => {
+//             // onBeforeInput to prevent user input
+//             if (props.disableUserInput) {
+//               ev.preventDefault()
+//             }
+//           },
+//           onInput: (e: Event) => {
+//             const text = (e.target as HTMLInputElement).value
+//             setInnerText(text)
+//             props.onInput?.(text, mergeObjects(controller, { byUser: true }))
+//             props.onUserInput?.(text, controller)
+//           },
+//           onFocus: focusInput,
+//           onBlur: unfocusInput,
+//         },
+//       }) as PivProps<"input">,
+//   )
+//   return [
+//     additionalProps,
+//     {
+//       innerText,
+//       updateText: updateTextDOMContent,
+//       cachedOutsideValue,
+//       isFocused,
+//       focusInput,
+//       unfocusInput,
+//       setCachedOutsideValue,
+//     },
+//   ] as const
+// }
+
+function useInputValue(props: {
+  value?: Accessify<string | undefined>
+  defaultValue?: Accessify<string | undefined>
+  onInput?(text: string | undefined, payload: { byUser: boolean }): void
+  onEnter?(text: string | undefined): void
+}) {
   const [inputRef, setInputRef] = createRef<HTMLInputElement>()
-  // if user is inputing or just input, no need to update upon out-side value
-  const [isFocused, { open: focusInput, close: unfocusInput }] = createDisclosure()
-  // store inner value for
-  const [cachedOutsideValue, setCachedOutsideValue] = createSignal(props.defaultValue ?? props.value)
 
-  /** DOM content */
-  const [innerText, setInnerText] = createSignal(props.defaultValue ?? props.value)
+  const inputDefaultValueAccessor = createMemo(() => shrinkFn(props.defaultValue))
+  const inputValueAccessor = createMemo(() => shrinkFn(props.value))
 
-  const updateTextDOMContent = (newText: string | undefined) => {
-    const el = inputRef()
-    if (el) {
-      el.value = newText ?? ""
-      setInnerText(newText)
-      props.onProgramInput?.(newText, controller)
-      props.onInput?.(newText, mergeObjects(controller, { byUser: false }))
-    }
-  }
+  const [jsInnerText, setJSInnerText] = createSignal(inputDefaultValueAccessor() ?? inputValueAccessor())
+  const [domInnerText, setDomInnerText] = createSignal(jsInnerText())
 
-  // handle outside value change (will stay selection offset effect)
-  const updateTextDOM = (newValue: string | undefined) => {
-    const el = inputRef()
-    const canChangeInnerValue = !(isFocused() && props.disableOutsideValueUpdateWhenUserInput)
-    if (canChangeInnerValue && el) {
-      const prevCursorOffsetStart = el.selectionStart ?? 0
-      const prevCursorOffsetEnd = el.selectionEnd ?? 0
-      const prevRangeDirection = el.selectionDirection ?? undefined
-      const prevValue = cachedOutsideValue()
-      // set real value by DOM API, for restore selectionRange
-      updateTextDOMContent(newValue)
-      const needUpdate = prevValue !== newValue && prevValue && newValue
+  const jsInnerTextHistory = createHistoryAccessor(jsInnerText)
+  const domInnerTextHistory = createHistoryAccessor(domInnerText)
+  const { aIsNewer: isInputFromBrowser } = useHistoryComparer(jsInnerTextHistory, domInnerTextHistory)
 
-      // restore selectionRange
-      if (needUpdate) {
-        const isCursor = prevCursorOffsetEnd === prevCursorOffsetStart
-        const isCursorAtTail = isCursor && prevCursorOffsetEnd === prevValue.length
-        const hasSelectAll = prevCursorOffsetStart === 0 && prevCursorOffsetEnd === prevValue.length
-        if (isCursorAtTail) {
-          // stay  end
-          el.setSelectionRange(newValue.length, newValue.length) // to end
-        } else if (hasSelectAll) {
-          // stay select all
-          el.setSelectionRange(prevCursorOffsetStart, newValue.length, prevRangeDirection) // to end
-        } else {
-          // stay same range offset
-          el.setSelectionRange(prevCursorOffsetStart, prevCursorOffsetEnd, prevRangeDirection)
+  // props.value -> jsInnerText
+  createEffect(
+    on(
+      inputValueAccessor,
+      (v) => {
+        setJSInnerText(v)
+      },
+      { defer: true },
+    ),
+  )
+
+  /** REFLECT real DOM's value -> {@link domInnerText} */
+  createEffect(
+    on(inputRef, () => {
+      const { cancel } = listenDomEvent(inputRef(), "input", ({ el, ev }) => {
+        if (!el) return
+        const value = el.value
+        if (domInnerText() !== value) {
+          setDomInnerText(value)
         }
+      })
+      onCleanup(cancel)
+    }),
+  )
+
+  /** REFLECT {@link domInnerText} -> real DOM's value */
+  createEffect(
+    on(domInnerText, (value) => {
+      const el = inputRef()
+      if (!el) return
+      const realDOMValue = el?.value
+      if (el && value != realDOMValue) {
+        el.value = value ?? ""
       }
-    }
-    // in any case, it will update inner's js cachedOutsideValue
-    setCachedOutsideValue(newValue)
-  }
+    }),
+  )
 
-  // reflect default text in init lifecycle
-  createEffect(on(inputRef, () => updateTextDOMContent(innerText())))
+  // sync domInnerValue with jsInnerText
+  createEffect(
+    on(domInnerText, (v) => {
+      setJSInnerText(v)
+    }),
+  )
+  createEffect(
+    on(jsInnerText, (v) => {
+      setDomInnerText(v)
+    }),
+  )
 
-  // handle outside value change (consider selection offset)
+  // handle onInput by jsInnerText
   createEffect(
     on(
-      () => props.value,
-      (newValue) => {
-        updateTextDOM(newValue)
+      jsInnerText,
+      (value) => {
+        props.onInput?.(value, { byUser: isInputFromBrowser() })
       },
+      { defer: true },
     ),
   )
 
-  // update when lose focus
+  // handle dom keyboard:enter
   createEffect(
-    on(
-      () => isFocused() === false,
-      () => {
-        setCachedOutsideValue(props.value)
-      },
-    ),
+    on(inputRef, (el) => {
+      const { cancel } = listenDomEvent(el, "keydown", ({ ev }) => {
+        if (ev.key === "Enter") {
+          props.onEnter?.(jsInnerText())
+        }
+      })
+      onCleanup(cancel)
+    }),
   )
 
-  const additionalProps = createMemo(
-    () =>
-      ({
-        domRef: setInputRef,
-        htmlProps: {
-          disabled: props.disabled,
-          onBeforeInput: (ev: Event) => {
-            // onBeforeInput to prevent user input
-            if (props.disableUserInput) {
-              ev.preventDefault()
-            }
-          },
-          onInput: (e: Event) => {
-            const text = (e.target as HTMLInputElement).value
-            setInnerText(text)
-            props.onInput?.(text, mergeObjects(controller, { byUser: true }))
-            props.onUserInput?.(text, controller)
-          },
-          onFocus: focusInput,
-          onBlur: unfocusInput,
-        },
-      }) as PivProps<"input">,
-  )
-  return [
-    additionalProps,
-    {
-      innerText,
-      updateText: updateTextDOMContent,
-      cachedOutsideValue,
-      isFocused,
-      focusInput,
-      unfocusInput,
-      setCachedOutsideValue,
-    },
-  ] as const
+  return { setDomRef: setInputRef, innerText: jsInnerText, setText: setJSInnerText }
 }

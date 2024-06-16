@@ -85,7 +85,7 @@ export function buildPopover(options?: PopoverPluginOptions) {
           return (originalNode) => {
             console.log("✅ load popover plugin")
             return (
-              <PopoverPanel class="popovers" canBackdropClose>
+              <PopoverPanel class="popovers" hasBackDrop>
                 {originalNode}
               </PopoverPanel>
             )

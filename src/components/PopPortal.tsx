@@ -12,7 +12,7 @@ export type PopoverPanelController = {
 export type PopoverPanelProps = {
   defaultOpen?: boolean
   open?: boolean
-  needBackDrop?: boolean
+  hasBackDrop?: boolean
 }
 
 /**
@@ -65,7 +65,7 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   })
 
   return (
-    <Piv shadowProps={shadowProps} htmlProps={{ popover: props.needBackDrop ? "auto" : "manual" }} domRef={setDom}>
+    <Piv shadowProps={shadowProps} htmlProps={{ popover: props.hasBackDrop ? "auto" : "manual" }} domRef={setDom}>
       {props.children}
     </Piv>
   )

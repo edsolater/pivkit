@@ -28,7 +28,6 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
   /**
    * auto merge by shadowProps
    * @todo: use ref instead of domRef
-   * @deprecated just use ref
    */
   domRef?: MayArray<CallbackRef<any> | null | undefined>
 
