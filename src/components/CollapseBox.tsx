@@ -49,7 +49,7 @@ const CollapseContext = createContext<CollapseBoxController>({} as CollapseBoxCo
  */
 export function CollapseBox(kitProps: CollapseBoxKitProps) {
   const { dom: boxDom, setDom: setBoxDom } = createDomRef()
-  const { props, shadowProps } = useKitProps(kitProps, { name: "Collapse", controller: () => controller })
+  const { props, shadowProps, loadController } = useKitProps(kitProps, { name: "Collapse" })
 
   const [innerOpen, { toggle, open, close, set }] = createDisclosure(() => props.open ?? props.defaultOpen ?? false, {
     onClose: props.onClose,
@@ -65,6 +65,7 @@ export function CollapseBox(kitProps: CollapseBoxKitProps) {
     toggle: () => toggle,
     set: () => set,
   })
+  loadController(controller)
 
   const {
     controller: { open: openCollapse, close: closeCollapse, toggle: toggleCollapse, opened: isCollapseOpened },

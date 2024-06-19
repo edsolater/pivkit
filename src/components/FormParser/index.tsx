@@ -4,7 +4,7 @@ import { useKitProps, type KitProps } from "../../createKit"
 import { createRef } from "../../hooks"
 import { Row } from "../Boxes"
 import { Input, type InputController } from "../Input"
-import { List } from "../List"
+import { Loop } from "../Loop"
 import { Text } from "../Text"
 import { isInputDescription } from "./inputFormDescription"
 import { FormDescription, GetSchemaData, type FormSchema } from "./type"
@@ -97,7 +97,7 @@ export function SchemaParser<T extends FormSchema>(
 
   createEffect(on(schemaData, (newSchema) => props.onDataChange?.({ newSchema })))
   return (
-    <List
+    <Loop
       shadowProps={shadowProps}
       items={Object.entries(props.schema)}
       icss={{ display: "flex", flexDirection: "column", gap: "4px" }}
@@ -116,6 +116,6 @@ export function SchemaParser<T extends FormSchema>(
           />
         </Row>
       )}
-    </List>
+    </Loop>
   )
 }

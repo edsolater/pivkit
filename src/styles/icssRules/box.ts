@@ -140,7 +140,7 @@ export const icssGrid = createICSS(
     gap,
     slot,
     autoTrim = true,
-    dir = "y",
+    dir = "x",
     dividerBackground = cssOpacity("currentColor", 0.5),
     dividerWidth,
     dividerHeight,
