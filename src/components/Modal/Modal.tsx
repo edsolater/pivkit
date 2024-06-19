@@ -9,7 +9,7 @@ import { createRef } from "../../hooks/createRef"
 import { ICSS, Piv, PivProps, createPlugin } from "../../piv"
 import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
 import { createController2 } from "../../utils/createController"
-import { PopoverPanel } from "../PopPortal"
+import { PopoverPanel } from "../PopoverPanel"
 import { Text } from "../Text"
 
 export interface ModalController {

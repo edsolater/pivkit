@@ -1,6 +1,6 @@
 import { Accessor, createEffect, onCleanup } from "solid-js"
 import { createRef } from "../.."
-import { PopoverPanel } from "../../components/PopPortal"
+import { PopoverPanel } from "../../components/PopoverPanel"
 import { listenDomEvent } from "../../domkit"
 import { useGestureHover } from "../../domkit/hooks/useGestureHover"
 import { createTrigger } from "../../hooks/utils/createTrigger"

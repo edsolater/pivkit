@@ -19,7 +19,7 @@ export interface InputController {
 }
 
 // TODO: too complicated!! should easier
-export type InputProps = {
+export interface InputProps {
   /**
    * will not apply default icss: `min-width: 10em`
    * input will auto widen depends on content Text

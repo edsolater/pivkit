@@ -4,7 +4,7 @@ import { useClickOutside } from "../../domkit/hooks/useClickOutside"
 import { createRef } from "../../hooks/createRef"
 import { Piv } from "../../piv"
 import { drawerKeyboardShortcut } from "../../plugins/drawerKeyboardShortcut"
-import { PopoverPanel } from "../PopPortal"
+import { PopoverPanel } from "../PopoverPanel"
 
 export interface DrawerController {
   isOpen: boolean

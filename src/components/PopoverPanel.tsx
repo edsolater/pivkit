@@ -1,6 +1,6 @@
 import { assert } from "@edsolater/fnkit"
 import { createEffect, createSignal } from "solid-js"
-import { Piv, createDomRef, useKitProps, type KitProps } from ".."
+import { AddProps, Piv, createDomRef, createStaticICSS, useKitProps, type KitProps } from ".."
 
 export type PopoverPanelController = {
   open: () => void
@@ -15,12 +15,17 @@ export type PopoverPanelProps = {
   hasBackDrop?: boolean
 }
 
+const icssPopoverStyle = createStaticICSS("PopoverPanel", () => ({
+  // margin: "unset",
+  // padding: "unset",
+  // border: "unset",
+}))
 /**
  *
  * NOTE: inner children will always be rendered, if you want to lazy load children, you should use `<Show>` to wrap your child
  */
 export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller: PopoverPanelController }>) {
-  const { props, lazyLoadController, shadowProps } = useKitProps(kitProps, { name: "Popover" })
+  const { props, loadController, shadowProps } = useKitProps(kitProps, { name: "Popover" })
   const { dom, setDom } = createDomRef()
 
   const [isOpen, setIsOpen] = createSignal(Boolean(props.defaultOpen))
@@ -51,7 +56,7 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
     isOpen,
   }
 
-  lazyLoadController(() => controller)
+  loadController(controller)
 
   // reflect open state to dom
   createEffect(() => {
@@ -65,7 +70,12 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   })
 
   return (
-    <Piv shadowProps={shadowProps} htmlProps={{ popover: props.hasBackDrop ? "auto" : "manual" }} domRef={setDom}>
+    <Piv
+      shadowProps={shadowProps}
+      htmlProps={{ popover: props.hasBackDrop ? "auto" : "manual" }}
+      domRef={setDom}
+      icss={icssPopoverStyle}
+    >
       {props.children}
     </Piv>
   )
