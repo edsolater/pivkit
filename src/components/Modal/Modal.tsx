@@ -56,8 +56,7 @@ export const ModalContext = createComponentContext<Partial<ModalController>>()
  */
 export function Modal(kitProps: ModalKitProps) {
   const { props, shadowProps, loadController } = useKitProps(kitProps, {
-    name: "Modal",
-    controller: () => modalController,
+    name: "Modal"
   })
   const [dialogDOM, setDialogDOM] = createRef<HTMLDialogElement>()
   const [dialogContentDOM, setDialogContentDOM] = createRef<HTMLDivElement>()
