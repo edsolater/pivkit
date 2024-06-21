@@ -17,7 +17,7 @@ export interface ModalController {
   dialogContentDOM: Accessor<HTMLDivElement | undefined>
   isOpen: Accessor<boolean>
   /** modal title */
-  title: Accessor<string>
+  title: Accessor<string | undefined>
   open(): void
   close(): void
   toggle(): void
@@ -55,18 +55,7 @@ export const ModalContext = createComponentContext<Partial<ModalController>>()
  * - {@link ModalTitle \<ModalTitle\>} - register mobal title. Actually is {@link Text \<Text\>}
  */
 export function Modal(kitProps: ModalKitProps) {
-  const modalController = createController2<ModalController>(() => ({
-    dialogDOM,
-    dialogContentDOM,
-    title: () => props.title,
-    /** is dialog open */
-    isOpen: innerOpen,
-    open: mergeFunction(open, openModal),
-    close: mergeFunction(close, closeModal),
-    toggle: toggle,
-  }))
-
-  const { props, shadowProps } = useKitProps(kitProps, {
+  const { props, shadowProps, loadController } = useKitProps(kitProps, {
     name: "Modal",
     controller: () => modalController,
   })
@@ -109,6 +98,17 @@ export function Modal(kitProps: ModalKitProps) {
     },
   })
 
+  const modalController: ModalController = {
+    dialogDOM,
+    dialogContentDOM,
+    title: () => props.title,
+    /** is dialog open */
+    isOpen: innerOpen,
+    open: mergeFunction(open, openModal),
+    close: mergeFunction(close, closeModal),
+    toggle: toggle,
+  }
+  loadController(modalController)
   return (
     <ModalContext.Provider value={modalController}>
       <PopoverPanel open={shouldRenderDOM}>
@@ -124,7 +124,7 @@ export function Modal(kitProps: ModalKitProps) {
             overflowY: "visible",
             maxHeight: "100dvh",
             maxWidth: "100dvw",
-            "&::backdrop": props.backdropICSS,
+            "&::backdrop": props.backdropICSS as any,
           }}
         >
           <Piv domRef={setDialogContentDOM} icss={{ display: "contents" }}>
