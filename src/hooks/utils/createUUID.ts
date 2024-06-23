@@ -1,6 +1,7 @@
 let currentIdGen = 1
 export type UUID = unknown
-export function createUUID(): { id: UUID } {
+/** not a hook, just a JS function  */
+export function createUUID(): UUID {
   const id = currentIdGen++
-  return { id }
+  return id
 }

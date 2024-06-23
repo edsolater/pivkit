@@ -31,7 +31,7 @@ type TriggerController = {
  * @param id force id; if not provided, will create a new one
  */
 export function createTrigger({
-  id = createUUID().id,
+  id = createUUID(),
   defaultState = false,
   state = defaultState, // TODO: signal plugin should handle this
 }: {

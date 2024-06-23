@@ -140,7 +140,7 @@ export const icssGrid = createICSS(
     gap,
     slot,
     autoTrim = true,
-    dir = "x",
+    dir,
     dividerBackground = cssOpacity("currentColor", 0.5),
     dividerWidth,
     dividerHeight,
@@ -158,7 +158,7 @@ export const icssGrid = createICSS(
       gridTemplateColumns: templateColumn,
       gridTemplateRows: templateRow,
       gap: gap,
-      gridAutoFlow: dir === "x" ? "column" : "row",
+      gridAutoFlow: dir ? undefined : dir === "x" ? "column" : "row",
     } as CSSObject
 
     if (dir === "x" && !templateColumn && slot != null) {

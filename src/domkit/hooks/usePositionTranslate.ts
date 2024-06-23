@@ -1,4 +1,4 @@
-import { addDefault, mergeObjects} from "@edsolater/fnkit"
+import { addDefaultProperties, mergeObjects} from "@edsolater/fnkit"
 import { Accessor, AccessorArray, createEffect, on, onCleanup } from "solid-js"
 import { createRef } from "../../hooks/createRef"
 
@@ -18,7 +18,7 @@ export function usePositionTranslate(options: {
 }) {
   // TODO: addDefault should also accept undefined
   // TODO: addDefault should also be solid-js friendly, that means it should not access object property
-  const animateOptions = addDefault(options.animateOptions ?? {}, { duration: 200, easing: "linear" })
+  const animateOptions = addDefaultProperties(options.animateOptions ?? {}, { duration: 200, easing: "linear" })
 
   const [squareRef, setSquareRef] = createRef<HTMLElement>()
 
@@ -92,7 +92,7 @@ export function makeElementMove(options: {
   }
   animateOptions?: KeyframeEffectOptions
 }): Animation {
-  const animateOptions = addDefault(options.animateOptions ?? {}, { duration: 200, easing: "linear" })
+  const animateOptions = addDefaultProperties(options.animateOptions ?? {}, { duration: 200, easing: "linear" })
   const deltaX = options.to.left - options.from.left
   const deltaY = options.to.top - options.from.top
   const deltaWidth = (options.from.right - options.from.left) / (options.to.right - options.to.left)

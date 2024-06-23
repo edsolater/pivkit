@@ -4,7 +4,7 @@ import { KitProps, useKitProps } from "../../createKit"
 import { listenDomEvent, useElementFocus } from "../../domkit"
 import { createDomRef, createHistoryAccessor, useHistoryComparer, useShortcutsRegister } from "../../hooks"
 import { createRef } from "../../hooks/createRef"
-import { Piv, parseICSSToClassName } from "../../piv"
+import { Piv, parseICSSToClassName, type PivProps } from "../../piv"
 import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
 import { cssOpacity } from "../../styles"
 import { ElementRefs, getElementFromRefs } from "../../utils"
@@ -26,6 +26,7 @@ export interface InputProps {
    * @todo
    */
   isFluid?: boolean
+  propsofInnerInput?: PivProps<"input">
   // -------- handle by useInputInnerValue --------
   /** only after `<Input>` created */
   defaultValue?: string
@@ -86,6 +87,7 @@ export function Input(rawProps: InputKitProps) {
   return (
     <Box shadowProps={shadowProps} icss={basicInputICSS}>
       <Piv<"input">
+        shadowProps={props.propsofInnerInput}
         domRef={[setInputBodyDom, setDomRef]}
         htmlProps={{
           placeholder: props.placeholder,
