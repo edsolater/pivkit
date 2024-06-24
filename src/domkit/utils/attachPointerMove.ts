@@ -76,7 +76,7 @@ export function listenGestureMove(el: HTMLElement | undefined | null, options: G
             handlePointerMove(ev)
           }
         },
-        { restrict: "rAF" },
+        { debounce: "rAF" },
       )
 
       const { cancel: cancel2 } = listenDomEvent(globalThis.document, "pointerup", ({ ev }) => {

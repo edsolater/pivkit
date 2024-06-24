@@ -16,6 +16,7 @@ export type UseClickOutsideOptions =
   | OnClickOutSideCallback
 
 /**
+ * TODO: should click event be bubbled to root? current too many click event 
  * inner use (bubbled to root) click event's `event.composedPath()` to check if the click event is outside of the target elements
  * @param els can be a single element or an array of elements or even a function that returns an element or an array of elements
  * @param options

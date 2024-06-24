@@ -11,9 +11,13 @@ export interface EventListenerController {
 export interface EventListenerOptions extends AddEventListenerOptions {
   stopPropergation?: boolean
   preventDefault?: boolean
+
+  /** sometimes event's is bubbled not user wanted */
   onlyTargetIsSelf?: boolean
   /** in 60FPS screen, pointer move max run 60 times each seconds */
-  restrict?: "rAF" // TODO: 'debounce 10' means max 10 times each seconds
+  debounce?: "rAF" // TODO: 'debounce 10' means max 10 times each seconds
+  /** js event delegation */
+  eventDelegateOn?: HTMLElement // TODO: imply it!!
 }
 
 type EventIdMap = Map<
@@ -97,11 +101,11 @@ export function listenDomEvent<
       eventPath: () => ev.composedPath().filter(isHTMLElement),
     })
   }
-  const shouldUseRAF = options && "restrict" in options ? options?.restrict === "rAF" : useRAFEventNames.has(eventName)
+  const shouldUseRAF = options && "restrict" in options ? options?.debounce === "rAF" : useRAFEventNames.has(eventName)
 
   const throttled = throttle(coreEventListener, { rAF: shouldUseRAF })
   const registedListener = (ev: Event) => {
-    if (options?.restrict) {
+    if (options?.debounce) {
       throttled(ev)
     } else {
       coreEventListener(ev)
