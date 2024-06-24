@@ -2,7 +2,7 @@ import { Accessor, createEffect, createMemo, createSignal } from "solid-js"
 import { isNumber, isObject, isString, shrinkFn } from "@edsolater/fnkit"
 
 /**
- * used in {@link useItems}
+ * used in {@link useSelectItems}
  */
 function defaultGetItemValue(item: any): string | number {
   return isString(item) || isNumber(item)
@@ -25,7 +25,7 @@ function defaultGetItemValue(item: any): string | number {
  *
  * value should be unique, it is used as unique key
  */
-export function useItems<T>(options?: {
+export function useSelectItems<T>(options?: {
   items?: T[]
 
   //if both value and defaultValue are not specified, the first item will be used as default value
@@ -106,8 +106,8 @@ export function useItems<T>(options?: {
     addItemToItemList,
     removeItemOfItemList,
 
-    item: activeItem,
-    index: activeItemIndex,
+    activeItem,
+    activeItemIndex,
     items: itemList,
     setItem,
     clearItem: reset,
@@ -126,14 +126,12 @@ export function useItems<T>(options?: {
     focusPrevItem,
     focusNextItem,
 
-    utils: {
-      getItemValue,
-    },
+    getItemValue,
   }
 }
 
 /**
- * only used in {@link useItems}
+ * only used in {@link useSelectItems}
  */
 function useItemManageUtils<T>(options: {
   items: Accessor<T[]>

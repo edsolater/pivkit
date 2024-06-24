@@ -1,6 +1,5 @@
-import { MayFn, hasProperty, isNumber, shrinkFn } from "@edsolater/fnkit"
+import { MayFn, hasProperty, shrinkFn } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on } from "solid-js"
-import { addDefaultProps } from "../piv"
 
 interface DisclosureController {
   open(options?: { delay?: number }): {
@@ -42,8 +41,6 @@ export function createDisclosure(
     onToggle?(isOn: boolean): void
   } = {},
 ): CreateDisclosureReturn {
-  const defaultOptions = { delay: 24 }
-  const opts = addDefaultProps(options, defaultOptions)
   const defaultOn = createMemo(() => Boolean(shrinkFn(initValue)))
   const [isOn, _setIsOn] = createSignal(defaultOn())
 
@@ -73,50 +70,54 @@ export function createDisclosure(
   const coreOn = () => {
     cancelDelayAction()
     setIsOn(true)
-    opts.onOpen?.()
+    options.onOpen?.()
   }
   const coreOff = () => {
     cancelDelayAction()
     setIsOn(false)
-    opts.onClose?.()
+    options.onClose?.()
   }
   const coreToggle = () => {
     cancelDelayAction()
     setIsOn((b: any) => {
-      if (b) opts.onClose?.()
-      if (!b) opts.onOpen?.()
+      if (b) options.onClose?.()
+      if (!b) options.onOpen?.()
       return !b
     })
-    opts.onToggle?.(isOn())
+    options.onToggle?.(isOn())
   }
 
-  const open: DisclosureController["open"] = (options) => {
-    if (hasProperty(opts, "delay") || hasProperty(options, "delay")) {
-      delayActionId = globalThis.setTimeout(coreOn, options?.delay ?? opts.delay)
+  const open: DisclosureController["open"] = (innerOptions) => {
+    if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
+      const delay = innerOptions?.delay ?? options.delay
+      delayActionId = globalThis.setTimeout(() => coreOn(), delay)
     } else {
       coreOn()
     }
     return { cancel: cancelDelayAction }
   }
-  const close: DisclosureController["close"] = (options) => {
-    if (hasProperty(opts, "delay") || hasProperty(options, "delay")) {
-      delayActionId = globalThis.setTimeout(coreOff, options?.delay ?? opts.delay)
+  const close: DisclosureController["close"] = (innerOptions) => {
+    if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
+      const delay = innerOptions?.delay ?? options.delay
+      delayActionId = globalThis.setTimeout(coreOff, delay)
     } else {
       coreOff()
     }
     return { cancel: cancelDelayAction }
   }
-  const toggle: DisclosureController["toggle"] = (options) => {
-    if (hasProperty(opts, "delay") || hasProperty(options, "delay")) {
-      delayActionId = globalThis.setTimeout(coreToggle, options?.delay ?? opts.delay)
+  const toggle: DisclosureController["toggle"] = (innerOptions) => {
+    if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
+      const delay = innerOptions?.delay ?? options.delay
+      delayActionId = globalThis.setTimeout(coreToggle, delay)
     } else {
       coreToggle()
     }
     return { cancel: cancelDelayAction }
   }
-  const set: DisclosureController["set"] = (v, options) => {
-    if (hasProperty(opts, "delay") || hasProperty(options, "delay")) {
-      delayActionId = globalThis.setTimeout(() => setIsOn(v), options?.delay ?? opts.delay)
+  const set: DisclosureController["set"] = (v, innerOptions) => {
+    if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
+      const delay = innerOptions?.delay ?? options.delay
+      delayActionId = globalThis.setTimeout(() => setIsOn(v), delay)
     } else {
       setIsOn(v)
     }

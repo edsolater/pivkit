@@ -12,7 +12,7 @@ export type PopoverPanelController = {
 export type PopoverPanelProps = {
   defaultOpen?: boolean
   open?: boolean
-  hasBackDrop?: boolean
+  canBackdropClose?: boolean
 }
 
 const icssPopoverStyle = createStaticICSS("PopoverPanel", () => ({
@@ -72,7 +72,7 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   return (
     <Piv
       shadowProps={shadowProps}
-      htmlProps={{ popover: props.hasBackDrop ? "auto" : "manual" }}
+      htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }}
       domRef={setDom}
       icss={icssPopoverStyle}
     >

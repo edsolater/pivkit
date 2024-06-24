@@ -8,9 +8,9 @@ import { cssVar, icssCardPanel, icssClickable, icssRow } from "../../styles"
 import { Box } from "../Boxes"
 import { ItemBox, ItemBoxKitProps } from "../ItemBox"
 import { Loop } from "../Loop"
-import { useItems } from "./useItems"
-
-type SelectableItem = unknown
+import { useSelectItems } from "./useSelectItems"
+export { useSelectItems } from "./useSelectItems"
+export type SelectableItem = unknown
 
 type SelectableController = {
   name: Accessor<string>
@@ -23,7 +23,9 @@ type FaceItemEventUtils<T extends SelectableItem> = {
   value: Accessor<string | number | undefined>
   triggerIsOpen: Accessor<boolean>
 }
-type ItemEventUtils<T extends SelectableItem> = {
+
+/** expose info of items in <SelectPanel> */
+export type ItemEventUtils<T extends SelectableItem> = {
   item: Accessor<T>
   index: Accessor<number>
   /** use this, for it's value won't change if item's struct change */
@@ -82,12 +84,13 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
   const { plugins: popoverPlugins, state: popoverState } = buildPopover({ triggerBy: "click", placement: "bottom" }) // <-- run on define, not good
 
   // items manager
-  const { item, items, index, utils, setItem, focusItem, selectPrevItem, selectNextItem } = useItems<T>({
-    items: props.items,
-    defaultValue: props.defaultValue,
-    getItemValue: methods.getItemValue,
-    onChange: methods.onChange,
-  })
+  const { activeItem, items, activeItemIndex, getItemValue, setItem, focusItem, selectPrevItem, selectNextItem } =
+    useSelectItems<T>({
+      items: props.items,
+      defaultValue: props.defaultValue,
+      getItemValue: methods.getItemValue,
+      onChange: methods.onChange,
+    })
 
   // compute render functions
   const { renderTriggerItem, renderItem, renderTriggerItemArrow } = buildRenderFunction<T>(methods, props)
@@ -151,9 +154,9 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
         ]}
       >
         {renderTriggerItem({
-          item,
-          index,
-          value: () => utils.getItemValue(item()),
+          item: activeItem,
+          index: activeItemIndex,
+          value: () => getItemValue(activeItem()),
           triggerIsOpen: popoverState.isTriggerOn,
         })}
       </Piv>
@@ -165,8 +168,8 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
       >
         <Loop items={items}>
           {(i, idx) => {
-            const isSelected = () => i === item()
-            const itemValue = () => utils.getItemValue(i)
+            const isSelected = () => i === activeItem()
+            const itemValue = () => getItemValue(i)
             return (
               <ItemBox
                 shadowProps={props.selectListItemBoxProps}
