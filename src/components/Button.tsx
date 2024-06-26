@@ -160,7 +160,7 @@ function loadButtonDefaultICSS() {
     addGlobalCSS(`
       @layer kit-theme {
         .Button {
-          transition: 50ms cubic-bezier(0.22, 0.61, 0.36, 1); 
+          /* transition: 50ms cubic-bezier(0.22, 0.61, 0.36, 1); */
           border: none;
           ${ButtonCSSVariables.mainTextColor}: ${cssOpacity(cssVar("--text-primary", tailwindPaletteColors.gray700), 0.75)};
           ${ButtonCSSVariables.mainBgColor}: ${cssVar("--secondary", tailwindPaletteColors.gray300)};

@@ -1,6 +1,6 @@
 import { shakeFalsy, toLowerCase, unifyItem } from "@edsolater/fnkit"
 import { listenDomEvent, EventListenerController } from "./addDomEventListener"
-import { addTabIndex } from "./addTabIndex"
+import { makeFocusable } from "./focusable"
 
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
@@ -106,7 +106,7 @@ export function addShortcutEventListener(
 ): { cancel(): void } {
   startListenShortcutEvent()
   if (!settingCache.has(el)) {
-    addTabIndex(el) // keydown must have fousable element
+    makeFocusable(el) // keydown must have fousable element
   }
 
   settingCache.set(el, { ...settingCache.get(el), ...keyboardShortcutSettings })

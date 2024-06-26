@@ -1,5 +1,5 @@
 export * from "./addDomEventListener"
-export * from "./addTabIndex"
+export * from "./focusable"
 export * from "./copyToClipboard"
 export * from "./handleKeyboardShortcut"
 export * from "../hooks/usePositionTranslate"
