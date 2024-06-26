@@ -1,23 +1,25 @@
-import { isNumber, isObjectLiteral, isString, toPercentString } from "@edsolater/fnkit"
+import { isArray, isNumber, isObjectLiteral, isString, toPercentString } from "@edsolater/fnkit"
 import type { CSSObject } from "@edsolater/pivkit"
 
 type ColorString = CSSObject["color"]
 
 type ColorPercent = number | `${number}%`
 
-type ColorItem = { /** ='currentColor' */ color?: ColorString; percent?: ColorPercent }
+type ColorItemObj = {
+  color?: ColorString
+  percent?: ColorPercent
+}
 
-/**
- * **CSS Utility Function**
- * @example
- * css_colorMix('#fff', ['#000', 0.5]) // => 'color-mix(in srgb, #ffffff 50%, #000000 50%)'
- * @returns css color-mix()
- */
+type ColorItemArray = [color: ColorString, percent?: ColorPercent]
+
+type ColorItem = ColorItemArray | ColorItemObj
+
 export function cssColorMix(...colors: (ColorString | ColorPercent | ColorItem)[]) {
-  const colorItems = getColorItems(colors)
-  const colorInfoList = colorItems.map(({ color, percent }) =>
-    isColorPercent(percent) ? `${color} ${isNumber(percent) ? toPercentString(percent) : percent}` : color,
-  )
+  const colorItems = getColorItemsObj(colors)
+  const colorInfoList = colorItems.map((colorItem) => {
+    const { color, percent } = isArray(colorItem) ? { color: colorItem[0], percent: colorItem[1] } : colorItem
+    return isColorPercent(percent) ? `${color} ${isNumber(percent) ? toPercentString(percent) : percent}` : color
+  })
   return `color-mix(in srgb, ${colorInfoList.join(", ")})`
 }
 
@@ -26,47 +28,36 @@ export function cssColorMix(...colors: (ColorString | ColorPercent | ColorItem)[
  * @example
  * getColorItems(['#fff', '60%', ['#000', 0.5]]) // => [{color: '#fff', percent: 0.6}, {color: '#000', percent: 0.5}]
  */
-function getColorItems(colors: (ColorString | ColorPercent | ColorItem)[]): ColorItem[] {
-  const composedColorItems: ColorItem[] = []
-  let tempRecordColorItem: ColorItem = {}
+function getColorItemsObj(colors: (ColorString | ColorPercent | ColorItem)[]): ColorItemObj[] {
+  const composedColorItems: ColorItemObj[] = []
   for (const item of colors) {
-    if (isColorItem(item)) {
-      const prev = tempRecordColorItem
-      composedColorItems.push(prev)
-      tempRecordColorItem = item
+    if (isColorItemObj(item)) {
+      composedColorItems.push(item)
     }
-
+    if (isColorItemArray(item)) {
+      composedColorItems.push({ color: item[0], percent: item[1] })
+    }
     if (isColorString(item)) {
-      const prevIsFulfilled = tempRecordColorItem.color
-      if (prevIsFulfilled) {
-        const prev = tempRecordColorItem
-        composedColorItems.push(prev)
-        tempRecordColorItem = { color: item }
-      } else {
-        tempRecordColorItem.color = item
-      }
-    }
-
-    if (isColorPercent(item)) {
-      tempRecordColorItem.percent = item
+      composedColorItems.push({ color: item })
     }
   }
-
-  composedColorItems.push(tempRecordColorItem)
-
   return composedColorItems
 }
 
 function isColorString(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorString {
-  return isString(c) && !isColorPercent(c)
+  return isString(c)
 }
 
 function isColorPercent(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorPercent {
   return typeof c === "number" || (typeof c === "string" && c.endsWith("%"))
 }
 
-function isColorItem(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorItem {
+function isColorItemObj(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorItemObj {
   return isObjectLiteral(c)
+}
+
+function isColorItemArray(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorItemArray {
+  return isArray(c)
 }
 /**
  * **CSS Utility Function**
@@ -77,17 +68,17 @@ function isColorItem(c: ColorPercent | ColorString | ColorItem | undefined): c i
  * @returns color-mix() string
  */
 export function cssOpacity(color: CSSObject["color"], alpha: number) {
-  return cssColorMix(color, "transparent", 1 - alpha)
+  return cssColorMix(color, ["transparent", 1 - alpha])
 }
 
 export function cssLighten(color: CSSObject["color"], depth: number) {
-  return cssColorMix(color, "white", depth)
+  return cssColorMix(color, ["white", depth])
 }
 
 export function cssDarken(color: CSSObject["color"], depth: number) {
-  return cssColorMix(color, "black", depth)
+  return cssColorMix(color, ["black", depth])
 }
 
 export function cssGrayscale(color: CSSObject["color"], depth: number) {
-  return cssColorMix(color, "gray", depth)
+  return cssColorMix(color, ["gray", depth])
 }

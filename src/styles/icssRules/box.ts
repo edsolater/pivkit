@@ -268,6 +268,7 @@ export const icssClickable = createStaticICSS("clickable", () => ({
   transition: "100ms",
   // backdropFilter: "brightness(1)", // backdrop-filter will cause render performance issue, avoid to use
   filter: "brightness(1)", // for transition
+  "&:hover:not(:active)": { backdropFilter: "brightness(1.1)" },
   "&:is(:hover,:active,:focus)": { filter: "brightness(0.85)", ".dark &": { filter: "brightness(1.3)" } },
   "&:active": { transform: "scale(0.9)" },
 }))

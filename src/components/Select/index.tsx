@@ -29,7 +29,7 @@ export type ItemEventUtils<T extends SelectableItem> = {
   item: Accessor<T>
   index: Accessor<number>
   /** use this, for it's value won't change if item's struct change */
-  value: Accessor<string | number>
+  itemValue: Accessor<string | number>
   isSelected: Accessor<boolean>
 }
 
@@ -189,7 +189,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
                 {renderItem({
                   item: () => i,
                   index: idx,
-                  value: itemValue,
+                  itemValue: itemValue,
                   isSelected,
                 })}
               </ItemBox>
@@ -205,7 +205,7 @@ function buildRenderFunction<T extends SelectableItem>(
   methods: AddDefaultPivProps<SelectKitProps<T>, {}>,
   props: DeKitProps<SelectKitProps<T>>,
 ) {
-  const renderItem = methods.renderItem ?? (({ value }) => <>{value()}</>)
+  const renderItem = methods.renderItem ?? (({ itemValue }) => <>{itemValue()}</>)
   const renderTriggerItem =
     methods.renderTriggerItem ??
     (((utils: FaceItemEventUtils<T>) => {
@@ -213,7 +213,7 @@ function buildRenderFunction<T extends SelectableItem>(
       const idx = utils.index()
       const v = utils.value()
       return isExist(i) && isExist(idx) && isExist(v)
-        ? renderItem({ item: () => i, index: () => idx, value: () => v, isSelected: () => true })
+        ? renderItem({ item: () => i, index: () => idx, itemValue: () => v, isSelected: () => true })
         : props.placeholder
     }) as NonNullable<SelectProps<T>["renderTriggerItem"]>)
   const renderTriggerItemArrow = methods.renderTriggerItemArrow ?? (() => <>{">"}</>)

@@ -1,10 +1,10 @@
-import { AnyFn, createEventCenter } from "@edsolater/fnkit"
-import { Accessor } from "solid-js"
+import { createEventCenter, type AnyFn, type ID } from "@edsolater/fnkit"
+import type { Accessor } from "solid-js"
 import { createSignalWithPlugin } from "../createSignalWithPlugin"
-import { UUID, createUUID } from "./createUUID"
+import { createUUID } from "./createUUID"
 
 // global cache
-const triggerControllers = new Map<UUID, TriggerController>()
+const triggerControllers = new Map<ID, TriggerController>()
 
 type TriggerController = {
   open(): void
@@ -35,7 +35,7 @@ export function createTrigger({
   defaultState = false,
   state = defaultState, // TODO: signal plugin should handle this
 }: {
-  id?: UUID
+  id?: ID
   defaultState?: boolean | Accessor<boolean>
   state?: boolean | Accessor<boolean> // TODO: signal plugin should handle this
 } = {}): TriggerController {

@@ -34,7 +34,7 @@ export function useSelectItems<T>(options?: {
   /** value is used in onChange, value is also used as key */
   getItemValue?: (item: T) => string | number
   /** only invoked when options:value is not currentValue */
-  onChange?(utils: { item: Accessor<T>; index: Accessor<number>; value: Accessor<string | number> }): void
+  onChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string | number> }): void
   onClear?(): void
 }) {
   //#region ------------------- item list -------------------
@@ -138,7 +138,7 @@ function useItemManageUtils<T>(options: {
   defaultValue?: T
   value?: T
   getItemValue: (item: T | undefined) => string | number
-  onChange?(utils: { item: Accessor<T>; index: Accessor<number>; value: Accessor<string | number> }): void
+  onChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string | number> }): void
   onClear?(): void
 }) {
   const [activeItem, setInnerActiveItem] = createSignal<T | undefined>(options?.defaultValue ?? options?.value)
@@ -166,7 +166,7 @@ function useItemManageUtils<T>(options: {
         options?.onChange?.({
           item: () => newI,
           index: () => activeItemIndex()!,
-          value: () => options.getItemValue(activeItem()),
+          itemValue: () => options.getItemValue(activeItem()),
         })
       }
     }
