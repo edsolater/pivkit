@@ -259,7 +259,7 @@ export const icssCard = createICSS((options?: ICSSCardOption) => ({
 
 export interface ICSSClickableOption {}
 
-/**     
+/**
  * build-in icss for make element looks clickable
  */
 export const icssClickable = createStaticICSS("clickable", () => ({
@@ -275,7 +275,7 @@ export const icssClickable = createStaticICSS("clickable", () => ({
     filter: "brightness(0.85)",
     ".dark &": { filter: "brightness(1.3)" },
     backdropFilter: "unset",
-        },
+  },
 }))
 
 /** content is half opacity, but it will be not transparent if element is active */

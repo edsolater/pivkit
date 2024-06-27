@@ -11,7 +11,6 @@ import { handlePluginProps } from "./handlePluginProps"
 import { parseHTMLProps } from "./htmlProps"
 import { handleICSSProps } from "./icss"
 import { parseIStyles } from "./istyle"
-import { handleMergifyOnCallbackProps } from "./mergifyProps"
 import { parseOnClick } from "./onClick"
 import { handleShadowProps } from "./shadowProps"
 
@@ -29,7 +28,6 @@ function getPropsInfoOfRawPivProps(raw: Partial<PivProps>) {
 
     parsePivRenderPrependChildren,
     parsePivRenderAppendChildren,
-    handleMergifyOnCallbackProps,
   )
   const controller =
     "innerController" in parsedPivProps ? ((parsedPivProps.innerController ?? {}) as ValidController) : {}

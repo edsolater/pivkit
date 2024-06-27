@@ -9,21 +9,20 @@ import {
   shrinkFn,
   type AnyFn,
 } from "@edsolater/fnkit"
-import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
+import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme, type KitProps } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
 import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
 import { PivProps } from "../piv/Piv"
 import { getPropsFromPropContextContext } from "../piv/PropContext"
-import { registerControllerInCreateKit } from "../piv/hooks/useComponentController"
 import { loadPropsControllerRef } from "../piv/propHandlers/children"
 import { handlePluginProps } from "../piv/propHandlers/handlePluginProps"
-import { handleMergifyOnCallbackProps } from "../piv/propHandlers/mergifyProps"
 import { Pluginable } from "../piv/propHandlers/plugin"
 import { handleShadowProps } from "../piv/propHandlers/shadowProps"
 import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { mergeProps } from "../piv/utils"
 import { AddDefaultPivProps, addDefaultPivProps } from "../piv/utils/addDefaultProps"
 import { omitItem } from "./utils"
+import { handlePivkitCallbackProps } from "../piv/propHandlers/mergifyProps"
 
 /** used for {@link useKitProps}'s option */
 export type KitPropsOptions<
@@ -183,11 +182,7 @@ function useKitPropParser<
 
     (props) => handleShadowProps(props, options?.selfProps), // outside-props-run-time(parsing props) // TODO: assume can't be promisify
     (props) => handlePluginProps(props), // outside-props-run-time(parsing props) // TODO: assume can't be promisify  //<-- bug is HERE!!, after this, class is doubled
-    /**
-     * handle `merge:` props
-     * not elegent to have this, what about export a function `flagMerge` to make property can merge each other? 🤔
-     */
-    (props) => handleMergifyOnCallbackProps(props),
+    (props) => handlePivkitCallbackProps(props), // outside-props-run-time(parsing props) // TODO: assume can't be promisify
   ) as any /* too difficult to type */
 
   let loadController: AnyFn = () => {}
@@ -253,3 +248,4 @@ export type DeKitProps<
   DefaultProps extends Partial<DeAccessifyProps<P>> = {},
 > = ParsedKitProps<AddDefaultPivProps<DeAccessifyProps<P>, DefaultProps>> &
   Omit<PivProps<HTMLTag, Controller>, keyof DeAccessifyProps<P>>
+

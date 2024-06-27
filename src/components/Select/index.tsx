@@ -89,7 +89,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
       items: props.items,
       defaultValue: props.defaultValue,
       getItemValue: methods.getItemValue,
-      onChange: methods.onChange,
+      onChange: props.onChange,
     })
 
   // compute render functions
@@ -118,7 +118,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
         shortcut: "ArrowDown",
       },
     },
-    { noNeedFocusWithin:true, enabled: popoverState.isTriggerOn },
+    { noNeedFocusWithin: true, enabled: popoverState.isTriggerOn },
   )
 
   // auto focus when open

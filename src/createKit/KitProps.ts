@@ -1,7 +1,6 @@
-import { AnyFn, MayArray, MayDeepArray } from "@edsolater/fnkit"
+import { MayArray, MayDeepArray } from "@edsolater/fnkit"
 import { AccessifyProps } from ".."
 import { CallbackRef, PivProps } from "../piv/Piv"
-import { MergifyProps } from "../piv/propHandlers/mergifyProps"
 import { GetPluginParams, Pluginable } from "../piv/propHandlers/plugin"
 import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { OmitItem } from "./utils"
@@ -50,7 +49,7 @@ export type KitProps<
     noNeedDeAccessifyProps?: (keyof RawProps)[]
   } = {},
 > = KitPropsInstance<
-  MergifyProps<RawProps>,
+  RawProps,
   NonNullable<O["controller"]>,
   NonNullable<O["plugin"]>,
   NonNullable<O["htmlPropsTagName"]>,

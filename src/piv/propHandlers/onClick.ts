@@ -1,4 +1,4 @@
-import { AnyFn, mergeObjects } from "@edsolater/fnkit"
+import { AnyFn, flap, mergeObjects, type MayArray } from "@edsolater/fnkit"
 import { ValidController } from "../typeTools"
 export type OnClickPayloads<C extends ValidController> = C & {
   ev: MouseEvent & {
@@ -13,17 +13,17 @@ export type OnClickPayloads<C extends ValidController> = C & {
   eventPath(): HTMLElement[]
 }
 
-export function parseOnClick(onClick: AnyFn, controller: ValidController) {
-  return (ev: Event) =>
-    onClick?.(
-      mergeObjects(controller, {
-        ev,
-        el: ev.currentTarget,
-        isSelf: () => ev.currentTarget === ev.target,
-        isBubbled: () => ev.currentTarget !== ev.target,
-        stopPropagation: () => ev.stopPropagation(),
-        preventDefault: () => ev.preventDefault(),
-        eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
-      }) as OnClickPayloads<ValidController>,
-    )
+export function parseOnClick(onClick: MayArray<AnyFn | undefined>, controller: ValidController) {
+  return (ev: Event) => {
+    const param = mergeObjects(controller, {
+      ev,
+      el: ev.currentTarget,
+      isSelf: () => ev.currentTarget === ev.target,
+      isBubbled: () => ev.currentTarget !== ev.target,
+      stopPropagation: () => ev.stopPropagation(),
+      preventDefault: () => ev.preventDefault(),
+      eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
+    }) as OnClickPayloads<ValidController>
+    return flap(onClick).forEach((fn) => fn?.(param))
+  }
 }

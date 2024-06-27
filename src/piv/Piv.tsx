@@ -14,6 +14,7 @@ import {
 import { renderHTMLDOM } from "./propHandlers/renderHTMLDOM"
 import { HTMLTag, PivChild, ValidController } from "./typeTools"
 import { omitProps } from "./utils"
+import type { PivkitCallback } from "./propHandlers/mergifyProps"
 
 type BooleanLike = any
 
@@ -45,8 +46,7 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
    */
   id?: string
 
-  onClick?: (utils: OnClickPayloads<Controller>) => void // for accessifyProps, onClick can't be array
-  "merge:onClick"?: (utils: OnClickPayloads<Controller>) => void // for accessifyProps, "merge:onClick" can't be array
+  onClick?: PivkitCallback<(utils: OnClickPayloads<Controller>) => void> // for accessifyProps, onClick can't be array
 
   /**
    * auto merge by shadowProps

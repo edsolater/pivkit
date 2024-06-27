@@ -1,5 +1,6 @@
 import { AnyFn, AnyObj, isFunction, isObject, isString, mutateObject } from "@edsolater/fnkit"
-import { ValidController } from "../piv/typeTools"
+import type { DePivkitCallback, PivkitCallback } from "../piv/propHandlers/mergifyProps"
+import type { ValidController } from "../piv/typeTools"
 
 export type Accessify<V, Controller extends ValidController | unknown = unknown> = V | ((controller: Controller) => V)
 export type DeAccessify<V> = V extends Accessify<infer T, any> ? T : V
@@ -8,32 +9,38 @@ export type DeAccessify<V> = V extends Accessify<infer T, any> ? T : V
  * propertyName start with 'on' or end with 'Fn' will treate as origin
  */
 export type AccessifyProps<P extends AnyObj, Controller extends ValidController | unknown = unknown> = {
-  [K in keyof P]: K extends
-    | `on${string}` // callback onXXX should no auto-accessified
-    | `render${string}` // renderXXX should no auto-accessified, if need pass subcomponent and have controller, just pass Captilazed prop name like Dot={}
-    | `${string}:${string}` // any namespaced props should no auto-accessified
-    | `domRef`
-    | `ref`
-    | `controllerRef`
-    | "children"
-    ? P[K]
-    : P[K] extends AnyFn | undefined
+  [K in keyof P]: K extends `on${string}` // callback onXXX should no auto-accessified
+    ? PivkitCallback<P[K]>
+    : K extends
+          | `render${string}` // renderXXX should no auto-accessified, if need pass subcomponent and have controller, just pass Captilazed prop name like Dot={}
+          | `${string}:${string}` // any namespaced props should no auto-accessified
+          | `domRef`
+          | `ref`
+          | `controllerRef`
+          | "children"
       ? P[K]
-      : Accessify<P[K], Controller>
+      : P[K] extends AnyFn | undefined
+        ? P[K]
+        : Accessify<P[K], Controller>
 }
 
 export type DeAccessifyProps<P> = {
-  [K in keyof P]: K extends
-    | `on${string}` // callback onXXX should no auto-accessified
-    | `render${string}` // renderXXX should no auto-accessified
-    | `${string}:${string}` // any namespaced props should no auto-accessified
-    | `domRef`
-    | `ref`
-    | `controllerRef`
-    | "children"
-    ? P[K]
-    : Exclude<P[K], AnyFn> // <-- bug here, type error
+  [K in keyof P]: K extends `on${string}` // callback onXXX should no auto-accessified
+    ? DePivkitCallback<P[K]>
+    : K extends
+          | `render${string}` // renderXXX should no auto-accessified
+          | `${string}:${string}` // any namespaced props should no auto-accessified
+          | `domRef`
+          | `ref`
+          | `controllerRef`
+          | "children"
+      ? P[K]
+      : Exclude<P[K], AnyFn> // <-- bug here, type error
 }
+
+// type C = KitProps<{ onCb: (util: { say: "hello" }) => void }>
+// type D = DeKitProps<C>["onCb"]
+// type E = C["onCb"]
 
 /**
  * propertyName start with 'on' will treate as function
