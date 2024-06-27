@@ -20,4 +20,10 @@ export function getFirstFocusableChild(parentElement: Element | undefined) {
   return firstFocusableElement ?? undefined
 }
 
-function isFocusableElement(el: HTMLElement) {}
+export function focusFirstFocusableChild(parentElement: HTMLElement | undefined) {
+  if (!parentElement) return
+  const firstFocusableChild = getFirstFocusableChild(parentElement)
+  window.requestAnimationFrame(() => {
+    firstFocusableChild?.focus()
+  })
+}

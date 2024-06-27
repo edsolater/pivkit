@@ -60,6 +60,7 @@ export function registerShortcut(shortcutItem: ShortcutItem) {
   }
 }
 
+//TODO: focus-within
 /**
  * HOOK
  * a convenient fast util for {@link registerShortcut}

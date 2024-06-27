@@ -105,9 +105,10 @@ export function addShortcutEventListener(
   keyboardShortcutSettings: KeyboardShortcutSettings,
 ): { cancel(): void } {
   startListenShortcutEvent()
-  if (!settingCache.has(el)) {
-    makeFocusable(el) // keydown must have fousable element
-  }
+  // TODO: really need this?
+  // if (!settingCache.has(el)) {
+  //   makeFocusable(el) // keydown must have fousable element
+  // }
 
   settingCache.set(el, { ...settingCache.get(el), ...keyboardShortcutSettings })
   return {

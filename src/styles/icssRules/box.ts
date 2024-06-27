@@ -259,7 +259,7 @@ export const icssCard = createICSS((options?: ICSSCardOption) => ({
 
 export interface ICSSClickableOption {}
 
-/**
+/**     
  * build-in icss for make element looks clickable
  */
 export const icssClickable = createStaticICSS("clickable", () => ({
@@ -268,9 +268,14 @@ export const icssClickable = createStaticICSS("clickable", () => ({
   // transition: "100ms",
   // backdropFilter: "brightness(1)", // backdrop-filter will cause render performance issue, avoid to use
   // filter: "brightness(1)", // for transition
-  "&:hover:not(:active)": { backdropFilter: "brightness(1.1)" },
-  "&:is(:hover,:active,:focus)": { filter: "brightness(0.85)", ".dark &": { filter: "brightness(1.3)" } },
-  "&:active": { transform: "scale(0.9)" },
+  "&:hover": { backdropFilter: "brightness(1.35)" },
+  "&:focus": { backdropFilter: "brightness(1.35)" },
+  "&:active": {
+    transform: "scale(0.95)",
+    filter: "brightness(0.85)",
+    ".dark &": { filter: "brightness(1.3)" },
+    backdropFilter: "unset",
+        },
 }))
 
 /** content is half opacity, but it will be not transparent if element is active */
