@@ -81,7 +81,7 @@ export function Input(rawProps: InputKitProps) {
         },
       },
     },
-    { when: isFocused, enabled: !hasProperty(props, "onEnter") },
+    { enabled: !hasProperty(props, "onEnter") },
   )
 
   return (

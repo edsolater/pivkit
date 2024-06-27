@@ -13,7 +13,7 @@ export function getElementFromRefs<R extends ElementRefs>(
   // @ts-expect-error force
   return shakeFalsy(flap(deRef(refs)).map(deRef))
 }
-export function getElementFromRef<R extends ElementRef>(ref: R): R extends ElementRef<infer H> ? H : HTMLElement {
+export function getElementFromRef<R extends ElementRef>(ref: R): R extends ElementRef<infer H> ? H : HTMLElement|undefined {
   // @ts-expect-error force
   return shrinkFn(ref)
 }

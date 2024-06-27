@@ -118,7 +118,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
         shortcut: "ArrowDown",
       },
     },
-    { enabled: popoverState.isTriggerOn },
+    { noNeedFocusWithin:true, enabled: popoverState.isTriggerOn },
   )
 
   // auto focus when open

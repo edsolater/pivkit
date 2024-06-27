@@ -122,18 +122,6 @@ export function addShortcutEventListener(
   }
 }
 
-/** this still not prevent **all** brower shortcut (like build-in ctrl T ) */
-export function preventDefaultKeyboardShortcut(pureEl: HTMLElement) {
-  pureEl.addEventListener(
-    "keydown",
-    (ev) => {
-      ev.stopPropagation()
-      ev.preventDefault()
-    },
-    { capture: true },
-  )
-}
-
 const shiftKeyMap = new Map([
   ["~", "`"],
   ["!", "1"],

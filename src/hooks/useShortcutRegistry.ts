@@ -1,6 +1,7 @@
-import { createSubscribable, flap, isArray, shrinkFn, toList, type MayFn, type WeakerMap } from "@edsolater/fnkit"
+import { createSubscribable, flap, isArray, shrinkFn, toList, type MayFn } from "@edsolater/fnkit"
 import { createEffect, createMemo, onCleanup } from "solid-js"
-import { addShortcutEventListener, type KeybordShortcutKeys } from "../domkit"
+import { addShortcutEventListener } from "../domkit"
+import { isElementChildrenFocused, isElementFocused } from "../domkit/utils/focusable"
 import { type ShortcutItem } from "../plugins/useKeyboardShortcut"
 import { getElementFromRef, type ElementRef } from "../utils"
 import { useSubscribable } from "./useSubscribable"
@@ -60,7 +61,6 @@ export function registerShortcut(shortcutItem: ShortcutItem) {
   }
 }
 
-//TODO: focus-within
 /**
  * HOOK
  * a convenient fast util for {@link registerShortcut}
@@ -69,17 +69,33 @@ export function useShortcutsRegister(
   ref: ElementRef,
   setting: { [key: string]: Omit<ShortcutItem, "targetElement" | "description"> },
   otherOptions?: {
-    when?: MayFn<boolean>
+    /**
+     * used in global component.
+     * by default, regardless of props:disabled or props:enabled,  only focus-withined component should workd
+     */
+    noNeedFocusWithin?: boolean
+
+    /** disabled when true */
     disabled?: MayFn<boolean>
+
+    /** enabled when true and focus-within */
     enabled?: MayFn<boolean>
   },
 ): {
   updateShortcut: (description: string, item: Partial<Omit<ShortcutItem, "targetElement" | "description">>) => void
 } {
   const isFeatureEnabled = () => {
-    const enabled = shrinkFn(otherOptions?.enabled)
-    const disabled = shrinkFn(otherOptions?.disabled)
-    const isEnabled = enabled != null ? enabled : !disabled
+    const canFeatureEnabled =
+      otherOptions?.noNeedFocusWithin ||
+      isElementFocused(getElementFromRef(ref)) ||
+      isElementChildrenFocused(getElementFromRef(ref))
+    if (!canFeatureEnabled) return false
+    const isEnabled =
+      otherOptions && "enabled" in otherOptions
+        ? shrinkFn(otherOptions?.enabled)
+        : otherOptions && "disabled" in otherOptions
+          ? !shrinkFn(otherOptions?.disabled)
+          : true
     return isEnabled
   }
 

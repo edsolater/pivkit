@@ -27,3 +27,10 @@ export function focusFirstFocusableChild(parentElement: HTMLElement | undefined)
     firstFocusableChild?.focus()
   })
 }
+export function isElementChildrenFocused(element: HTMLElement) {
+  const activeElement = document.activeElement
+  return element.contains(activeElement)
+}
+export function isElementFocused(element: HTMLElement) {
+  return element === document.activeElement
+}
