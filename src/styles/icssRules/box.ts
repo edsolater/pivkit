@@ -265,18 +265,42 @@ export interface ICSSClickableOption {}
 export const icssClickable = createStaticICSS("clickable", () => ({
   cursor: "pointer",
   userSelect: "none",
-  // transition: "100ms",
+  transition: "150ms",
   // backdropFilter: "brightness(1)", // backdrop-filter will cause render performance issue, avoid to use
-  // filter: "brightness(1)", // for transition
-  "&:hover": { backdropFilter: "brightness(1.35)" },
-  "&:focus": { backdropFilter: "brightness(1.35)" },
+  filter: "brightness(1)", // for transition
+  "&:hover": { filter: "brightness(1.35)" },
+  "&:focus": { filter: "brightness(1.35)" },
   "&:active": {
     transform: "scale(0.95)",
     filter: "brightness(0.85)",
     ".dark &": { filter: "brightness(1.3)" },
-    backdropFilter: "unset",
   },
 }))
+
+type ICSSColorManagerOptions = {
+  textColor?: CSSObject["color"]
+  bgColor?: CSSObject["backgroundColor"]
+}
+
+/**
+ * unique place to manage element color, with options {@link ICSSColorManagerOptions}
+ */
+export const icssColorManager = createICSS((options?: ICSSColorManagerOptions) => {
+  const returnedICSSBlock = {}
+  if (options?.bgColor) {
+    Object.assign(returnedICSSBlock, {
+      "--bg": options?.bgColor,
+      background: options?.bgColor,
+    })
+  }
+  if (options?.textColor) {
+    Object.assign(returnedICSSBlock, {
+      "--text": options?.textColor,
+      color: options?.textColor,
+    })
+  }
+  return returnedICSSBlock
+})
 
 /** content is half opacity, but it will be not transparent if element is active */
 export const icssContentClickableOpacity = createICSS(() => ({
