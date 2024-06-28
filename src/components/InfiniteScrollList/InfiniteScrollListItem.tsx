@@ -3,9 +3,9 @@ import { useKitProps, type KitProps } from "../../createKit"
 import useResizeObserver from "../../webTools/hooks/useResizeObserver"
 import { createDomRef } from "../../hooks"
 import { createRef } from "../../hooks/createRef"
-import isClientSide from "../../jFetch/utils/isSSR"
 import { Piv, omitProps } from "../../piv"
 import { InfiniteScrollListContext } from "./InfiniteScrollList"
+import { isClientSide } from "../../webTools/jFetch"
 
 export type InfiniteScrollListItemRawProps = {
   children: () => JSX.Element

@@ -1,12 +1,12 @@
 import { isCurrentDateAfter, switchCase, type MayPromise } from "@edsolater/fnkit"
+import { type JFetchMiddlewareFn } from "../jFetch"
+import { isResponse } from "../utils/isResponse"
 import {
   createIDBStoreManager,
   createLocalStorageStoreManager,
   createMemoryStoreManager,
   createSessionStorageStoreManager,
-} from "@edsolater/pivkit"
-import { type JFetchMiddlewareFn } from "../jFetch"
-import { isResponse } from "../utils/isResponse"
+} from "../../cacheManager"
 
 type ResourceUrl = string
 
