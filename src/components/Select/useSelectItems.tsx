@@ -14,7 +14,7 @@ function defaultGetItemValue(item: any): string | number {
 
 /**
  * provide some methods to manage items
- * - {@link activeItem} current active item
+ * - {@link selectedItem} current active item
  * - {@link itemList} all items
  * - {@link setItem} set current active item
  *
@@ -35,6 +35,7 @@ export function useSelectItems<T>(options?: {
   getItemValue?: (item: T) => string | number
   /** only invoked when options:value is not currentValue */
   onChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string | number> }): void
+  onFocusChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string | number> }): void
   onClear?(): void
 }) {
   //#region ------------------- item list -------------------
@@ -56,10 +57,10 @@ export function useSelectItems<T>(options?: {
   }
   //#endregion
 
-  //#region ------------------- active item -------------------
+  //#region ------------------- select item -------------------
   const {
-    item: activeItem,
-    index: activeItemIndex,
+    item: selectedItem,
+    index: selectedItemIndex,
     setItem,
     reset,
     undo,
@@ -92,13 +93,15 @@ export function useSelectItems<T>(options?: {
     redo: redoFocusItem,
   } = useItemManageUtils({
     items: itemList,
-    defaultValue: options?.defaultValue,
-    value: options?.value,
     getItemValue,
-    onChange: options?.onChange,
-    onClear: options?.onClear,
+    onChange: options?.onFocusChange,
   })
-
+  /**
+   * a helper function to select the focused item
+   */
+  function selectFromFocusedItem() {
+    setItem(focusItem())
+  }
   //#endregion
 
   return {
@@ -106,15 +109,16 @@ export function useSelectItems<T>(options?: {
     addItemToItemList,
     removeItemOfItemList,
 
-    activeItem,
-    activeItemIndex,
     items: itemList,
+
+    selectedItem,
+    selectedItemIndex,
     setItem,
-    clearItem: reset,
+    resetItem: reset,
     undo: undo,
     redo: redo,
-    selectPrevItem,
-    selectNextItem,
+    selectPrevItem, // really need?🤔
+    selectNextItem, // really need?🤔
 
     /** the item that can select by fast focusItem */
     focusItem,
@@ -125,6 +129,7 @@ export function useSelectItems<T>(options?: {
     redoFocusItem,
     focusPrevItem,
     focusNextItem,
+    selectFromFocusedItem,
 
     getItemValue,
   }

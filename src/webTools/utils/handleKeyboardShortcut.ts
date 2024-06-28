@@ -1,6 +1,5 @@
 import { shakeFalsy, toLowerCase, unifyItem } from "@edsolater/fnkit"
-import { listenDomEvent, EventListenerController } from "./addDomEventListener"
-import { makeFocusable } from "./focusable"
+import { listenDomEvent } from "./addDomEventListener"
 
 /**
  * @see https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values
@@ -14,7 +13,7 @@ export type AuxiliaryKeyName =
   | "ctrl + shift"
   | "shift + alt"
   | "ctrl + shift + alt"
-type KeyNamesActionKey = `F${number}` | "Backspace" | "Enter" | "Escape" | "Delete" | "Insert" | " "
+type KeyNamesActionKey = `F${number}` | "Backspace" | "Enter" | "Escape" | "Delete" | "Insert" | "Space" | "Tab"
 type KeyNamesNormalContent =
   | "`"
   | "1"
@@ -86,15 +85,21 @@ const settingCache = new WeakMap<HTMLElement, KeyboardShortcutSettings>()
 let haveListenToDocument = false
 function startListenShortcutEvent() {
   if (!haveListenToDocument) {
-    listenDomEvent(globalThis.document.documentElement, "keydown", ({ ev }) => {
-      const pressedKey = getShorcutStringFromKeyboardEvent(ev)
-      for (const target of ev.composedPath()) {
-        const settings = settingCache.get(target as any)
-        if (!settings) continue
-        const targetShortcutFn = Reflect.get(settings, pressedKey)
-        targetShortcutFn?.()
-      }
-    })
+    listenDomEvent(
+      globalThis.document.documentElement,
+      "keydown",
+      ({ ev }) => {
+        const pressedKey = getShorcutStringFromKeyboardEvent(ev)
+        for (const targetElement of ev.composedPath()) {
+          const settings = settingCache.get(targetElement as any)
+          if (!settings) continue
+          const targetShortcutFn = settings[pressedKey]
+          targetShortcutFn?.()
+          break // only need to parse nearest element's shortcut
+        }
+      },
+      { capture: true, passive: false },
+    )
     haveListenToDocument = true
   }
 }
@@ -180,11 +185,13 @@ function handleShiftedKey(key: string) {
 }
 /**
  * parse from original KeyboardEvent to a string
+ * special key:(for easier type)
+ * " " -> "Space"
  * @example
  * getShorcutStringFromKeyboardEvent(new KeyboardEvent('keydown', { ctrlKey: true, key: 'a' })) // 'ctrl + a'
  */
 export function getShorcutStringFromKeyboardEvent(ev: KeyboardEvent) {
-  const rawKey = areCaseInsensitiveEqual(ev.key, "control") ? "ctrl" : ev.key // special
+  const rawKey = areCaseInsensitiveEqual(ev.key, "control") ? "ctrl" : ev.key.replace(" ", "Space") // special
   const keyArray = [
     ev.ctrlKey ? "ctrl" : undefined,
     ev.shiftKey ? "shift" : undefined,
