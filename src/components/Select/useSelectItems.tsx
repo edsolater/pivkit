@@ -67,7 +67,7 @@ export function useSelectItems<T>(options?: {
     redo,
     selectPrevItem,
     selectNextItem,
-  } = useItemManageUtils({
+  } = useItemManager({
     items: itemList,
     defaultValue: options?.defaultValue,
     value: options?.value,
@@ -91,8 +91,9 @@ export function useSelectItems<T>(options?: {
     selectNextItem: focusNextItem,
     undo: undoFocusItem,
     redo: redoFocusItem,
-  } = useItemManageUtils({
+  } = useItemManager({
     items: itemList,
+    mutedItems: () => [selectedItem()],
     getItemValue,
     onChange: options?.onFocusChange,
   })
@@ -138,8 +139,10 @@ export function useSelectItems<T>(options?: {
 /**
  * only used in {@link useSelectItems}
  */
-function useItemManageUtils<T>(options: {
+function useItemManager<T>(options: {
   items: Accessor<T[]>
+  /** will jump pass the muted items */
+  mutedItems?: Accessor<(T | undefined)[]>
   defaultValue?: T
   value?: T
   getItemValue: (item: T | undefined) => string | number
@@ -207,20 +210,24 @@ function useItemManageUtils<T>(options: {
     recordItemToHistory(redoItem)
     setInnerActiveItem(() => redoItem)
   }
-  function selectPrevItem() {
+  function selectPrevItem(step = 1) {
     const items = options.items()
     if (!items) return
     const idx = activeItemIndex() ?? 0
-    const prevItem = items.at(idx - 1)
+    const prevItem = items.at(idx - step)
     if (!prevItem) return
+    // bypass the muted items
+    if (options.mutedItems?.()?.includes(prevItem)) return selectPrevItem(step + 1)
     setItem(prevItem)
   }
-  function selectNextItem() {
+  function selectNextItem(step = 1) {
     const items = options.items()
     if (!items) return
     const idx = activeItemIndex() ?? -1
-    const nextItem = items.at((idx + 1) % items.length)
+    const nextItem = items.at((idx + step) % items.length)
     if (!nextItem) return
+    // bypass the muted items
+    if (options.mutedItems?.()?.includes(nextItem)) return selectNextItem(step + 1)
     setItem(nextItem)
   }
 
