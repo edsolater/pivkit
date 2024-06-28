@@ -8,7 +8,7 @@ import {
   type OnMoveEnd,
   type OnMoveStart,
   type OnMoving,
-} from "../../domkit"
+} from "../../webTools"
 import { createDomRef } from "../../hooks"
 import { Piv, createPlugin, type CSSObject, type Plugin } from "../../piv"
 

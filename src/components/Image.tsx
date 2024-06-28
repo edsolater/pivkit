@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onCleanup } from "solid-js"
-import { listenDomEvent } from "../domkit"
+import { listenDomEvent } from "../webTools"
 import { createRef } from "../hooks"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
 

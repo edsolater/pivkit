@@ -1,6 +1,6 @@
 import { MayArray, MayFn, arrify, shrinkFn } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
-import { listenDomEvent } from "../domkit"
+import { listenDomEvent } from "../webTools"
 import { CSSObject, PivProps, createPlugin, mergeProps } from "../piv"
 
 export type TransitionDetectorActionPhase = "before-going" | "on-going" | "finish"

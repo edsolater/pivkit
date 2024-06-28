@@ -1,13 +1,13 @@
 import { createEffect, onCleanup } from "solid-js"
-import { listenDomEvent } from "../domkit"
-import { emitCustomEvent, listenCustomEvent } from "../domkit/utils/customEvent"
-import { moveElementNextToSibling } from "../domkit/utils/moveElementDOMToNewContiner"
-import { createStateClass } from "../domkit/utils/stateClass"
+import { listenDomEvent } from "../webTools"
+import { emitCustomEvent, listenCustomEvent } from "../webTools/utils/customEvent"
+import { moveElementNextToSibling } from "../webTools/utils/moveElementDOMToNewContiner"
+import { createStateClass } from "../webTools/utils/stateClass"
 import { createDomRef } from "../hooks"
 import { createPlugin, type CSSObject } from "../piv/propHandlers"
 import { cssOpacity } from "../styles"
 import { GestureDragCustomedEventInfo } from "./draggable&droppable"
-import { attachGestureDrag } from "../domkit/utils/attachGestureDrag"
+import { attachGestureDrag } from "../webTools/utils/attachGestureDrag"
 type GestureSortCustomedEventInfo = {
   dragElement: HTMLElement
   dragTranslate: {

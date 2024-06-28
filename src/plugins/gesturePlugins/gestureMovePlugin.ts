@@ -1,5 +1,5 @@
 import { createEffect } from "solid-js"
-import { createStateClass, listenGestureMove, type GestureMoveOptions } from "../../domkit"
+import { createStateClass, listenGestureMove, type GestureMoveOptions } from "../../webTools"
 import { createDomRef } from "../../hooks"
 import { createPlugin, type CSSObject, type Plugin } from "../../piv"
 

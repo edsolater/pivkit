@@ -1,6 +1,6 @@
 import { Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { usePositionTranslate } from "../../domkit/hooks/usePositionTranslate"
+import { usePositionTranslate } from "../../webTools/hooks/usePositionTranslate"
 import { createSyncSignal } from "../../hooks/createSyncSignal"
 import { Piv } from "../../piv"
 import { LabelKitProps } from "../Label"

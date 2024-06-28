@@ -1,16 +1,16 @@
 import type { AnyFn } from "@edsolater/fnkit"
 import { createEffect, onCleanup } from "solid-js"
-import { emitCustomEvent, listenCustomEvent } from "../domkit/utils/customEvent"
-import { moveElementDOMToNewContiner } from "../domkit/utils/moveElementDOMToNewContiner"
-import { createStateClass } from "../domkit/utils/stateClass"
+import { emitCustomEvent, listenCustomEvent } from "../webTools/utils/customEvent"
+import { moveElementDOMToNewContiner } from "../webTools/utils/moveElementDOMToNewContiner"
+import { createStateClass } from "../webTools/utils/stateClass"
 import { createDomRef } from "../hooks"
 import { attachIcssToElement, createPlugin, type CSSObject, type Plugin } from "../piv/propHandlers"
 import { cssOpacity } from "../styles"
 import { getElementFromRefs, type ElementRefs } from "../utils"
 import type { ICSS } from "@edsolater/pivkit"
-import type { OnMoveEnd, OnMoveStart, OnMoving } from "../domkit/utils/attachPointerMove"
-import { listenDomEvent } from "../domkit"
-import { attachGestureDrag, type GestureDragOptions } from "../domkit/utils/attachGestureDrag"
+import type { OnMoveEnd, OnMoveStart, OnMoving } from "../webTools/utils/attachPointerMove"
+import { listenDomEvent } from "../webTools"
+import { attachGestureDrag, type GestureDragOptions } from "../webTools/utils/attachGestureDrag"
 
 export type GestureDragCustomedEventInfo = {
   dragElement: HTMLElement

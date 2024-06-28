@@ -1,7 +1,7 @@
 import { Booleanable, MayArray, MayFn, arrify, isMeanfulArray, mergeObjects, shrinkFn } from "@edsolater/fnkit"
 import { createEffect, createMemo } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
-import { useClassRef } from "../domkit"
+import { useClassRef } from "../webTools"
 import { createRef } from "../hooks/createRef"
 import { Piv, mergeProps, omitProps, parsePivChildren } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"

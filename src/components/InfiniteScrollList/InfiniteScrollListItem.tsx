@@ -1,6 +1,6 @@
 import { Accessor, JSX, Show, createEffect, createMemo, createSignal, splitProps, useContext } from "solid-js"
 import { useKitProps, type KitProps } from "../../createKit"
-import useResizeObserver from "../../domkit/hooks/useResizeObserver"
+import useResizeObserver from "../../webTools/hooks/useResizeObserver"
 import { createDomRef } from "../../hooks"
 import { createRef } from "../../hooks/createRef"
 import isClientSide from "../../jFetch/utils/isSSR"

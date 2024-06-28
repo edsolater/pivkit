@@ -1,6 +1,6 @@
 import { createEffect } from "solid-js"
 import { ModalController, ModalProps } from "../components/Modal"
-import { addShortcutEventListener } from "../domkit"
+import { addShortcutEventListener } from "../webTools"
 import { createPlugin } from "../piv"
 import { createControllerRef } from "../hooks/createControllerRef"
 import { createRef } from "../hooks/createRef"

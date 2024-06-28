@@ -1,5 +1,5 @@
 import { KitProps, useKitProps } from "../createKit"
-import { useClassRef } from "../domkit"
+import { useClassRef } from "../webTools"
 import { Piv } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
 import { cssVar } from "../styles"

@@ -1,6 +1,6 @@
 import { createEffect } from "solid-js"
 import { DrawerController } from "../components/Drawer"
-import { addShortcutEventListener } from "../domkit"
+import { addShortcutEventListener } from "../webTools"
 import { createControllerRef } from "../hooks/createControllerRef"
 import { createRef } from "../hooks/createRef"
 import { createPlugin } from "../piv"

@@ -2,7 +2,7 @@ import {
   isArray,
   shakeFalsy
 } from "@edsolater/fnkit"
-import { KeyboardShortcutFn, KeyboardShortcutSettings, KeybordShortcutKeys } from "../domkit"
+import { KeyboardShortcutFn, KeyboardShortcutSettings, KeybordShortcutKeys } from "../webTools"
 
 type Description = string
 

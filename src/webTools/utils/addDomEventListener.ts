@@ -46,7 +46,7 @@ export type EventCallback<
   eventPath(): HTMLElement[]
 }
 
-// TODO: !!! move to domkit
+// TODO: !!! move to webTools
 export function listenDomEvent<
   El extends HTMLElement | Document | Window | undefined | null,
   K extends keyof HTMLElementEventMap,

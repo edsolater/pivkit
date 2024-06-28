@@ -1,7 +1,7 @@
 import { isExist } from "@edsolater/fnkit"
 import { Accessor, createEffect } from "solid-js"
 import { DeKitProps, KitProps, useKitProps } from "../../createKit"
-import { createDomRef, useClickOutside, useShortcutsRegister } from "../../hooks"
+import { createDomRef, useShortcutsRegister } from "../../hooks"
 import { AddDefaultPivProps, Piv, PivChild } from "../../piv"
 import { buildPopover } from "../../plugins"
 import { cssVar, icssCardPanel, icssClickable, icssRow } from "../../styles"
@@ -9,6 +9,7 @@ import { Box } from "../Boxes"
 import { ItemBox, ItemBoxKitProps } from "../ItemBox"
 import { Loop } from "../Loop"
 import { useSelectItems } from "./useSelectItems"
+import { useClickOutside } from "../../webTools"
 export { useSelectItems } from "./useSelectItems"
 export type SelectableItem = unknown
 

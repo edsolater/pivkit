@@ -6,7 +6,7 @@ export function makeFocusable(el: Element | undefined | null, options?: { tabInd
   }
 }
 /**
- * domkit
+ * webTools
  * get the first focusable child element
  *
  * @param parentElement parent element

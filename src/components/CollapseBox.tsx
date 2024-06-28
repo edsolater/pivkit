@@ -1,6 +1,7 @@
 import { Show, createContext, createEffect, createSignal, useContext } from "solid-js"
 import { type KitProps, useKitProps } from "../createKit"
-import { createDomRef, useClickOutside } from "../hooks"
+import { createDomRef } from "../hooks"
+
 import { createDisclosure } from "../hooks/createDisclosure"
 import { Fragnment, Piv, PivChild, PivProps } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
@@ -8,6 +9,7 @@ import { loadModuleCSSCollapse, type FeatureCSSCollapseOption } from "../plugins
 import { createController } from "../utils/createController"
 import { Box } from "./Boxes"
 import { shrinkFn, type MayFn } from "@edsolater/fnkit"
+import { useClickOutside } from "../webTools"
 
 export interface CollapseBoxProps {
   /** TODO: open still can't auto lock the trigger not controled component now */

@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { useClickOutside } from "../../domkit/hooks/useClickOutside"
+import { useClickOutside } from "../../webTools/hooks/useClickOutside"
 import { createRef } from "../../hooks/createRef"
 import { Piv } from "../../piv"
 import { drawerKeyboardShortcut } from "../../plugins/drawerKeyboardShortcut"

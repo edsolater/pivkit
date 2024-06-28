@@ -22,8 +22,8 @@ import {
   type JSXElement,
 } from "solid-js"
 import { useKitProps, type KitProps } from "../../createKit"
-import { useIntersectionObserver, type ObserveFn } from "../../domkit/hooks/useIntersectionObserver"
-import { useScrollDegreeDetector } from "../../domkit/hooks/useScrollDegreeDetector"
+import { useIntersectionObserver, type ObserveFn } from "../../webTools/hooks/useIntersectionObserver"
+import { useScrollDegreeDetector } from "../../webTools/hooks/useScrollDegreeDetector"
 import { createAsyncMemo } from "../../hooks/createAsyncMemo"
 import { createRef } from "../../hooks/createRef"
 import { Piv } from "../../piv"

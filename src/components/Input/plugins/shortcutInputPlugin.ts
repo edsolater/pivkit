@@ -1,6 +1,6 @@
 import { createEffect, createSignal, on, onCleanup } from "solid-js"
 import { createSubscribable } from "@edsolater/fnkit"
-import { KeybordShortcutKeys, getShorcutStringFromKeyboardEvent, listenDomEvent } from "../../../domkit"
+import { KeybordShortcutKeys, getShorcutStringFromKeyboardEvent, listenDomEvent } from "../../../webTools"
 import { createControllerRef } from "../../../hooks/createControllerRef"
 import { createRef } from "../../../hooks/createRef"
 import { createPlugin } from "../../../piv"

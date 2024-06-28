@@ -1,7 +1,7 @@
 import { createSubscribable, arrify, isArray, shrinkFn, toList, type MayFn } from "@edsolater/fnkit"
 import { createEffect, createMemo, onCleanup } from "solid-js"
-import { addShortcutEventListener } from "../domkit"
-import { isElementChildrenFocused, isElementFocused } from "../domkit/utils/focusable"
+import { addShortcutEventListener } from "../webTools"
+import { isElementChildrenFocused, isElementFocused } from "../webTools/utils/focusable"
 import { type ShortcutItem } from "../plugins/useKeyboardShortcut"
 import { getElementFromRef, type ElementRef } from "../utils"
 import { useSubscribable } from "./useSubscribable"
@@ -132,7 +132,7 @@ export function useShortcutsRegister(
 // watcher means info watcher
 export function useShortcutsInfo(ref: ElementRef) {
   const el = getElementFromRef(ref)
-  const shortcutCache = useSubscribable(shortcutCacheSubscribable)
+  const [shortcutCache] = useSubscribable(shortcutCacheSubscribable)
   const settings = createMemo(() => shortcutCache()?.get(el))
   const shortcuts = () => toList(settings())
   return { shortcuts }

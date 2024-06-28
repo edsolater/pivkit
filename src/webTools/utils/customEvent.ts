@@ -7,7 +7,7 @@ import { listenDomEvent } from "./addDomEventListener"
  * @param listener
  * @returns
  */
-// TODO move to pivkit's domkit
+// TODO move to pivkit's webTools
 export function listenCustomEvent<DetailInfo = any>(
   el: HTMLElement,
   eventName: `customed-${string}`,
@@ -24,7 +24,7 @@ export function listenCustomEvent<DetailInfo = any>(
  * @param options
  * @returns
  */
-// TODO move to pivkit's domkit
+// TODO move to pivkit's webTools
 export function emitCustomEvent<DetailInfo = any>(
   el: HTMLElement,
   eventName: `customed-${string}`,

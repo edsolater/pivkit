@@ -1,7 +1,7 @@
 import { cacheFn, hasProperty, mergeObjects, runtimeObject, shrinkFn } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { listenDomEvent, useElementFocus } from "../../domkit"
+import { listenDomEvent, useElementFocus } from "../../webTools"
 import { createDomRef, createHistoryAccessor, useHistoryComparer, useShortcutsRegister } from "../../hooks"
 import { createRef } from "../../hooks/createRef"
 import { Piv, parseICSSToClassName, type PivProps } from "../../piv"
