@@ -1,4 +1,4 @@
-import { AnyFn, MayArray, MayPromise, flap, shakeUndefinedItem } from "@edsolater/fnkit"
+import { AnyFn, MayArray, MayPromise, arrify, shakeUndefinedItem } from "@edsolater/fnkit"
 import { delayDo } from "./invokeInMicroTaskLoop"
 
 interface CallbackStore<Callback extends AnyFn> {
@@ -19,7 +19,7 @@ export function createCallbacksStore<Callback extends (...params: any[]) => void
   initCallbacks?: MayArray<Callback | undefined>
 }): CallbackStore<Callback> {
   const registeredCallbacks = options?.initCallbacks
-    ? new Set<Callback>(shakeUndefinedItem(flap(options.initCallbacks)))
+    ? new Set<Callback>(shakeUndefinedItem(arrify(options.initCallbacks)))
     : new Set<Callback>()
   const registeredCleanFn = new WeakMap<Callback, MayPromise<(() => void) | void>>()
   /** don't need to worry about callback registed multi times, will invoke in micro  */

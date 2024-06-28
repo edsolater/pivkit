@@ -1,4 +1,4 @@
-import { flap, mutateByDescriptors, pipeDo, shakeFalsy, shrinkFn } from "@edsolater/fnkit"
+import { arrify, mutateByDescriptors, pipeDo, shakeFalsy, shrinkFn } from "@edsolater/fnkit"
 import { getPropsFromAddPropContext } from "../AddProps"
 import { PivProps } from "../Piv"
 import { getPropsFromPropContextContext } from "../PropContext"
@@ -63,7 +63,7 @@ function getNativeHTMLPropsFromParsedPivProp(props: any, controller: ValidContro
             ) /* don't render if empty string */
           },
           get ref() {
-            return (el: HTMLElement) => el && mergeRefs(...flap(props.domRef))(el)
+            return (el: HTMLElement) => el && mergeRefs(...arrify(props.domRef))(el)
           },
           get style() {
             return parseIStyles(props.style, controller)
@@ -87,7 +87,7 @@ function getNativeHTMLPropsFromParsedPivProp(props: any, controller: ValidContro
             ) /* don't render if empty string */
           },
           get ref() {
-            return (el: HTMLElement) => el && mergeRefs(...flap(props.domRef))(el)
+            return (el: HTMLElement) => el && mergeRefs(...arrify(props.domRef))(el)
           },
           get style() {
             return parseIStyles(props.style, controller)
@@ -152,7 +152,7 @@ export function createEmptyObject<T extends (keyof any)[]>(keys: T): { [K in T[n
 function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "render:firstChild"> {
   return "render:firstChild" in props
     ? mutateByDescriptors(props, {
-        newGetters: { children: (props) => flap(props["render:firstChild"]).concat(props.children) },
+        newGetters: { children: (props) => arrify(props["render:firstChild"]).concat(props.children) },
         deletePropertyNames: ["render:firstChild"],
       })
     : props
@@ -168,7 +168,7 @@ function parsePivRenderAppendChildren<T extends Partial<PivProps<any, any>>>(pro
   return "render:lastChild" in props
     ? mutateByDescriptors(props, {
         newGetters: {
-          children: (props) => flap(props.children).concat(flap(props["render:lastChild"])),
+          children: (props) => arrify(props.children).concat(arrify(props["render:lastChild"])),
         },
         deletePropertyNames: ["render:lastChild"],
       })

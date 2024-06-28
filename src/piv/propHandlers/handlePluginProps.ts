@@ -1,4 +1,4 @@
-import { AnyObj, flap, hasProperty, MayArray, shakeNil, shrinkFn } from "@edsolater/fnkit"
+import { AnyObj, arrify, hasProperty, MayArray, shakeNil, shrinkFn } from "@edsolater/fnkit"
 import { createSignal } from "solid-js"
 import { KitProps } from "../../createKit/KitProps"
 import { PivProps } from "../Piv"
@@ -19,7 +19,7 @@ export function handlePluginProps<P extends AnyObj>(
   if (!checkHasPluginProps(props)) return props
   const plugin = getPlugin(props)
   if (!plugin) return omitProps(props, "plugin")
-  return getMergePluginReturnedProps(sortPluginByPriority(flap(plugin)), props)
+  return getMergePluginReturnedProps(sortPluginByPriority(arrify(plugin)), props)
 }
 
 function sortPluginByPriority(plugins: Pluginable<any>[]) {
@@ -47,7 +47,7 @@ function getMergePluginReturnedProps<T extends AnyObj>(
   props: T & PivProps,
 ): Omit<T & PivProps, "plugin"> {
   return omitProps(
-    plugins ? shakeNil(flap(plugins)).reduce((acc, plugin) => invokePlugin(plugin, acc), props) : props,
+    plugins ? shakeNil(arrify(plugins)).reduce((acc, plugin) => invokePlugin(plugin, acc), props) : props,
     "plugin",
   )
 }

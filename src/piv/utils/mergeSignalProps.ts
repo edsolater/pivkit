@@ -1,4 +1,4 @@
-import { AnyFn, flap, mergeObjectsWithConfigs, switchCase, shakeNil } from "@edsolater/fnkit"
+import { AnyFn, arrify, mergeObjectsWithConfigs, switchCase, shakeNil } from "@edsolater/fnkit"
 import { SignalizeProps, ValidProps } from "../typeTools"
 import { mergeRefs } from "./mergeRefs"
 
@@ -33,7 +33,7 @@ export function mergeSignalProps<P extends SignalizeProps<ValidProps> | undefine
 ): Exclude<P, undefined> {
   // @ts-ignore
   if (propsObjs.length <= 1) return propsObjs[0] ?? {}
-  const trimedProps = shakeNil(flap(propsObjs))
+  const trimedProps = shakeNil(arrify(propsObjs))
   // @ts-ignore
   if (trimedProps.length <= 1) return trimedProps[0] ?? {}
 

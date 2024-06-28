@@ -1,4 +1,4 @@
-import { isArray, isString, shrinkFn, type AnyFn, type DeMayArray, type MayArray } from "@edsolater/fnkit"
+import { isString, mayForEach, shrinkFn, type AnyFn, type DeMayArray, type MayArray } from "@edsolater/fnkit"
 
 export type PivkitCallback<F extends AnyFn | undefined> = MayArray<F>
 export type DePivkitCallback<F> = DeMayArray<F>
@@ -7,16 +7,7 @@ export function invokePivkitCallback(
   callbacks: PivkitCallback<AnyFn | undefined> | undefined,
   params?: any[] | (() => any[]),
 ) {
-  if (!callbacks) return
-  if (isArray(callbacks)) {
-    callbacks.forEach((cb) => (params ? cb?.(...shrinkFn(params)) : cb?.()))
-  } else {
-    if (params) {
-      callbacks(params ? shrinkFn(params) : [])
-    } else {
-      callbacks()
-    }
-  }
+  mayForEach(callbacks, (cb) => (params ? cb?.(...shrinkFn(params)) : cb?.()))
 }
 
 export function turnPivkitCallbackToNormalCallback<F extends AnyFn>(callbacks: PivkitCallback<F>) {

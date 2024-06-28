@@ -1,4 +1,4 @@
-import { flap, shrinkFn, type Booleanable, type MayArray, type MayFn } from "@edsolater/fnkit"
+import { arrify, shrinkFn, type Booleanable, type MayArray, type MayFn } from "@edsolater/fnkit"
 import { createEffect, createSignal } from "solid-js"
 import type { Accessify } from "../utils"
 
@@ -24,7 +24,7 @@ export function useValidators<V>(options: ValidatorOption<V>) {
     if (shrinkFn(options.disabled)) return false
     if (shrinkFn(options.enabled)) return true
     const value = shrinkFn(options.value)
-    const isAllValid = flap(options?.validatorRules).every((validator) => {
+    const isAllValid = arrify(options?.validatorRules).every((validator) => {
       if (!validator) return true
       const isValid = shrinkFn(validator.should, [value])
       if (!isValid) {

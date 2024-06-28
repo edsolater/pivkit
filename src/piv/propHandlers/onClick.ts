@@ -1,4 +1,4 @@
-import { AnyFn, flap, mergeObjects, type MayArray } from "@edsolater/fnkit"
+import { AnyFn, arrify, mergeObjects, type MayArray } from "@edsolater/fnkit"
 import { ValidController } from "../typeTools"
 export type OnClickPayloads<C extends ValidController> = C & {
   ev: MouseEvent & {
@@ -24,6 +24,6 @@ export function parseOnClick(onClick: MayArray<AnyFn | undefined>, controller: V
       preventDefault: () => ev.preventDefault(),
       eventPath: () => ev.composedPath().filter((el) => el instanceof HTMLElement) as HTMLElement[],
     }) as OnClickPayloads<ValidController>
-    return flap(onClick).forEach((fn) => fn?.(param))
+    return arrify(onClick).forEach((fn) => fn?.(param))
   }
 }

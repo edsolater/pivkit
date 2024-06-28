@@ -1,4 +1,4 @@
-import { createSubscribable, flap, isArray, shrinkFn, toList, type MayFn } from "@edsolater/fnkit"
+import { createSubscribable, arrify, isArray, shrinkFn, toList, type MayFn } from "@edsolater/fnkit"
 import { createEffect, createMemo, onCleanup } from "solid-js"
 import { addShortcutEventListener } from "../domkit"
 import { isElementChildrenFocused, isElementFocused } from "../domkit/utils/focusable"
@@ -28,7 +28,7 @@ export function registerShortcut(shortcutItem: ShortcutItem) {
     { force: true },
   ) // force invoke subscribable
 
-  const shortcutSetting = flap(shortcutItem.shortcut).reduce((acc, shortcutKey) => {
+  const shortcutSetting = arrify(shortcutItem.shortcut).reduce((acc, shortcutKey) => {
     if (isArray(shortcutKey)) {
       for (const key of shortcutKey) {
         acc[key] = shortcutItem.action

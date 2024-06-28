@@ -1,4 +1,4 @@
-import { MayArray, MayFn, flap, pipeDo } from "@edsolater/fnkit"
+import { MayArray, MayFn, arrify, pipeDo } from "@edsolater/fnkit"
 import { JSX, JSXElement } from "solid-js"
 import {
   ClassName,
@@ -11,10 +11,10 @@ import {
   handlePluginProps,
   handleShadowProps,
 } from "./propHandlers"
+import type { PivkitCallback } from "./propHandlers/mergifyProps"
 import { renderHTMLDOM } from "./propHandlers/renderHTMLDOM"
 import { HTMLTag, PivChild, ValidController } from "./typeTools"
 import { omitProps } from "./utils"
-import type { PivkitCallback } from "./propHandlers/mergifyProps"
 
 type BooleanLike = any
 
@@ -157,7 +157,7 @@ function handleNormalPivProps(rawProps?: Omit<PivProps<any, any>, "plugin" | "sh
 
 function handlePropRenderOutWrapper(props: PivProps<any, any>): JSXElement {
   console.log("detect render:outWrapper") // FIXME: <-- why not detected?
-  return flap(props["render:outWrapper"]).reduce(
+  return arrify(props["render:outWrapper"]).reduce(
     (prevNode, getWrappedNode) => (getWrappedNode ? getWrappedNode(prevNode) : prevNode),
     (() => handleNormalPivProps(omitProps(props, "render:outWrapper"))) as unknown as JSXElement, // 📝 wrap function to let not solidjs read at once when array.prototype.reduce not finish yet
   )

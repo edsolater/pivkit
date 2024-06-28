@@ -1,4 +1,4 @@
-import { Booleanable, MayArray, MayFn, flap, isMeanfulArray, mergeObjects, shrinkFn } from "@edsolater/fnkit"
+import { Booleanable, MayArray, MayFn, arrify, isMeanfulArray, mergeObjects, shrinkFn } from "@edsolater/fnkit"
 import { createEffect, createMemo } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { useClassRef } from "../domkit"
@@ -89,7 +89,7 @@ export function Button(kitProps: ButtonKitProps) {
   // ---------------- validation ----------------
   const failedTestValidator = createMemo(() =>
     isMeanfulArray(props.validators) || props.validators
-      ? flap(props.validators!).find(({ should }) => !shrinkFn(should))
+      ? arrify(props.validators!).find(({ should }) => !shrinkFn(should))
       : undefined,
   )
   const mergedProps = mergeProps(props, failedTestValidator()?.fallbackProps)

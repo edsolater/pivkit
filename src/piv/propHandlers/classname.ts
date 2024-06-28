@@ -1,4 +1,4 @@
-import { flap, isObjectLike, isTruthy, MayArray, shrinkFn } from "@edsolater/fnkit"
+import { arrify, isObjectLike, isTruthy, MayArray, shrinkFn } from "@edsolater/fnkit"
 import { LoadController, ValidController } from "../typeTools"
 
 export type ClassName<Controller extends ValidController | unknown = unknown> = LoadController<
@@ -10,7 +10,7 @@ export function classname<Controller extends ValidController | unknown = unknown
   classNameArray: MayArray<ClassName<Controller>>,
   controller?: Controller,
 ) {
-  return flap(classNameArray)
+  return arrify(classNameArray)
     .filter(isTruthy)
     .flatMap((classItemFn) => {
       const classItem = shrinkFn(classItemFn, [controller])

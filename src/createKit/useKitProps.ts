@@ -1,28 +1,28 @@
 import {
   LazyLoadObj,
   MayArray,
+  arrify,
   createObjectWhenAccess,
-  flap,
   hasProperty,
   mergeObjects,
   pipeDo,
   shrinkFn,
-  type AnyFn,
+  type AnyFn
 } from "@edsolater/fnkit"
-import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme, type KitProps } from ".."
+import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
 import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
 import { PivProps } from "../piv/Piv"
 import { getPropsFromPropContextContext } from "../piv/PropContext"
 import { loadPropsControllerRef } from "../piv/propHandlers/children"
 import { handlePluginProps } from "../piv/propHandlers/handlePluginProps"
+import { handlePivkitCallbackProps } from "../piv/propHandlers/mergifyProps"
 import { Pluginable } from "../piv/propHandlers/plugin"
 import { handleShadowProps } from "../piv/propHandlers/shadowProps"
 import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { mergeProps } from "../piv/utils"
 import { AddDefaultPivProps, addDefaultPivProps } from "../piv/utils/addDefaultProps"
 import { omitItem } from "./utils"
-import { handlePivkitCallbackProps } from "../piv/propHandlers/mergifyProps"
 
 /** used for {@link useKitProps}'s option */
 export type KitPropsOptions<
@@ -188,7 +188,7 @@ function useKitPropParser<
   let loadController: AnyFn = () => {}
   if (hasProperty(kitProps, "ref")) {
     loadController = (controller) => {
-      flap(kitProps.ref).forEach((ref) => ref?.(shrinkFn(controller)))
+      arrify(kitProps.ref).forEach((ref) => ref?.(shrinkFn(controller)))
     }
   }
 

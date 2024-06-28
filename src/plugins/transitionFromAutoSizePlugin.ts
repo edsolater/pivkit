@@ -1,4 +1,4 @@
-import { MayArray, MayFn, flap, shrinkFn } from "@edsolater/fnkit"
+import { MayArray, MayFn, arrify, shrinkFn } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
 import { listenDomEvent } from "../domkit"
 import { CSSObject, PivProps, createPlugin, mergeProps } from "../piv"
@@ -57,13 +57,13 @@ export const transitionFromAutoSizePlugin = createPlugin(
         }
         return {
           from: mergeProps(
-            flap(presets).map((i) => shrinkFn(i)?.fromProps), // not readable
+            arrify(presets).map((i) => shrinkFn(i)?.fromProps), // not readable
             progressProps,
             fromProps,
             { style: baseTransitionICSS } as PivProps,
           ),
           to: mergeProps(
-            flap(presets).map((i) => shrinkFn(i)?.toProps), // not readable
+            arrify(presets).map((i) => shrinkFn(i)?.toProps), // not readable
             progressProps,
             toProps,
             { style: baseTransitionICSS } as PivProps,

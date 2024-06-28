@@ -5,8 +5,7 @@ import {
   MayFn,
   createConfigableFunction,
   filter,
-  flap,
-  flapDeep,
+  arrify,
   isObject,
   isString,
   mergeObjectsWithConfigs,
@@ -105,7 +104,7 @@ export function handleICSSProps<Controller extends ValidController | unknown = u
     return ""
   }
   let outputClassName = ""
-  for (const i of flapDeep(cssProp)) {
+  for (const i of arrify(cssProp)) {
     const fn = isTaggedICSS(i) ? invokeTaggedICSS(i as any) : i
     const shrinked = shrinkFn(fn, [controller])
     if (!shrinked || (!isString(shrinked) && !isObject(shrinked))) continue
@@ -133,7 +132,7 @@ export function compressICSSToObj<Controller extends ValidController | unknown =
 ): ICSSObject<Controller> {
   return (controller: Controller) => {
     const cssObjList = filter(
-      flap(icss).map((i) => shrinkFn(i, [controller])),
+      arrify(icss).map((i) => shrinkFn(i, [controller])),
       isObject,
     ) as ICSSObject<Controller>[]
     const l = cssObjList.reduce((acc, cur) => mergeICSSObject<Controller>(acc, cur), {} as ICSSObject<Controller>)

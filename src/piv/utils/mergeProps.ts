@@ -1,4 +1,4 @@
-import { AnyFn, AnyObj, flap, mergeFunction, shakeNil } from "@edsolater/fnkit"
+import { AnyFn, AnyObj, arrify, mergeFunction, shakeNil } from "@edsolater/fnkit"
 import { ValidProps } from "../typeTools"
 import { getKeys } from "./getKeys"
 import { mergeRefs } from "./mergeRefs"
@@ -33,7 +33,7 @@ export function mergeProps<P extends ValidProps | undefined>(...propsObjs: P[]):
   // @ts-ignore
   if (propsObjs.length <= 1) return propsObjs[0] ?? {}
   // ready to parse
-  const props = shakeNil(flap(propsObjs))
+  const props = shakeNil(arrify(propsObjs))
   // @ts-ignore
   if (props.length <= 1) return props[0] ?? {}
 

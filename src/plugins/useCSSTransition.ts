@@ -1,4 +1,4 @@
-import { flap, MayArray, MayFn, shrinkFn, switchCase } from "@edsolater/fnkit"
+import { arrify, MayArray, MayFn, shrinkFn, switchCase } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on, onCleanup } from "solid-js"
 import { listenDomEvent } from "../domkit"
 import { runtimeObject } from "@edsolater/fnkit"
@@ -79,7 +79,7 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
       transition: `${opts.cssTransitionDurationMs ?? 250}ms`,
       transitionTimingFunction: opts.cssTransitionTimingFunction,
     }
-    const presets = flap(opts.presets)
+    const presets = arrify(opts.presets)
     return {
       enterFrom: [
         presets.map((i) => shrinkFn(i)?.enterFromIcss),
