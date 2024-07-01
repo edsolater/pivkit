@@ -26,23 +26,18 @@ export function useClickOutside(els: ElementRefs, options?: UseClickOutsideOptio
   const getOption = () => parasedOptions
   createEffect(() => {
     const targetElements = getElementFromRefs(els)
-    const { cancel: cancel } = listenDomEvent(
-      globalThis.document,
-      "click",
-      (payload) => {
+    targetElements.forEach((el) => {
+      const { cancel } = listenDomEvent(el, "click", (payload) => {
         const enabled = shrinkFn(getOption()?.enabled)
         const disabled = shrinkFn(getOption()?.disabled)
         const isEnabled = enabled != null ? enabled : !disabled
-
         if (!isEnabled) return
-        if (!targetElements.length) return
-        const path = payload.ev.composedPath()
-        const isTargetInPath = targetElements.some((el) => el && path.includes(el))
+
+        const isTargetInPath = el.contains(payload.ev.target as Node)
         if (isTargetInPath) return
         parasedOptions?.onClickOutSide?.(payload)
-      },
-      { capture: true },
-    )
-    onCleanup(cancel)
+      })
+      onCleanup(cancel)
+    })
   })
 }

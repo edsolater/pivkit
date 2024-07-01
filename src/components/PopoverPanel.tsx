@@ -1,6 +1,6 @@
 import { assert } from "@edsolater/fnkit"
-import { createEffect, createSignal, on } from "solid-js"
-import { AddProps, Piv, createDomRef, createStaticICSS, useKitProps, type KitProps } from ".."
+import { Show, createEffect, createSignal, on } from "solid-js"
+import { AddProps, Piv, createDomRef, createStaticICSS, listenDomEvent, useKitProps, type KitProps } from ".."
 
 export type PopoverPanelController = {
   open: () => void
@@ -13,12 +13,18 @@ export type PopoverPanelProps = {
   defaultOpen?: boolean
   open?: boolean
   canBackdropClose?: boolean
+  isWrapperAddProps?: boolean
+  onClose?: () => void
+  onBeforeClose?: () => void
 }
 
 const icssPopoverStyle = createStaticICSS("PopoverPanel", () => ({
-  // margin: "unset",
-  // padding: "unset",
-  // border: "unset",
+  "@layer reset": {
+    padding: "unset",
+    border: "unset",
+    background: "unset",
+    margin: "unset",
+  },
 }))
 /**
  *
@@ -29,6 +35,32 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   const { dom, setDom } = createDomRef()
 
   const [isOpen, setIsOpen] = createSignal(Boolean(props.defaultOpen))
+
+  const [shouldRender, setShouldRender] = createSignal(isOpen())
+
+  // ---------------- handle close event ----------------
+  createEffect(() => {
+    const el = dom()
+    if (!el) return
+    listenDomEvent(el, "toggle", ({ ev }) => {
+      // @ts-expect-error force
+      const isClosed = ev.newState === "closed"
+      if (isClosed) {
+        setIsOpen(false)
+        props.onClose?.()
+      }
+    })
+  })
+
+  createEffect(
+    on(isOpen, (open) => {
+      if (shouldRender()) {
+        return
+      } else {
+        return setShouldRender(open)
+      }
+    }),
+  )
 
   // sync props.open to state.open
   createEffect(() => {
@@ -70,13 +102,26 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   })
 
   return (
-    <Piv
-      shadowProps={shadowProps}
-      htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }}
-      domRef={setDom}
-      icss={icssPopoverStyle}
-    >
-      {props.children}
-    </Piv>
+    <Show when={shouldRender()}>
+      {props.isWrapperAddProps ? (
+        <AddProps
+          shadowProps={shadowProps}
+          htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }}
+          domRef={setDom}
+          icss={icssPopoverStyle}
+        >
+          {props.children}
+        </AddProps>
+      ) : (
+        <Piv
+          shadowProps={shadowProps}
+          htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }}
+          domRef={setDom}
+          icss={icssPopoverStyle}
+        >
+          {props.children}
+        </Piv>
+      )}
+    </Show>
   )
 }
