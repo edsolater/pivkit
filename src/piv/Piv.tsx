@@ -96,18 +96,18 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
   /** @example
    * const Button = () => <Piv as={(parsedPivProps) => <button {...parsedPivProps} />} />
    */
-  as?: any // TODO: imply it // 💡soft `render-self`, props will merge other than cover
-  "render:self"?: (selfProps: PivProps<any, any>) => JSX.Element // assume a function return ReactNode is a Component
+  as?: any // TODO: imply it // 💡soft `define-self`, props will merge other than cover
+  "defineSelf"?: (selfProps: PivProps<any, any>) => JSX.Element // assume a function return ReactNode is a Component
 
   /**
    * auto merge by shadowProps
    * change outter wrapper element
    */
-  "render:outWrapper"?: MayArray<DangerousWrapperNodeFn>
+  "defineOutWrapper"?: MayArray<DangerousWrapperNodeFn>
 
-  "render:firstChild"?: MayArray<PivChild<Controller>>
+  "defineFirstChild"?: MayArray<PivChild<Controller>>
 
-  "render:lastChild"?: MayArray<PivChild<Controller>>
+  "defineLastChild"?: MayArray<PivChild<Controller>>
 }
 
 type DangerousWrapperNodeFn = (originalChildren: JSXElement) => JSXElement // change outter wrapper element
@@ -135,18 +135,18 @@ export const pivPropsNames = [
   "innerController",
   "children",
 
-  "render:self",
-  "render:outWrapper",
-  "render:firstChild",
-  "render:lastChild",
+  "defineSelf",
+  "defineOutWrapper",
+  "defineFirstChild",
+  "defineLastChild",
 ] satisfies (keyof PivProps<any>)[]
 
 export const Piv = <TagName extends HTMLTag = HTMLTag, Controller extends ValidController = ValidController>(
   kitProps: PivProps<TagName, Controller>,
 ) => {
-  // 📝 render:outWrapper may in showProps or plugin. so need to handle it first
+  // 📝 defineOutWrapper may in showProps or plugin. so need to handle it first
   const props = pipeDo(kitProps, handleShadowProps, handlePluginProps, handleShadowProps)
-  return "render:outWrapper" in props ? handlePropRenderOutWrapper(props) : handleNormalPivProps(props)
+  return "defineOutWrapper" in props ? handlePropRenderOutWrapper(props) : handleNormalPivProps(props)
 }
 
 function handleNormalPivProps(rawProps?: Omit<PivProps<any, any>, "plugin" | "shadowProps">) {
@@ -156,9 +156,9 @@ function handleNormalPivProps(rawProps?: Omit<PivProps<any, any>, "plugin" | "sh
 }
 
 function handlePropRenderOutWrapper(props: PivProps<any, any>): JSXElement {
-  console.log("detect render:outWrapper") // FIXME: <-- why not detected?
-  return arrify(props["render:outWrapper"]).reduce(
+  console.log("detect defineOutWrapper") // FIXME: <-- why not detected?
+  return arrify(props["defineOutWrapper"]).reduce(
     (prevNode, getWrappedNode) => (getWrappedNode ? getWrappedNode(prevNode) : prevNode),
-    (() => handleNormalPivProps(omitProps(props, "render:outWrapper"))) as unknown as JSXElement, // 📝 wrap function to let not solidjs read at once when array.prototype.reduce not finish yet
+    (() => handleNormalPivProps(omitProps(props, "defineOutWrapper"))) as unknown as JSXElement, // 📝 wrap function to let not solidjs read at once when array.prototype.reduce not finish yet
   )
 }

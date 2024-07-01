@@ -22,7 +22,7 @@ export function renderRadioThumb(
 ): RadioKitProps["shadowProps"] {
   return {
     "anatomy:Thumb": {
-      "render:lastChild": renderContent,
+      "defineLastChild": renderContent,
     },
   }
 }

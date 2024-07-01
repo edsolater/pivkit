@@ -53,7 +53,7 @@ export function Image(rawProps: ImageKitProps) {
     <Piv<"img">
       domRef={setDom}
       class="Image"
-      render:self={(selfProps) => renderHTMLDOM("img", selfProps)}
+      defineSelf={(selfProps) => renderHTMLDOM("img", selfProps)}
       htmlProps={{ src: String(props.src), alt: props.alt, loading: props.loading ?? "lazy" }}
       icss={{
         display: "block",

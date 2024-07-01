@@ -112,7 +112,7 @@ export function Modal(kitProps: ModalKitProps) {
     <ModalContext.Provider value={modalController}>
       <PopoverPanel open={shouldRenderDOM}>
         <Piv<"dialog">
-          render:self={(selfProps) => renderHTMLDOM("dialog", selfProps)}
+          defineSelf={(selfProps) => renderHTMLDOM("dialog", selfProps)}
           domRef={setDialogDOM}
           shadowProps={shadowProps}
           htmlProps={{ role: "dialog" }}

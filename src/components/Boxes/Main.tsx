@@ -10,5 +10,5 @@ export type MainProps = BoxProps
 export function Main(kitProps: KitProps<MainProps>) {
   const { shadowProps } = useKitProps(kitProps, { name: "Main" })
   /* ---------------------------------- props --------------------------------- */
-  return <Box shadowProps={shadowProps} render:self={renderAsHTMLMain} />
+  return <Box shadowProps={shadowProps} defineSelf={renderAsHTMLMain} />
 }

@@ -61,11 +61,11 @@ export function mergeSignalProps<P extends SignalizeProps<ValidProps> | undefine
 
         ["debugLog", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
 
-        ["render:outWrapper", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["defineOutWrapper", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
 
-        ["render:firstChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["defineFirstChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
 
-        ["render:lastChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        ["defineLastChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
 
         ["controller", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
       ],

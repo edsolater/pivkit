@@ -12,7 +12,7 @@ export type AccessifyProps<P extends AnyObj, Controller extends ValidController 
   [K in keyof P]: K extends `on${string}` // callback onXXX should no auto-accessified
     ? PivkitCallback<P[K]>
     : K extends
-          | `render${string}` // renderXXX should no auto-accessified, if need pass subcomponent and have controller, just pass Captilazed prop name like Dot={}
+          | `define${string}` // renderXXX should no auto-accessified, if need pass subcomponent and have controller, just pass Captilazed prop name like Dot={}
           | `${string}:${string}` // any namespaced props should no auto-accessified
           | `domRef`
           | `ref`
@@ -28,7 +28,7 @@ export type DeAccessifyProps<P> = {
   [K in keyof P]: K extends `on${string}` // callback onXXX should no auto-accessified
     ? DePivkitCallback<P[K]>
     : K extends
-          | `render${string}` // renderXXX should no auto-accessified
+          | `define${string}` // renderXXX should no auto-accessified
           | `${string}:${string}` // any namespaced props should no auto-accessified
           | `domRef`
           | `ref`
@@ -58,7 +58,7 @@ export function accessifyProps<P extends AnyObj, Controller extends ValidControl
       isString(key) &&
       ((needAccessifyProps ? !needAccessifyProps?.includes(key) : false) ||
         key.startsWith("on") ||
-        key.startsWith("render:") ||
+        key.startsWith("define") ||
         key.startsWith("merge:") ||
         key === "domRef" ||
         key === "ref" ||
@@ -80,7 +80,7 @@ export function accessifyProps<P extends AnyObj, Controller extends ValidControl
   //           isString(key) &&
   //           ((needAccessifyProps ? !needAccessifyProps?.includes(key) : false) ||
   //             key.startsWith('on') ||
-  //             key.startsWith('render:') ||
+  //             key.startsWith('define:') ||
   //             key.startsWith('merge:') ||
   //             key === 'domRef' ||
   //             key === 'controllerRef' ||

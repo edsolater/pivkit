@@ -132,7 +132,7 @@ export function Button(kitProps: ButtonKitProps) {
 
   return (
     <Piv<"button">
-      render:self={(selfProps) => renderHTMLDOM("button", selfProps)}
+      defineSelf={(selfProps) => renderHTMLDOM("button", selfProps)}
       shadowProps={omitProps(props, "onClick")} // omit onClick for need to invoke the function manually, see below 👇
       onClick={(...args) => {
         if (!isInteractive()) return

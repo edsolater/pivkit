@@ -12,7 +12,7 @@ export function HTMLCheckbox(kitProps: HTMLCheckboxKitProps) {
   return (
     <Piv
       class="HTMLCheckbox"
-      render:self={(selfProps) => renderHTMLDOM("input", selfProps)}
+      defineSelf={(selfProps) => renderHTMLDOM("input", selfProps)}
       htmlProps={{
         type: "checkbox",
         checked: props.defaultChecked,

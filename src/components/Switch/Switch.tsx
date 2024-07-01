@@ -95,7 +95,7 @@ export function Switch(rawProps: SwitchProps) {
         class="SwitchThumb"
         domRef={setMotionTargetRef}
         icss={[{ display: "grid", placeContent: "center" }]}
-        // render:lastChild={({ isChecked }) => {
+        // defineLastChild={({ isChecked }) => {
         //   console.count('rerun thumb child')
         //   return (
         //     <Piv

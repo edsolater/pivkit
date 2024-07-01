@@ -128,7 +128,7 @@ export function CollapseFace(
   const { props } = useKitProps(rawProps, { name: "CollapseFase", controller: () => controller })
   return (
     <Piv<"summary", CollapseBoxController>
-      render:self={(selfProps) => renderHTMLDOM("summary", selfProps)}
+      defineSelf={(selfProps) => renderHTMLDOM("summary", selfProps)}
       shadowProps={props}
       icss={{ listStyle: "none" }}
       innerController={controller}

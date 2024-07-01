@@ -144,7 +144,7 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
   return (
     <>
       <Piv
-        // render:self={renderAsHTMLSelect}
+        // defineSelf={renderAsHTMLSelect}
         domRef={setSelectFaceDom}
         class={props.name}
         shadowProps={[shadowProps, props.selectWrapperBoxProps]}

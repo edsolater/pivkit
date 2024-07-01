@@ -12,7 +12,7 @@ export function HTMLInputRadio(kitProps: HTMLInputRadioKitProps) {
   return (
     <Piv
       class="HTMLCheckbox"
-      render:self={(selfProps) => renderHTMLDOM("input", selfProps)}
+      defineSelf={(selfProps) => renderHTMLDOM("input", selfProps)}
       htmlProps={{
         type: "radio",
         checked: props.defaultChecked,

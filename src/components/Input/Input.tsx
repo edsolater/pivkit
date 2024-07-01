@@ -93,7 +93,7 @@ export function Input(rawProps: InputKitProps) {
           placeholder: props.placeholder,
           autofocus: props.autoFocus,
         }}
-        render:self={(selfProps) => renderHTMLDOM("input", selfProps)}
+        defineSelf={(selfProps) => renderHTMLDOM("input", selfProps)}
         icss={[
           { flex: 1, background: "transparent", minWidth: props.isFluid ? undefined : "14em" },
           /* initialize */

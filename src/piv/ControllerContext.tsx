@@ -54,7 +54,7 @@ export function handlePropsInnerController(props: ValidProps, componentName?: st
   if (inputController && Object.keys(inputController).length) {
     const ControllerContext = getControllerContext(componentName)
     const newProps = mergeProps(props, {
-      "render:outWrapper": (originalNode) => {
+      "defineOutWrapper": (originalNode) => {
         console.log("parse outWrapper", 33)
         return (
           <ControllerContext.Provider value={inputController}>

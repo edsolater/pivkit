@@ -59,7 +59,7 @@ export function Icon(rawProps: KitProps<IconProps>) {
 
   const image = () => (
     <Piv<"img">
-      render:self={(selfProps) => renderHTMLDOM("img", selfProps)}
+      defineSelf={(selfProps) => renderHTMLDOM("img", selfProps)}
       htmlProps={{ alt: props.name, src: props.src }}
       icss={{
         display: "block",

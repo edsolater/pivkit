@@ -37,7 +37,7 @@ function getPropsInfoOfRawPivProps(raw: Partial<PivProps>) {
       ? () => Boolean(shrinkFn(parsedPivProps.ifSelfShown))
       : undefined
   const selfCoverNode =
-    "render:self" in raw ? parsedPivProps["render:self"]?.(omitProps(parsedPivProps, ["render:self"])) : undefined
+    "defineSelf" in raw ? parsedPivProps["defineSelf"]?.(omitProps(parsedPivProps, ["defineSelf"])) : undefined
   return {
     parsedPivProps,
     controller,
@@ -144,33 +144,33 @@ export function createEmptyObject<T extends (keyof any)[]>(keys: T): { [K in T[n
 }
 
 /**
- * Parses the PivProps's render:firstChild.
+ * Parses the PivProps's defineFirstChild.
  * @param props - The raw PivProps object to be parsed.
  * @param controller - The controller object to be used for parsing.
  * @returns new props with the parsed properties and prepended children.
  */
-function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "render:firstChild"> {
-  return "render:firstChild" in props
+function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "defineFirstChild"> {
+  return "defineFirstChild" in props
     ? mutateByDescriptors(props, {
-        newGetters: { children: (props) => arrify(props["render:firstChild"]).concat(props.children) },
-        deletePropertyNames: ["render:firstChild"],
+        newGetters: { children: (props) => arrify(props["defineFirstChild"]).concat(props.children) },
+        deletePropertyNames: ["defineFirstChild"],
       })
     : props
 }
 
 /**
- * Parses the PivProps's render:lastChild.
+ * Parses the PivProps's defineLastChild.
  * @param props - The raw PivProps object to be parsed.
  * @param controller - The controller object to be used for parsing.
  * @returns new props with the parsed properties and appended children.
  */
-function parsePivRenderAppendChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "render:lastChild"> {
-  return "render:lastChild" in props
+function parsePivRenderAppendChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "defineLastChild"> {
+  return "defineLastChild" in props
     ? mutateByDescriptors(props, {
         newGetters: {
-          children: (props) => arrify(props.children).concat(arrify(props["render:lastChild"])),
+          children: (props) => arrify(props.children).concat(arrify(props["defineLastChild"])),
         },
-        deletePropertyNames: ["render:lastChild"],
+        deletePropertyNames: ["defineLastChild"],
       })
     : props
 }

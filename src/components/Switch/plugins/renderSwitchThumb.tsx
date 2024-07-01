@@ -10,7 +10,7 @@ export const renderSwitchThumb = createPlugin<{ renderThumbContent?: PivChild<Sw
   ({ renderThumbContent }) =>
     () => ({
       "anatomy:Thumb": {
-        "render:lastChild": renderThumbContent,
+        "defineLastChild": renderThumbContent,
       },
     }),
 )

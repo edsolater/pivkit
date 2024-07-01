@@ -14,7 +14,7 @@ export function LabelBox(kitProps: LabelBoxKitProps) {
   const { props, shadowProps } = useKitProps(kitProps, { name: "LabelBox" })
   return (
     <Piv
-      render:self={(selfProps) => renderHTMLDOM("label", selfProps)} // why set as will render twice
+      defineSelf={(selfProps) => renderHTMLDOM("label", selfProps)} // why set as will render twice
       shadowProps={shadowProps}
     />
   )

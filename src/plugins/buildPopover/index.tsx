@@ -80,7 +80,7 @@ export function buildPopover(options?: PopoverPluginOptions) {
         ...options,
       })
       return {
-        get ["render:outWrapper"]() {
+        get ["defineOutWrapper"]() {
           console.log("✅ pick popover plugin")
           return (originalNode) => {
             console.log("✅ load popover plugin")
