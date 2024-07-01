@@ -36,7 +36,7 @@ export function useSubscribableStore<T extends object>(
   options?: {
     canCachedByIndexDB?: boolean
     /** name is for indexedDB */
-    name?: string
+    dbName?: string
   },
 ): [T, SetStoreFunction<T>] {
   const [store, setStore] = createStore(subscribable())
@@ -64,7 +64,7 @@ export function useSubscribableStore<T extends object>(
   // ---------------- indexedDB ----------------
   if (options?.canCachedByIndexDB) {
     const idbManager = createIDBStoreManager<T>({
-      dbName: options.name ?? "default",
+      dbName: options.dbName ?? subscribable.name ?? "default",
       onStoreLoaded: async ({ get }) => {
         const valueStore = await get("store")
         if (valueStore) {
