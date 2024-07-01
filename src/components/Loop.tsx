@@ -9,6 +9,8 @@ export interface LoopController {}
 type ComponentStructure = (...anys: any[]) => JSXElement
 
 export type LoopProps<T> = {
+  /** only for inner */
+  $isList?: boolean
   renderWrapper?: ComponentStructure
   renderListItemWrapper?: ComponentStructure
 
@@ -28,11 +30,11 @@ export type LoopKitProps<T> = KitProps<LoopProps<T>, { controller: LoopControlle
  */
 export function Loop<T>(kitProps: LoopKitProps<T>) {
   const { props, shadowProps } = useKitProps(kitProps, {
-    name: "Loop",
+    name: kitProps.$isList ? "List" : "Loop",
     noNeedDeAccessifyChildren: true,
   })
   const BoxWrapper = kitProps.renderWrapper ?? AddProps
-  const ItemWrapper = kitProps.renderWrapper ?? Fragnment
+  const ItemWrapper = kitProps.renderListItemWrapper ?? Fragnment
 
   // [configs]
   const allItems = createMemo(() => {
@@ -65,5 +67,3 @@ export function Loop<T>(kitProps: LoopKitProps<T>) {
     </BoxWrapper>
   )
 }
-
-

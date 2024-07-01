@@ -1,5 +1,5 @@
 import { assert } from "@edsolater/fnkit"
-import { createEffect, createSignal } from "solid-js"
+import { createEffect, createSignal, on } from "solid-js"
 import { AddProps, Piv, createDomRef, createStaticICSS, useKitProps, type KitProps } from ".."
 
 export type PopoverPanelController = {

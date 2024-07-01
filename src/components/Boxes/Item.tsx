@@ -10,6 +10,7 @@ export type ItemKitProps = KitProps<ItemProps>
 
 /**
  * for direct sub component of `<GridBox>`
+ * @deprecated use `<Group>` or `<Section>` instead
  */
 export function Item(rawProps: ItemKitProps) {
   const { shadowProps, props } = useKitProps(rawProps, { name: "Item" })

@@ -170,7 +170,8 @@ function loadButtonDefaultICSS() {
           width: max-content;
           display: inline-grid;
           gap: 4px;
-          place-content: center;
+          place-items: center;
+          grid-auto-flow: column;
           font-size: 16px;
           border-radius: 8px;
           font-weight: 500;
