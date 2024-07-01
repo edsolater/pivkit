@@ -3,7 +3,6 @@ import { Accessor, createEffect, createSignal, on, onCleanup, onMount, type Sett
 import { type SetStoreFunction, createStore, unwrap, reconcile } from "solid-js/store"
 import { createIDBStoreManager } from "../webTools"
 
-//TODO: move to pivkit
 /**
  * useful for subscribe to a subscribable
  * @param subscribable
@@ -27,7 +26,6 @@ export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>,
   return [value, setValue]
 }
 
-//TODO: move to pivkit
 /**
  * useful for subscribe to a subscribable
  * @param subscribable
@@ -35,7 +33,11 @@ export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>,
  */
 export function useSubscribableStore<T extends object>(
   subscribable: Subscribable<T>,
-  options?: { cachedByIndexDB?: boolean; name?: string },
+  options?: {
+    canCachedByIndexDB?: boolean
+    /** name is for indexedDB */
+    name?: string
+  },
 ): [T, SetStoreFunction<T>] {
   const [store, setStore] = createStore(subscribable())
 
@@ -60,7 +62,7 @@ export function useSubscribableStore<T extends object>(
   })
 
   // ---------------- indexedDB ----------------
-  if (options?.cachedByIndexDB) {
+  if (options?.canCachedByIndexDB) {
     const idbManager = createIDBStoreManager<T>({
       dbName: options.name ?? "default",
       onStoreLoaded: async ({ get }) => {
