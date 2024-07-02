@@ -1,4 +1,4 @@
-import { arrify, mutateByDescriptors, pipeDo, shakeFalsy, shrinkFn } from "@edsolater/fnkit"
+import { arrify, mutateObjectByDescriptors, pipeDo, shakeFalsy, shrinkFn } from "@edsolater/fnkit"
 import { getPropsFromAddPropContext } from "../AddProps"
 import { PivProps } from "../Piv"
 import { getPropsFromPropContextContext } from "../PropContext"
@@ -151,7 +151,7 @@ export function createEmptyObject<T extends (keyof any)[]>(keys: T): { [K in T[n
  */
 function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "defineFirstChild"> {
   return "defineFirstChild" in props
-    ? mutateByDescriptors(props, {
+    ? mutateObjectByDescriptors(props, {
         newGetters: { children: (props) => arrify(props["defineFirstChild"]).concat(props.children) },
         deletePropertyNames: ["defineFirstChild"],
       })
@@ -166,7 +166,7 @@ function parsePivRenderPrependChildren<T extends Partial<PivProps<any, any>>>(pr
  */
 function parsePivRenderAppendChildren<T extends Partial<PivProps<any, any>>>(props: T): Omit<T, "defineLastChild"> {
   return "defineLastChild" in props
-    ? mutateByDescriptors(props, {
+    ? mutateObjectByDescriptors(props, {
         newGetters: {
           children: (props) => arrify(props.children).concat(arrify(props["defineLastChild"])),
         },

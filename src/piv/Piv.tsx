@@ -1,4 +1,4 @@
-import { MayArray, MayFn, arrify, pipeDo } from "@edsolater/fnkit"
+import { MayArray, MayFn, arrify, pipeDo, shakeUndefinedItem } from "@edsolater/fnkit"
 import { JSX, JSXElement } from "solid-js"
 import {
   ClassName,
@@ -97,28 +97,22 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
    * const Button = () => <Piv as={(parsedPivProps) => <button {...parsedPivProps} />} />
    */
   as?: any // TODO: imply it // 💡soft `define-self`, props will merge other than cover
-  "defineSelf"?: (selfProps: PivProps<any, any>) => JSX.Element // assume a function return ReactNode is a Component
 
-  /**
-   * auto merge by shadowProps
-   * change outter wrapper element
-   */
-  "defineOutWrapper"?: MayArray<DangerousWrapperNodeFn>
+  defineOutWrapper?: MayArray<DangerousWrapperNodeFn>
 
-  "defineFirstChild"?: MayArray<PivChild<Controller>>
+  defineSelf?: (selfProps: PivProps<any, any>) => JSX.Element // assume a function return ReactNode is a Component
 
-  "defineLastChild"?: MayArray<PivChild<Controller>>
+  definePrevSibling?: MayArray<PivChild<Controller>>
+  defineNextSibling?: MayArray<PivChild<Controller>>
+  defineFirstChild?: MayArray<PivChild<Controller>>
+  defineLastChild?: MayArray<PivChild<Controller>>
 }
 
 type DangerousWrapperNodeFn = (originalChildren: JSXElement) => JSXElement // change outter wrapper element
 
 export type CallbackRef<T> = (el: T) => void // not right
 
-export const pivPropsNames = [
-  "id",
-  "if",
-  "ifSelfShown",
-
+export const arriablePivPropsNames = [
   "domRef",
   "ref",
   "class",
@@ -133,12 +127,21 @@ export const pivPropsNames = [
   "debugLog",
 
   "innerController",
-  "children",
 
-  "defineSelf",
   "defineOutWrapper",
+  "definePrevSibling",
+  "defineNextSibling",
+  "defineSelf",
   "defineFirstChild",
   "defineLastChild",
+] satisfies (keyof PivProps<any>)[]
+
+export const pivPropsNames = [
+  "id",
+  "if",
+  "ifSelfShown",
+  "children",
+  ...arriablePivPropsNames,
 ] satisfies (keyof PivProps<any>)[]
 
 export const Piv = <TagName extends HTMLTag = HTMLTag, Controller extends ValidController = ValidController>(
@@ -146,19 +149,24 @@ export const Piv = <TagName extends HTMLTag = HTMLTag, Controller extends ValidC
 ) => {
   // 📝 defineOutWrapper may in showProps or plugin. so need to handle it first
   const props = pipeDo(kitProps, handleShadowProps, handlePluginProps, handleShadowProps)
-  return "defineOutWrapper" in props ? handlePropRenderOutWrapper(props) : handleNormalPivProps(props)
+  return "defineOutWrapper" in props ? renderWithOutWrapper(props) : renderWithNormalPivProps(props)
 }
 
-function handleNormalPivProps(rawProps?: Omit<PivProps<any, any>, "plugin" | "shadowProps">) {
+function renderWithNormalPivProps(rawProps?: Omit<PivProps<any, any>, "plugin" | "shadowProps">) {
   if (!rawProps) return
-
-  return renderHTMLDOM("div", rawProps)
+  if ("defineNextSibling" in rawProps || "definePrevSibling" in rawProps) {
+    return shakeUndefinedItem(
+      [rawProps.definePrevSibling, renderHTMLDOM("div", rawProps), rawProps.defineNextSibling].flat(),
+    ) as JSXElement
+  } else {
+    return renderHTMLDOM("div", rawProps)
+  }
 }
 
-function handlePropRenderOutWrapper(props: PivProps<any, any>): JSXElement {
+function renderWithOutWrapper(props: PivProps<any, any>): JSXElement {
   console.log("detect defineOutWrapper") // FIXME: <-- why not detected?
   return arrify(props["defineOutWrapper"]).reduce(
     (prevNode, getWrappedNode) => (getWrappedNode ? getWrappedNode(prevNode) : prevNode),
-    (() => handleNormalPivProps(omitProps(props, "defineOutWrapper"))) as unknown as JSXElement, // 📝 wrap function to let not solidjs read at once when array.prototype.reduce not finish yet
+    (() => renderWithNormalPivProps(omitProps(props, "defineOutWrapper"))) as unknown as JSXElement, // 📝 wrap function to let not solidjs read at once when array.prototype.reduce not finish yet
   )
 }

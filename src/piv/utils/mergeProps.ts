@@ -1,7 +1,8 @@
-import { AnyFn, AnyObj, arrify, mergeFunction, shakeNil } from "@edsolater/fnkit"
+import { AnyFn, AnyObj, arrify, isString, mergeFunction, shakeNil, switchCase } from "@edsolater/fnkit"
 import { ValidProps } from "../typeTools"
 import { getKeys } from "./getKeys"
 import { mergeRefs } from "./mergeRefs"
+import { arriablePivPropsNames } from "../Piv"
 
 /**
  * invoke only once, return the cached result when invoke again
@@ -66,46 +67,32 @@ export function mergeProps<P extends ValidProps | undefined>(...propsObjs: P[]):
  * use in mergeProps, core if merge props
  */
 export function getPivPropsValue(objs: AnyObj[], key: keyof any) {
-  switch (key) {
-    // -------- specific --------
-    // inside define's  children's priority is higher than outside define's
-    case "children":
-      for (let i = 0; i < objs.length; i++) {
-        const obj = objs[i]
-        const v = obj?.[key]
+  return switchCase(
+    key,
+    [
+      [
+        "children",
+        () => {
+          for (let i = 0; i < objs.length; i++) {
+            const v = objs[i]?.[key]
+            if (v != null) return v
+          }
+        },
+      ],
+      [
+        (s) => isString(s) && (arriablePivPropsNames.includes(s as any) || s.startsWith("on")),
+        () =>
+          objs.reduce((finalValue, objB) => {
+            const valueB = objB[key]
+            return valueB && finalValue ? [finalValue, valueB].flat() : valueB ?? finalValue
+          }, undefined as unknown),
+      ],
+    ],
+    () => {
+      for (let i = objs.length - 1; i >= 0; i--) {
+        const v = objs[i]?.[key]
         if (v != null) return v
       }
-
-    // -------- pivprops --------
-    case "domRef":
-    case "class":
-    case "style":
-    case "icss":
-    case "htmlProps":
-    case "shadowProps":
-    case "plugin":
-    case "defineOutWrapper":
-      return objs.reduce((finalValue, objB) => {
-        const valueB = objB[key]
-        return valueB && finalValue ? [finalValue, valueB].flat() : valueB ?? finalValue
-      }, undefined as unknown)
-    // -------- normal props --------
-    default: {
-      // -------- 'merge:on' callback function --------
-      if (key.toString().startsWith("merge:")) {
-        return objs.reduce((finalValue, objB) => {
-          const valueB = objB[key]
-          return valueB && finalValue ? mergeFunction(finalValue, valueB) : valueB ?? finalValue
-        }, undefined as unknown)
-      } else {
-        // -------- very normal props --------
-        // outside define's props priority is higher than inside define's
-        for (let i = objs.length - 1; i >= 0; i--) {
-          const obj = objs[i]
-          const v = obj?.[key]
-          if (v != null) return v
-        }
-      }
-    }
-  }
+    },
+  )
 }

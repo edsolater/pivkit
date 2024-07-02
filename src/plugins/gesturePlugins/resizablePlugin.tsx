@@ -172,7 +172,7 @@ export const resizablePlugin: ResizablePlugin = createPlugin((options) => {
         },
       } as const,
       domRef: [setDom, resizableStateClassManager.setDom, resizingStateClassManager.setDom],
-      "defineFirstChild": [
+      defineFirstChild: [
         canResizeX ? (
           <Piv // resize vertical handler
             icss={{

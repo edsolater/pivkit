@@ -1,6 +1,6 @@
-import { AnyFn, arrify, mergeObjectsWithConfigs, switchCase, shakeNil } from "@edsolater/fnkit"
+import { arrify, isString, mergeObjectsWithConfigs, shakeNil, switchCase } from "@edsolater/fnkit"
 import { SignalizeProps, ValidProps } from "../typeTools"
-import { mergeRefs } from "./mergeRefs"
+import { arriablePivPropsNames } from "../Piv"
 
 // TODO: mergeSignalProps should have right type tools, current is wrong
 
@@ -37,47 +37,19 @@ export function mergeSignalProps<P extends SignalizeProps<ValidProps> | undefine
   // @ts-ignore
   if (trimedProps.length <= 1) return trimedProps[0] ?? {}
 
-  const mergedResult = mergeObjectsWithConfigs(trimedProps, ({ key, valueA: v1, valueB: v2 }) =>
-    switchCase(
+  const mergedResult = mergeObjectsWithConfigs(trimedProps, ({ key, valueA: v1, valueB: v2 }) => {
+    return switchCase(
       key,
       [
         // special div props
-        // TODO: just use ref
-        ["domRef", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["ref", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["class", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["style", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["icss", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["htmlProps", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["shadowProps", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["plugin", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["debugLog", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["defineOutWrapper", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["defineFirstChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["defineLastChild", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
-
-        ["controller", () => (v1 && v2 ? () => [v1(), v2()].flat() : v1 ?? v2)],
+        [
+          (s) => isString(s) && (arriablePivPropsNames.includes(s as any) || s.startsWith("on")),
+          () => (v1 && v2 ? [v1, v2].flat() : v1 ?? v2),
+        ],
       ],
-      v1 && v2 ? () => v2() ?? v1() : v2 ?? v1,
-    ),
-  )
+      v2 ?? v1,
+    )
+  })
   // @ts-ignore
   return mergedResult
 }
-
-type GetReturn<F extends AnyFn | undefined> = F extends AnyFn ? ReturnType<F> : undefined
-
-type MergeData<T1, T2> = T1 & T2 extends never ? T2 : T1
-type MergeOneSignalProps<P1 extends AnyFn | undefined, P2 extends AnyFn | undefined> = () => GetReturn<P1> &
-  GetReturn<P2>

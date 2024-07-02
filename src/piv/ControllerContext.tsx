@@ -54,14 +54,11 @@ export function handlePropsInnerController(props: ValidProps, componentName?: st
   if (inputController && Object.keys(inputController).length) {
     const ControllerContext = getControllerContext(componentName)
     const newProps = mergeProps(props, {
-      "defineOutWrapper": (originalNode) => {
-        console.log("parse outWrapper", 33)
-        return (
-          <ControllerContext.Provider value={inputController}>
-            <Fragnment>{originalNode}</Fragnment>
-          </ControllerContext.Provider>
-        )
-      },
+      defineOutWrapper: (originalNode) => (
+        <ControllerContext.Provider value={inputController}>
+          <Fragnment>{originalNode}</Fragnment>
+        </ControllerContext.Provider>
+      ),
     } as Partial<PivProps>)
     return newProps
   }
