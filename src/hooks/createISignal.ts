@@ -9,9 +9,15 @@ export type SignalPlugin<V> = () => {
 
 /**
  * basic util: plugin can get multi features
+ *
+ * with plugin, options
  */
 // TODO: haven't test
-export function createSignalWithPlugin<V>(defaultValue: V | (() => V), options?: { plugins?: SignalPlugin<V>[] }) {
+// TODO: maybe it's too complicated
+export function createISignal<V>(
+  defaultValue: V | (() => V),
+  options?: { name?: string; plugins?: SignalPlugin<V>[] },
+) {
   const defaultSignalValueWrappers: ((getOriginalValue: () => V | Accessor<V>) => () => V | Accessor<V>)[] = []
   const setWrappers: ((originalSet: Setter<V>) => Setter<V>)[] = []
   const getWrappers: ((originalGet: Accessor<V>) => Accessor<V>)[] = []

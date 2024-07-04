@@ -1,16 +1,21 @@
 import { Booleanable, MayArray, MayFn, arrify, isMeanfulArray, mergeObjects, shrinkFn } from "@edsolater/fnkit"
-import { createEffect, createMemo } from "solid-js"
+import { createEffect, createMemo, type Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { useClassRef } from "../webTools"
 import { createRef } from "../hooks/createRef"
-import { Piv, mergeProps, omitProps, parsePivChildren } from "../piv"
+import { Piv, mergeProps, omitProps, parsePivChildren, shrinkPivChildren, type PivChild } from "../piv"
 import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
 import { cssOpacity, cssVar, icssClickable, tailwindPaletteColors } from "../styles"
 import { addGlobalCSS } from "../utils/cssGlobalStyle"
+import { createLazyMemo } from "../hooks"
 
 export interface ButtonController {
-  click?: () => void
-  focus?: () => void
+  /** button is active. detected by `props:isActive` */
+  isActive: Accessor<boolean>
+
+  click: () => void
+
+  focus: () => void
 }
 
 export const ButtonCSSVariables = {
@@ -49,6 +54,9 @@ export interface ButtonProps {
    */
   size?: keyof typeof ButtonSize
 
+  /** button is clicked */
+  isActive?: boolean
+
   /** a short cut for validator */
   disabled?: boolean
   enabled?: boolean
@@ -71,7 +79,12 @@ export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonControlle
 export function Button(kitProps: ButtonKitProps) {
   const [dom, setDom] = createRef<HTMLButtonElement>()
   loadButtonDefaultICSS()
+
+  // ---------------- props ----------------
+  const { props, loadController } = useKitProps(kitProps, { name: "Button", noNeedDeAccessifyChildren: true })
+
   const innerController: ButtonController = {
+    isActive: createLazyMemo(() => Boolean(props.isActive)),
     click: () => {
       dom()?.click()
     },
@@ -79,12 +92,7 @@ export function Button(kitProps: ButtonKitProps) {
       dom()?.focus()
     },
   }
-
-  // ---------------- props ----------------
-  const { props } = useKitProps(kitProps, {
-    controller: () => innerController,
-    name: "Button",
-  })
+  loadController(innerController)
 
   // ---------------- validation ----------------
   const failedTestValidator = createMemo(() =>
@@ -126,26 +134,22 @@ export function Button(kitProps: ButtonKitProps) {
     ),
   )
 
-  // ---------------- controller ----------------
-  const mergedController =
-    "innerController" in props ? mergeObjects(props.innerController!, innerController) : innerController
-
   return (
     <Piv<"button">
       defineSelf={(selfProps) => renderHTMLDOM("button", selfProps)}
       shadowProps={omitProps(props, "onClick")} // omit onClick for need to invoke the function manually, see below 👇
-      onClick={(...args) => {
+      onClick={(arg) => {
         if (!isInteractive()) return
         if ("onClick" in props) {
-          const { ev } = args[0]
+          const { ev } = arg
           ev.stopPropagation()
-          props.onClick?.(...args)
+          props.onClick?.(mergeObjects(arg, innerController))
         }
       }}
       icss={icssClickable}
       domRef={[setDom, setStateClassRef]}
     >
-      {parsePivChildren(props.children, mergedController)}
+      {shrinkPivChildren(props.children, [innerController])}
     </Piv>
   )
 }

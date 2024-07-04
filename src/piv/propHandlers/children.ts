@@ -1,4 +1,4 @@
-import { AnyFn, hasProperty, isArray, isFunction } from "@edsolater/fnkit"
+import { AnyFn, hasProperty, isArray, isFunction, shrinkFn } from "@edsolater/fnkit"
 import { JSXElement } from "solid-js"
 import { KitProps } from "../../createKit/KitProps"
 import { ValidController } from "../typeTools"
@@ -12,13 +12,14 @@ export function loadPropsControllerRef<Controller extends ValidController | unkn
   }
 }
 
+/** for solidjs's raw JSXElement is just a function */
 export function parsePivChildren<
   P extends unknown | ((controller: Controller) => unknown),
   Controller extends ValidController | unknown,
 >(originalChildren: P, controller: Controller = {} as Controller): JSXElement {
   return isArray(originalChildren)
     ? originalChildren.map((i) => parsePivChildren(i, controller))
-    : isNormalControllerChildren(originalChildren)
+    : isCustomizedFunctionalChildren(originalChildren)
       ? originalChildren(controller)
       : originalChildren
 }
@@ -28,6 +29,10 @@ export function parsePivChildren<
  * @param node children
  * @returns
  */
-function isNormalControllerChildren(node: unknown): node is AnyFn {
+function isCustomizedFunctionalChildren(node: unknown): node is AnyFn {
   return isFunction(node) && !node.name.includes("readSignal" /*  learn by window console.log */)
+}
+
+export function shrinkPivChildren(fn: any, params?: any[]) {
+  return isCustomizedFunctionalChildren(fn) ? shrinkFn(fn, params as any) : fn
 }

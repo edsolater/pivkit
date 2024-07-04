@@ -1,6 +1,6 @@
 import { createEventCenter, type AnyFn, type ID } from "@edsolater/fnkit"
 import type { Accessor } from "solid-js"
-import { createSignalWithPlugin } from "../createSignalWithPlugin"
+import { createISignal } from "../createISignal"
 import { createUUID } from "./createUUID"
 
 // global cache
@@ -40,7 +40,7 @@ export function createTrigger({
   state?: boolean | Accessor<boolean> // TODO: signal plugin should handle this
 } = {}): TriggerController {
   if (triggerControllers.has(id)) return triggerControllers.get(id)!
-  const [isTriggerOn, setIsTriggerOn] = createSignalWithPlugin(defaultState)
+  const [isTriggerOn, setIsTriggerOn] = createISignal(defaultState)
   const callbackOnStack = [] as AnyFn[]
   const callbackOffStack = [] as AnyFn[]
   const callbackToggleStack = [] as AnyFn[]
