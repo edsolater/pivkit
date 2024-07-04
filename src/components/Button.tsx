@@ -36,7 +36,7 @@ export const ButtonVariant = {
   solid: "solid", // default
   outline: "outline",
   ghost: "ghost",
-  transparent: "transparent", // have button's feature but no outside appearance
+  plain: "plain", // have button's feature but no outside appearance
 }
 
 export interface ButtonProps {
@@ -234,7 +234,7 @@ function loadButtonDefaultICSS() {
             }
             color: currentcolor;
           }
-          &.${ButtonVariant.transparent} {
+          &.${ButtonVariant.plain} {
             background-color: transparent;
             color: currentcolor;
           }
