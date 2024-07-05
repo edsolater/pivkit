@@ -55,9 +55,7 @@ export const ModalContext = createComponentContext<Partial<ModalController>>()
  * - {@link ModalTitle \<ModalTitle\>} - register mobal title. Actually is {@link Text \<Text\>}
  */
 export function Modal(kitProps: ModalKitProps) {
-  const { props, shadowProps, loadController } = useKitProps(kitProps, {
-    name: "Modal"
-  })
+  const { props, shadowProps, loadController } = useKitProps(kitProps, { name: "Modal" })
   const [dialogDOM, setDialogDOM] = createRef<HTMLDialogElement>()
   const [dialogContentDOM, setDialogContentDOM] = createRef<HTMLDivElement>()
   const openModal = () => dialogDOM()?.showModal()
