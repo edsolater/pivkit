@@ -191,7 +191,7 @@ export function InfiniteScrollList<T extends Collection>(kitProps: InfiniteScrol
 }
 
 /**
- * render may be not visiable
+ * render may be not visible
  */
 function checkNeedRenderByIndex(idx: number | undefined, renderItemLength: number | undefined) {
   if (idx == null) return false

@@ -9,8 +9,8 @@ import { Accessify, accessifyProps } from "../utils/accessifyProps"
 import { createController2 } from "../utils/createController"
 
 type TransitionPhase =
-  | "hidden" /* UI unvisiable */
-  | "shown" /* UI visiable and stable(not in transition) */
+  | "hidden" /* UI unvisible */
+  | "shown" /* UI visible and stable(not in transition) */
   | "during-process"
 
 type TransitionCurrentPhasePropsName = "enterFrom" | "enterTo" | "leaveFrom" | "leaveTo"
@@ -410,10 +410,10 @@ export function loadModuleAutoSizeTransition(options?: {
 }
 
 // const cssTransitionPlugin = createPlugin<CSSTransactionOptions, any, any>((options: CSSTransactionOptions = {}) => () => {
-//   const { refSetter, transitionIcss, isInnerVisiable } = useCSSTransition(options)
+//   const { refSetter, transitionIcss, isInnervisible } = useCSSTransition(options)
 //   return {
 //     ref: refSetter,
 //     ...transitionIcss,
-//     show: isInnerVisiable,
+//     show: isInnervisible,
 //   }
 // })

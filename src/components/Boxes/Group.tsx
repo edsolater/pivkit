@@ -2,19 +2,13 @@ import { KitProps, useKitProps } from "../../createKit"
 import { Box, BoxProps } from "./Box"
 
 export type GroupProps = BoxProps & {
-  /** only display:contents */
-  displayContents?: boolean
+  
+  /**
+   * only display:contents 
+   * just render nothing
+   */
+  ghost?: boolean
   name?: string
-}
-
-/**
- * just render nothing
- */
-export function GhostGroup(kitProps: KitProps<GroupProps>) {
-  const { props, shadowProps } = useKitProps(kitProps, { name: "GhostGroup" })
-  const groupIcss = { display: "contents" }
-  /* ---------------------------------- props --------------------------------- */
-  return <Box class={props.name} shadowProps={shadowProps} icss={groupIcss} />
 }
 
 /**
@@ -27,7 +21,7 @@ export function Group(kitProps: KitProps<GroupProps>) {
     <Box
       class={props.name}
       shadowProps={shadowProps}
-      icss={props.displayContents ? { display: "contents" } : undefined}
+      icss={props.ghost ? { display: "contents" } : undefined}
     />
   )
 }

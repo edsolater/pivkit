@@ -1,7 +1,7 @@
 import { AnyFn, AnyObj, MayFn } from "@edsolater/fnkit"
 import { JSX, JSXElement } from "solid-js"
 
-export type ValidProps = Record<keyof any, Exclude<any, Promise<any>>>
+export type ValidProps = Record<keyof any, any>
 
 /**
  * includes component controller and component methods

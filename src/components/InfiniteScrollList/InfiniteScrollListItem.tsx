@@ -9,9 +9,9 @@ import { isClientSide } from "../../webTools/jFetch"
 
 export type InfiniteScrollListItemRawProps = {
   children: () => JSX.Element
-  // TODO: just forceVisiable is not enough, should have more control props
+  // TODO: just forcevisible is not enough, should have more control props
   /** default is false */
-  initVisiable?: boolean
+  initvisible?: boolean
 }
 
 export interface InfiniteScrollListItemController {
@@ -35,7 +35,7 @@ export function InfiniteScrollListItem(originalProps: InfiniteScrollListItemProp
 
   //=== isIntersecting with parent `<List>`'s intersectionObserver
   const listContext = useContext(InfiniteScrollListContext)
-  const [isIntersecting, setIsIntersecting] = createSignal(Boolean(props.initVisiable))
+  const [isIntersecting, setIsIntersecting] = createSignal(Boolean(props.initvisible))
   createEffect(() => {
     const el = itemDomRef()
     if (!el) return
