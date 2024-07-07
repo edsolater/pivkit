@@ -34,6 +34,11 @@ determin what component looks like
 
 - `<Text>` ui text
 
+# PluginContext (UI)
+
+- `<PluginContext>` base component. all other plugin components is based on this
+- `<EditablePluginContext>` with editablePlugin
+
 # StateManager (UI)
 
 if use hooks to hold state, the user's component's code will be too complicated to understand

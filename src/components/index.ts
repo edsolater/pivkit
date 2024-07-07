@@ -29,3 +29,5 @@ export * from "./Tabs"
 export * from "./TagInput"
 export * from "./Text"
 
+// ---------------- plugin component ----------------
+export * from "./PluginWrapper"
