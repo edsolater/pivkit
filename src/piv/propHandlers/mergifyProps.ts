@@ -1,6 +1,6 @@
 import { isString, mayForEach, shrinkFn, type AnyFn, type DeMayArray, type MayArray } from "@edsolater/fnkit"
 
-export type PivkitCallback<F extends AnyFn | undefined> = MayArray<F>
+export type PivkitCallback<F extends AnyFn | undefined> = MayArray<NonNullable<F>> | undefined
 export type DePivkitCallback<F> = DeMayArray<F>
 
 export function invokePivkitCallback(
@@ -22,4 +22,3 @@ export function handlePivkitCallbackProps(props: any) {
       isString(key) && key.startsWith("on") ? turnPivkitCallbackToNormalCallback(target[key]) : target[key],
   }) as any
 }
-
