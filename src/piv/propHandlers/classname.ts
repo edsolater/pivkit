@@ -1,12 +1,12 @@
 import { arrify, isObjectLike, isTruthy, MayArray, shrinkFn } from "@edsolater/fnkit"
 import { LoadController, ValidController } from "../typeTools"
 
-export type ClassName<Controller extends ValidController | unknown = unknown> = LoadController<
+export type ClassName<Controller extends ValidController = ValidController> = LoadController<
   any | { [classname: string]: LoadController<boolean, Controller> },
   Controller
 >
 
-export function classname<Controller extends ValidController | unknown = unknown>(
+export function classname<Controller extends ValidController = ValidController>(
   classNameArray: MayArray<ClassName<Controller>>,
   controller?: Controller,
 ) {

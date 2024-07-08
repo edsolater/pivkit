@@ -35,4 +35,4 @@ export type SignalizeProps<T extends object | undefined> = {
   [K in keyof T]: T[K] extends AnyFn ? T[K] : () => T[K]
 }
 
-export type LoadController<Target, Controller extends ValidController | unknown = unknown> = MayFn<Target, [Controller]>
+export type LoadController<Target, Controller extends ValidController = ValidController> = MayFn<Target, [Controller]>

@@ -1,30 +1,32 @@
 import { Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { usePositionTranslate } from "../../webTools/hooks/usePositionTranslate"
 import { createSyncSignal } from "../../hooks/createSyncSignal"
 import { Piv } from "../../piv"
+import { usePositionTranslate } from "../../webTools/hooks/usePositionTranslate"
+import { Box } from "../Boxes"
 import { LabelKitProps } from "../Label"
-import { LabelBox } from "../LabelBox"
 import { HTMLCheckbox, HTMLCheckboxProps } from "./HTMLCheckbox"
 import { useSwitchStyle } from "./hooks/useSwitchStyle"
-import { Box } from "../Boxes"
 
 export interface SwitchController {
   isChecked: Accessor<boolean>
 }
 
-export type SwitchProps = KitProps<{
-  isChecked?: boolean
-  name?: string
-  isDefaultChecked?: boolean
-  onChange?(utils: { isChecked: boolean }): void
-  /** for Chakra has, so i has */
-  "anatomy:ContainerBox"?: LabelKitProps
-  /** hidden HTML input(type=checkbox) for aria readbility */
-  "anatomy:HTMLCheckbox"?: HTMLCheckboxProps
-  /** SwitchThumb */
-  "anatomy:Thumb"?: any
-}>
+export type SwitchProps = KitProps<
+  {
+    isChecked?: boolean
+    name?: string
+    isDefaultChecked?: boolean
+    onChange?(utils: { isChecked: boolean }): void
+    /** for Chakra has, so i has */
+    "anatomy:ContainerBox"?: LabelKitProps
+    /** hidden HTML input(type=checkbox) for aria readbility */
+    "anatomy:HTMLCheckbox"?: HTMLCheckboxProps
+    /** SwitchThumb */
+    "anatomy:Thumb"?: any
+  },
+  { controller: SwitchController }
+>
 
 const selfProps = [
   "isChecked",

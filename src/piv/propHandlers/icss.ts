@@ -1,7 +1,6 @@
 import {
   AnyFn,
   AnyObj,
-  MayDeepArray,
   MayFn,
   createConfigableFunction,
   filter,
@@ -12,14 +11,16 @@ import {
   overwriteFunctionName,
   shrinkFn,
   type ConfigableFunction,
+  type MayArray,
+  type MayDeepArray,
+  deepArrify,
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
 // just for type, just use goober is not enough
 import type * as CSS from "csstype" // or it will have bug when `pnpm build`
+import type { LoadController, ValidController } from "../typeTools"
 
-type ValidController = AnyObj
-type LoadController<Target, Controller extends ValidController | unknown = unknown> = MayFn<Target, [Controller]>
-export type ICSSObject<Controller extends ValidController | unknown = unknown> = LoadController<CSSObject, Controller> // rename  for ICSSObject may be a superset of CSSObject
+export type ICSSObject<Controller extends ValidController = ValidController> = LoadController<CSSObject, Controller> // rename  for ICSSObject may be a superset of CSSObject
 
 // export type CSSObject = JSX.CSSProperties & {
 //   '&:hover'?: JSX.CSSProperties
@@ -27,7 +28,8 @@ export type ICSSObject<Controller extends ValidController | unknown = unknown> =
 // }
 export type CSSObject = CSSAttribute
 
-export type ICSS<Controller extends ValidController | unknown = unknown> = MayDeepArray<
+export type ICSS<Controller extends ValidController = ValidController> = MayDeepArray<
+  // for more composeable, have to
   LoadController<boolean | string | number | null | undefined, Controller> | ICSSObject<Controller>
 >
 
@@ -95,7 +97,7 @@ export function attachIcssToElement(el: HTMLElement, icss: ICSS) {
 }
 
 /** for piv to parse icss props */
-export function handleICSSProps<Controller extends ValidController | unknown = unknown>(
+export function handleICSSProps<Controller extends ValidController = ValidController>(
   cssProp: ICSS<Controller>,
   controller: Controller = {} as Controller,
   debug?: boolean,
@@ -104,7 +106,7 @@ export function handleICSSProps<Controller extends ValidController | unknown = u
     return ""
   }
   let outputClassName = ""
-  for (const i of arrify(cssProp)) {
+  for (const i of deepArrify(cssProp)) {
     const fn = isTaggedICSS(i) ? invokeTaggedICSS(i as any) : i
     const shrinked = shrinkFn(fn, [controller])
     if (!shrinked || (!isString(shrinked) && !isObject(shrinked))) continue
@@ -120,14 +122,14 @@ export function handleICSSProps<Controller extends ValidController | unknown = u
  * ICSS => string(class-name)
  * you can parse icss not in component-show-time to speed up
  */
-export function parseICSSToClassName<Controller extends ValidController | unknown = unknown>(
+export function parseICSSToClassName<Controller extends ValidController = ValidController>(
   icss: ICSS<Controller>,
   controller?: Controller,
 ): string {
   return handleICSSProps(icss, controller)
 }
 
-export function compressICSSToObj<Controller extends ValidController | unknown = unknown>(
+export function compressICSSToObj<Controller extends ValidController = ValidController>(
   icss: ICSS<Controller>,
 ): ICSSObject<Controller> {
   return (controller: Controller) => {
@@ -140,7 +142,7 @@ export function compressICSSToObj<Controller extends ValidController | unknown =
   }
 }
 
-export function mergeICSSObject<Controller extends ValidController | unknown = unknown>(
+export function mergeICSSObject<Controller extends ValidController = ValidController>(
   ...icssEs: ICSSObject<Controller>[]
 ): ICSSObject<Controller> {
   return (controller: Controller) =>

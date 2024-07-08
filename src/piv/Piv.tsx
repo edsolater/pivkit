@@ -32,6 +32,7 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
    */
   domRef?: MayArray<CallbackRef<any> | null | undefined>
 
+  /** old controllerRef, but `controllerRef` is not strightforward */
   ref?: MayArray<CallbackRef<any> | null | undefined>
 
   /**
@@ -52,13 +53,13 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
    * auto merge by shadowProps
    * if it's in shadow props, it will merge with exist props
    */
-  icss?: ICSS<any>
+  icss?: ICSS<Controller>
 
   /**
    * auto merge by shadowProps
    * if it's in shadow props, it will merge with exist props
    */
-  style?: IStyle<any>
+  style?: IStyle<Controller>
 
   /**
    * auto merge by shadowProps
@@ -88,9 +89,6 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
   // -------- special prop --------
 
   /** only passed in parent component */
-  /**
-   * @deprecated
-   */
   innerController?: Controller
 
   /** @example
@@ -99,9 +97,7 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
   as?: any // TODO: imply it // 💡soft `define-self`, props will merge other than cover
 
   defineOutWrapper?: MayArray<DangerousWrapperNodeFn>
-
   defineSelf?: (selfProps: PivProps<any, any>) => JSX.Element // assume a function return ReactNode is a Component
-
   definePrevSibling?: MayArray<PivChild<Controller>>
   defineNextSibling?: MayArray<PivChild<Controller>>
   defineFirstChild?: MayArray<PivChild<Controller>>
