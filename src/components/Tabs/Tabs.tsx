@@ -96,8 +96,8 @@ export function Tabs(rawProps: TabsKitProps) {
 
   const [selectedIndex, selectTabByIndex] = createSyncSignal({
     defaultValue: () => getDefaultIndex() ?? getDefaultIndexByValue() ?? 0 /* defaultly focus on first one */,
-    getValueFromOutside: () => getIndex() ?? getIndexByValue() ?? undefined /* defaultly focus on first one */,
-    onInvokeSetter(value) {
+    value: () => getIndex() ?? getIndexByValue() ?? 0 /* defaultly focus on first one */,
+    onSetByInner(value) {
       invokeCallbacks(tabsController)
       props.onChange?.(tabsController)
     },

@@ -1,44 +1,42 @@
-import { Signal, createEffect, createSignal, on } from "solid-js"
+import { Signal, createEffect, createSignal, on, type Accessor } from "solid-js"
 
 /**
  * a shortcut
  */
 export function createSyncSignal<T>(options: {
-  defaultValue(): T
-  getValueFromOutside: (prev?: T) => T | undefined
-  onInvokeSetter?: (value: T) => void
-}): Signal<T>
-export function createSyncSignal<T>(options: {
-  defaultValue?(): T
-  getValueFromOutside: (prev?: T) => T
-  onInvokeSetter?: (value: T) => void
-}): Signal<T | undefined>
-export function createSyncSignal<T>(options: {
-  defaultValue?(): T
-  getValueFromOutside: (prev?: T) => T | undefined
-  onInvokeSetter?: (value: T) => void
-}): Signal<T | undefined> {
-  const [accessor, setAccessor] = createSignal(
-    "defaultValue" in options
-      ? options.defaultValue?.() ?? options.getValueFromOutside()
-      : options.getValueFromOutside(),
+  defaultValue?: Accessor<T>
+  value: Accessor<T>
+  onSetByInner?: (value: T, prevValue: T | undefined) => void
+}): Signal<T> {
+  const [innerValue, setInnerValue] = createSignal(
+    "defaultValue" in options ? options.defaultValue!() : options.value(),
   )
 
-  // invoke `get`
-  createEffect(() => setAccessor((prev) => options.getValueFromOutside(prev) ?? prev))
-
-  // invoke `set`
+  // cause from outside: value -> innerValue
   createEffect(
     on(
-      accessor,
-      (newValue, prevValue) => {
-        // same as input so no need to invoke the setter fn
-        if (newValue === options.getValueFromOutside()) return
-        options.onInvokeSetter?.(newValue as T)
+      options.value,
+      (newValue) => {
+        // same as input so no need to invoke the setter fn,
+        // but this is handled by the innerValue signal 's original
+        setInnerValue(() => newValue)
       },
       { defer: true },
     ),
   )
 
-  return [accessor, setAccessor]
+  // cause from inside: innerValue -> value
+  createEffect(
+    on(
+      innerValue,
+      (newValue, prevValue) => {
+        // same as input so no need to invoke the setter fn
+        if (newValue === options.value()) return
+        options.onSetByInner?.(newValue as T, prevValue)
+      },
+      { defer: true },
+    ),
+  )
+
+  return [innerValue, setInnerValue]
 }

@@ -26,8 +26,8 @@ export function createFormField<T>(opts: Omit<UseFormFieldOptions<T | undefined>
 export function createFormField<T>(opts: Omit<UseFormFieldOptions<T>, "value"> & { value: Accessify<T> }): FormField<T>
 export function createFormField(opts: UseFormFieldOptions<any>): FormField<any> {
   const [value, setValue] = createSyncSignal({
-    getValueFromOutside: () => deAccessify(opts.value),
-    onInvokeSetter: (to) => {
+    value: () => deAccessify(opts.value),
+    onSetByInner: (to) => {
       opts.onChange?.(to)
     },
   })
