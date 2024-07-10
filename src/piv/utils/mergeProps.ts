@@ -1,8 +1,7 @@
-import { AnyFn, AnyObj, arrify, isString, mergeFunction, shakeNil, switchCase } from "@edsolater/fnkit"
+import { AnyFn, AnyObj, arrify, isString, mergeObjects, shakeNil, switchCase } from "@edsolater/fnkit"
+import { arriablePivPropsNames } from "../Piv"
 import { ValidProps } from "../typeTools"
 import { getKeys } from "./getKeys"
-import { mergeRefs } from "./mergeRefs"
-import { arriablePivPropsNames } from "../Piv"
 
 /**
  * invoke only once, return the cached result when invoke again
@@ -19,6 +18,7 @@ function createCachedFunction<F extends AnyFn>(fn: F): F {
   } as F
 }
 
+/** for piv's props */
 export function mergeProps<P1 = ValidProps, P2 = ValidProps>(...propsObjs: [P1, P2]): Exclude<P1 & P2, undefined>
 export function mergeProps<P1 = ValidProps, P2 = ValidProps, P3 = ValidProps>(
   ...propsObjs: [P1, P2, P3]
@@ -80,7 +80,11 @@ export function getPivPropsValue(objs: AnyObj[], key: keyof any) {
         },
       ],
       [
-        (s) => isString(s) && (arriablePivPropsNames.includes(s as any) || s.startsWith("on")),
+        "innerController", // innerController is a mergable object
+        () => mergeObjects(...objs.map((obj) => obj[key])),
+      ],
+      [
+        (s) => isString(s) && (arriablePivPropsNames.includes(s as any) || s.startsWith("on")), // basic pivprops all support may array value
         () =>
           objs.reduce((finalValue, objB) => {
             const valueB = objB[key]
@@ -91,7 +95,7 @@ export function getPivPropsValue(objs: AnyObj[], key: keyof any) {
     () => {
       for (let i = objs.length - 1; i >= 0; i--) {
         const v = objs[i]?.[key]
-        if (v != null) return v
+        if (v !== null && v !== undefined) return v
       }
     },
   )

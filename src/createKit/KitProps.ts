@@ -50,7 +50,7 @@ export type KitProps<
   } = {},
 > = KitPropsInstance<
   RawProps,
-  NonNullable<O["controller"]>,
+  unknown extends O["controller"] ? any : NonNullable<O["controller"]>, // when not set, any access is ok
   NonNullable<O["plugin"]>,
   NonNullable<O["htmlPropsTagName"]>,
   NonNullable<

@@ -7,7 +7,7 @@ import {
   mergeObjects,
   pipeDo,
   shrinkFn,
-  type AnyFn
+  type AnyFn,
 } from "@edsolater/fnkit"
 import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
@@ -154,51 +154,55 @@ function useKitPropParser<
   shadowProps: any
   loadController: AnyFn
 } {
-  const controller1 = options?.controller ? createObjectWhenAccess(() => options.controller!(parsedProps2)) : {}
+  const controllerFromOptions = options?.controller
+    ? createObjectWhenAccess(() => options.controller!(deAccessfiedProps))
+    : {}
 
-  // const startTime = performance.now()
   // merge kit props
-  const parsedProps1 = pipeDo(
+  const preparsedProps = pipeDo(
     kitProps,
-    //handle context props
+    // (context) handle context props
     (props) => mergeProps(props, getPropsFromPropContextContext({ componentName: options?.name })),
-    // handle addPropContext props
+    // (context) handle addPropContext props
     (props) => mergeProps(props, getPropsFromAddPropContext({ componentName: options?.name })),
-    // get defaultProps from uikitTheme
+    // (global config) get defaultProps from uikitTheme
     (props) => (options?.name && hasUIKitTheme(options.name) ? mergeProps(getUIKitTheme(options.name), props) : props),
-    // get default props
+    // (useKitProps's option) get default props
     (props) => (options?.defaultProps ? addDefaultPivProps(props, options.defaultProps) : props),
-    // parse shadowProps of **options**
-    (props) => handleShadowProps(props, options?.selfProps), // TODO: assume can't be promisify
-    // parse plugin of **options**
+    // (useKitProps's option) parse plugin
     (props) =>
       handlePluginProps(
         props,
         () => options?.plugin,
         () => hasProperty(options, "plugin"),
       ), // defined-time (parsing option)
-    // parse component name of **options**
+    // (useKitProps's option) component name
     (props) => (hasProperty(options, "name") ? mergeProps(props, { class: options!.name }) : props), // defined-time (parsing option)
-
+    // (runtime props) parse shadowProps
     (props) => handleShadowProps(props, options?.selfProps), // outside-props-run-time(parsing props) // TODO: assume can't be promisify
+    // (runtime props) parse plugin
     (props) => handlePluginProps(props), // outside-props-run-time(parsing props) // TODO: assume can't be promisify  //<-- bug is HERE!!, after this, class is doubled
+    // (runtime props) parse onXxxx callbacks
     (props) => handlePivkitCallbackProps(props), // outside-props-run-time(parsing props) // TODO: assume can't be promisify
   ) as any /* too difficult to type */
 
   let loadController: AnyFn = () => {}
+
   if (hasProperty(kitProps, "ref")) {
     loadController = (controller) => {
       arrify(kitProps.ref).forEach((ref) => ref?.(shrinkFn(controller)))
     }
   }
 
-  // TODO: don't use controllerRef, use ref instead
-  const controller = parsedProps1.innerController
-    ? mergeObjects(controller1, parsedProps1.innerController)
-    : controller1
+  // TODO: don't use controllerRef, use ref instead. because `ref` name is more user-friendly
+  const controller = preparsedProps.innerController
+    ? mergeObjects(controllerFromOptions, preparsedProps.innerController)
+    : controllerFromOptions
+
   // inject controller to props:innerController (📝!!!important notice, for lazyLoadController props:innerController will always be a prop of any component useKitProps)
-  const shadowProps = mergeObjects(parsedProps1, { innerController: controller } as PivProps)
-  const parsedProps2 = pipeDo(parsedProps1, (props) => {
+  const needPassDownProps = mergeProps(preparsedProps, { innerController: controller } as PivProps)
+
+  const deAccessfiedProps = pipeDo(preparsedProps, (props) => {
     const verboseAccessifyPropNames =
       options?.needAccessify ??
       (options?.noNeedDeAccessifyChildren
@@ -211,12 +215,12 @@ function useKitPropParser<
   }) as any /* too difficult to type */
 
   // fullfill input props:controllerRef
-  if (hasProperty(kitProps, "controllerRef") && controller) loadPropsControllerRef(parsedProps2, controller)
+  if (hasProperty(kitProps, "controllerRef") && controller) loadPropsControllerRef(deAccessfiedProps, controller)
 
   // in design, is it good?🤔
   // registerControllerInCreateKit(proxyController, rawProps.id)
 
-  return { props: parsedProps2, methods: parsedProps1, shadowProps, loadController }
+  return { props: deAccessfiedProps, methods: preparsedProps, shadowProps: needPassDownProps, loadController }
 }
 
 /**
@@ -248,4 +252,3 @@ export type DeKitProps<
   DefaultProps extends Partial<DeAccessifyProps<P>> = {},
 > = ParsedKitProps<AddDefaultPivProps<DeAccessifyProps<P>, DefaultProps>> &
   Omit<PivProps<HTMLTag, Controller>, keyof DeAccessifyProps<P>>
-

@@ -1,4 +1,4 @@
-import { AnyObj, arrify, hasProperty, MayArray, shakeNil, shrinkFn } from "@edsolater/fnkit"
+import { AnyObj, arrify, hasProperty, MayArray, omit, shakeNil, shrinkFn } from "@edsolater/fnkit"
 import { createSignal } from "solid-js"
 import { KitProps } from "../../createKit/KitProps"
 import { PivProps } from "../Piv"
@@ -39,25 +39,31 @@ function sortPluginByPriority(plugins: Pluginable<any>[]) {
 }
 
 /**
- * merge additional props from plugin
+ * pick additional props from plugin and merge plugin(state) to innerController
  */
-
 function getMergePluginReturnedProps<T extends AnyObj>(
   plugins: MayArray<Pluginable<T> | undefined>,
   props: T & PivProps,
 ): Omit<T & PivProps, "plugin"> {
-  return omitProps(
-    plugins ? shakeNil(arrify(plugins)).reduce((acc, plugin) => invokePlugin(plugin, acc), props) : props,
-    "plugin",
-  )
+  if (!plugins) return props
+  const pluginProps = shakeNil(arrify(plugins)).map((plugin) => invokePlugin(plugin, props))
+  const mergedProps = mergeProps(props, ...pluginProps)
+  return omit(mergedProps, "plugin")
 }
 
 /** core */
-function invokePlugin(plugin: Pluginable<any>, props: KitProps<any>) {
+function invokePlugin(plugin: Pluginable<any>, props: KitProps<any>): KitProps<any> {
   const [controller, setController] = createSignal<ValidController>({})
   const [dom, setDom] = createSignal<HTMLElement>()
-
-  const pluginProps = shrinkFn(extractPluginCore(plugin)(props, { controller, dom }))
-  const returnProps = mergeProps(props, pluginProps, { controllerRef: setController, domRef: setDom })
-  return returnProps
+  const { plugin: pluginCoreFn, state: pluginState } = extractPluginCore(plugin)
+  const pluginReturnedValue = pluginCoreFn(props, { controller, dom })
+  // TODO: should also extract plugin's state
+  const rawPluginProps = shrinkFn(pluginReturnedValue)
+  const returnedPluginProps = mergeProps(
+    rawPluginProps,
+    pluginState
+      ? { controllerRef: setController, domRef: setDom, innerController: pluginState }
+      : { controllerRef: setController, domRef: setDom },
+  )
+  return returnedPluginProps
 }

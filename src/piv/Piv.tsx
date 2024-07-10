@@ -88,8 +88,8 @@ export interface PivProps<TagName extends HTMLTag = HTMLTag, Controller extends 
 
   // -------- special prop --------
 
-  /** only passed in parent component */
-  innerController?: Controller
+  /** only passed in parent component, innerController will pass to deeper () */
+  innerController?: MayArray<object>
 
   /** @example
    * const Button = () => <Piv as={(parsedPivProps) => <button {...parsedPivProps} />} />
@@ -122,8 +122,6 @@ export const arriablePivPropsNames = [
   "style",
   "debugLog",
 
-  "innerController",
-
   "defineOutWrapper",
   "definePrevSibling",
   "defineNextSibling",
@@ -137,6 +135,8 @@ export const pivPropsNames = [
   "if",
   "ifSelfShown",
   "children",
+
+  "innerController",
   ...arriablePivPropsNames,
 ] satisfies (keyof PivProps<any>)[]
 

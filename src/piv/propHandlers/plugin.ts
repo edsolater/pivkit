@@ -51,14 +51,16 @@ export type Plugin<
   pluginName?: string
 }>
 
+export type PluginCorePayload<C extends ValidController> = {
+  /** only in component has controller, or will be an empty object*/
+  controller: Accessor<C>
+  dom: Accessor<HTMLElement | undefined>
+}
+
 /** a function that return additional props */
 export type PluginCoreFn<T extends ValidProps = any, C extends ValidController = ValidController> = (
   props: T,
-  utils: {
-    /** only in component has controller, or will be an empty object*/
-    controller: Accessor<C>
-    dom: Accessor<HTMLElement | undefined>
-  },
+  utils: PluginCorePayload<C>,
 ) => Accessify<Partial<KitProps<T, { controller: C }>>> | undefined | void // TODO: should support 'plugin' and 'shadowProps' for easier compose
 
 export const plugin = Symbol("pluginCore")
@@ -101,9 +103,9 @@ export function createPlugin<
 export function extractPluginCore<T extends ValidProps, C extends ValidController>(
   plugin: Pluginable<any, any, T, C>,
   options?: any,
-): PluginCoreFn<T, C> {
-  const pluginCoreFn = (isPluginObj(plugin) ? plugin(options ?? {}).plugin : plugin) as PluginCoreFn<T, C>
-  return pluginCoreFn
+): { plugin: PluginCoreFn<T, C>; state?: object } {
+  const pluginCore = isPluginObj(plugin) ? plugin(options ?? {}) : { plugin: plugin as PluginCoreFn<T, C> }
+  return pluginCore
 }
 
 export function isPluginObj(v: any): v is Plugin<any> {
