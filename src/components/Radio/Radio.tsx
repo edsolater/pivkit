@@ -50,7 +50,7 @@ export function Radio(kitProps: RadioKitProps) {
 
   const [isChecked, setIsChecked] = createSyncSignal({
     value: () => props.isChecked,
-    onValueSet(value) {
+    onSetByInner(value) {
       props.onChange?.({ isChecked: value, option: props.option ?? "" })
     },
   })

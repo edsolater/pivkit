@@ -59,10 +59,14 @@ export function createDisclosure(
   )
 
   let delayActionId: any = 0
-  const setIsOn = (...params: any[]) => {
+  const setIsOn = (is: boolean | ((b: boolean) => boolean)) => {
     if (options.locked) return
-    //@ts-expect-error temp
-    _setIsOn(...params)
+
+    _setIsOn((b) => {
+      if (b) options.onClose?.()
+      if (!b) options.onOpen?.()
+      return shrinkFn(is, [b])
+    })
   }
   const cancelDelayAction = () => {
     globalThis.clearTimeout(delayActionId)
@@ -79,11 +83,7 @@ export function createDisclosure(
   }
   const coreToggle = () => {
     cancelDelayAction()
-    setIsOn((b: any) => {
-      if (b) options.onClose?.()
-      if (!b) options.onOpen?.()
-      return !b
-    })
+    setIsOn((b) => !b)
     options.onToggle?.(isOn())
   }
 

@@ -59,7 +59,7 @@ export function Switch(rawProps: SwitchProps) {
 
   const [isChecked, setIsChecked] = createSyncSignal({
     value: () => props.isChecked ?? props.isDefaultChecked,
-    onValueSet(value) {
+    onSetByInner(value) {
       props.onChange?.({ isChecked: value })
     },
   })
