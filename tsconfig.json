@@ -16,7 +16,7 @@
     "noImplicitAny": false,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
-    "types": [],
+    "types": []
   },
-  "exclude": ["node_modules", "./dist", "./dev"]
+  "exclude": ["node_modules", "./dist"]
 }

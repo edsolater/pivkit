@@ -28,6 +28,7 @@ export * from "./Switch"
 export * from "./Tabs"
 export * from "./TagInput"
 export * from "./Text"
+export * from "./Title"
 
 // ---------------- plugin component ----------------
 export * from "./PluginWrapper"

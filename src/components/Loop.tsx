@@ -2,7 +2,7 @@ import { MayFn, shrinkFn } from "@edsolater/fnkit"
 import { For, JSXElement, createMemo, type Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { createRef } from "../hooks/createRef"
-import { AddProps, Fragnment, Piv, PivChild, parsePivChildren, type PivProps } from "../piv"
+import { AddProps, Fragnment, PivChild, parsePivChildren } from "../piv"
 
 export interface LoopController {}
 
@@ -11,12 +11,14 @@ type ComponentStructure = (...anys: any[]) => JSXElement
 export type LoopProps<T> = {
   /** only for inner */
   $isList?: boolean
+
+  /** `<List>` has default `<Box>` wrapper, but `<Loop>` has not*/
   renderWrapper?: ComponentStructure
   renderListItemWrapper?: ComponentStructure
 
   items?: MayFn<Iterable<T>>
 
-  Divider?: MayFn<PivChild, [payload: { prevIndex: Accessor<number>; currentIndex: Accessor<number> }]>
+  renderDivider?: MayFn<PivChild, [payload: { prevIndex: Accessor<number>; currentIndex: Accessor<number> }]>
   sortCompareFn?: (a: T, b: T) => number
 
   children(item: T, index: () => number): PivChild
@@ -56,7 +58,7 @@ export function Loop<T>(kitProps: LoopKitProps<T>) {
           <ItemWrapper>{parsePivChildren(props.children(item, idx))}</ItemWrapper>
           {idx() < itemLength() - 1 &&
             "Divider" in kitProps &&
-            parsePivChildren(shrinkFn(kitProps.Divider, [{ prevIndex: idx, currentIndex: () => idx() + 1 }]))}
+            parsePivChildren(shrinkFn(kitProps.renderDivider, [{ prevIndex: idx, currentIndex: () => idx() + 1 }]))}
         </Fragnment>
       )}
     </For>
