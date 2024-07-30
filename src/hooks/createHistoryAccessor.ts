@@ -1,5 +1,5 @@
-import type { TimeStamp } from "@edsolater/fnkit"
-import { type Accessor, createEffect, createSignal, on } from "solid-js"
+import { createTimeStamp, type TimeStamp } from "@edsolater/fnkit";
+import { type Accessor, createEffect, createSignal, on } from "solid-js";
 
 type History<T> = { value: T; stamp: TimeStamp }[]
 
@@ -13,7 +13,7 @@ export function createHistoryAccessor<T>(toRecordAccessor: Accessor<T>): Accesso
 
   createEffect(
     on(toRecordAccessor, (value) => {
-      setHistory((prev) => [...prev, { value, stamp: Date.now() }])
+      setHistory((prev) => [...prev, { value, stamp: createTimeStamp() }])
     }),
   )
 

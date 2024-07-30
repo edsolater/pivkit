@@ -1,3 +1,4 @@
+import { setIntervalWithSecondes } from "@edsolater/fnkit"
 import { createSignal, createEffect } from "solid-js"
 
 /**
@@ -11,9 +12,9 @@ export function createIncreasingSeed(options?: {
 }) {
   const [seed, setSeed] = createSignal(options?.startFrom ?? 0)
   createEffect(() => {
-    setInterval(() => {
+    setIntervalWithSecondes(() => {
       setSeed((s) => s + 1)
-    }, options?.eachTime ?? 1000)
+    }, options?.eachTime ?? 1)
   })
   return seed
 }

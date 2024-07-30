@@ -1,10 +1,12 @@
+import { setTimeoutWithSecondes } from "@edsolater/fnkit"
+
 /**
  * easier to use than `setTimeout`
  */
-export function promisedTimeout(ms: number) {
+export function promisedTimeout(s: number) {
   let timeoutId: number | NodeJS.Timeout | undefined = undefined
   const detector = new Promise((resolve) => {
-    timeoutId = setTimeout(resolve, ms)
+    timeoutId = setTimeoutWithSecondes(resolve, s)
   })
   const stop = () => {
     if (timeoutId) {

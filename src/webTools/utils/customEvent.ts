@@ -1,3 +1,4 @@
+import { setTimeoutWithSecondes } from "@edsolater/fnkit"
 import { listenDomEvent } from "./addDomEventListener"
 
 /**
@@ -35,9 +36,9 @@ export function emitCustomEvent<DetailInfo = any>(
   },
 ) {
   if (options?.async) {
-    setTimeout(() => {
+    setTimeoutWithSecondes(() => {
       el.dispatchEvent(new CustomEvent(eventName, { detail }))
-    }, 0)
+    })
     return
   } else {
     el.dispatchEvent(new CustomEvent(eventName, { detail }))

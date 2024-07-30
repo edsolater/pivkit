@@ -57,7 +57,7 @@ export function Loop<T>(kitProps: LoopKitProps<T>) {
         <Fragnment>
           <ItemWrapper>{parsePivChildren(props.children(item, idx))}</ItemWrapper>
           {idx() < itemLength() - 1 &&
-            "Divider" in kitProps &&
+            "renderDivider" in kitProps &&
             parsePivChildren(shrinkFn(kitProps.renderDivider, [{ prevIndex: idx, currentIndex: () => idx() + 1 }]))}
         </Fragnment>
       )}

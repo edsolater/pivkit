@@ -4,7 +4,7 @@ import { Accessor, createEffect, onCleanup } from "solid-js"
 import { createDisclosure } from "../../hooks/createDisclosure"
 import { getElementFromRefs, type ElementRefs } from "../../utils"
 import { listenDomEvent } from "../utils"
-import type { AnyFn } from "@edsolater/fnkit"
+import { setTimeoutWithSecondes, type AnyFn } from "@edsolater/fnkit"
 
 export interface GestureHoverOptions {
   el: ElementRefs
@@ -47,7 +47,7 @@ export function attachGestureHover(options: GestureHoverOptions) {
   const hoverStartHandler = (ev: PointerEvent) => {
     if (options.disable) return
     if (options.triggerDelay) {
-      hoverDelayTimerId = setTimeout(() => {
+      hoverDelayTimerId = setTimeoutWithSecondes(() => {
         hoverEndHandler(ev)
       }, options.triggerDelay) as any
     } else {

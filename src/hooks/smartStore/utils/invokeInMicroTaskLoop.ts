@@ -1,4 +1,4 @@
-import { AnyFn } from "@edsolater/fnkit"
+import { AnyFn, setTimeoutWithSecondes } from "@edsolater/fnkit"
 import { PromiseWithInjecters, createPromiseWithInjecters } from "./createPromiseWithInjecters"
 
 const allRegistedTasks = new Map<any, AnyFn>()
@@ -52,7 +52,7 @@ export function delayDo_doInNextFrame<T>(delayTime = 0) {
     return new Promise((resolve, reject) => {
       let timeoutId
       try {
-        timeoutId = globalThis.setTimeout(() => {
+        timeoutId = setTimeoutWithSecondes(() => {
           const result = task()
           resolve(result)
         }, delayTime)

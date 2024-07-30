@@ -8,14 +8,13 @@ export function createSyncSignal<T>(options: {
   defaultValue?: Accessor<T>
   value: Accessor<T>
   /**
-   * Note: this **will not** invoke when the inner value is the same as the input value
+   * Note: this will **not** invoke when the inner value is the same as the input value
    *
    * this event callback is invoked by inner, user should use this and `opt:value` to establish two-way bind of outside value
    */
   onSetByInner?: (value: T, prevValue: T | undefined) => void
   /**
-   * Note: this **will** invoke when the inner value is the same as the input value
-   *
+   * Note: this will **always** invoke even the inner value is the same as the input value (outside value)
    */
   onSet?: (value: T, prevValue: T | undefined) => void
 }): Signal<T> {
@@ -43,8 +42,9 @@ export function createSyncSignal<T>(options: {
       (newValue, prevValue) => {
         options.onSet?.(newValue, prevValue)
         // same as input so no need to invoke the setter fn
-        if (options.value && newValue === options.value()) return
-        options.onSetByInner?.(newValue, prevValue)
+        if (options.value && newValue !== options.value()) {
+          options.onSetByInner?.(newValue, prevValue)
+        }
       },
       { defer: true },
     ),

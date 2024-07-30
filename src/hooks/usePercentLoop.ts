@@ -10,7 +10,7 @@ export function usePercentLoop({
   canRoundCountOverOne,
   onRoundEnd,
   eachSecondPercent = 1 / 10,
-  updateEach = 1000,
+  updateEach = 1,
 }: {
   updateEach?: number // default 1000ms
   canRoundCountOverOne?: boolean
@@ -25,7 +25,7 @@ export function usePercentLoop({
   const { startLoop, stopLoop } = useLoopTask({
     cb: () => {
       setPercent((percent) => {
-        const nextPercent = percent + eachSecondPercent / (updateEach / 1000)
+        const nextPercent = percent + eachSecondPercent / updateEach
         if (nextPercent >= 1) {
           if (canRoundCountOverOne) {
             onRoundEnd?.()
@@ -53,5 +53,3 @@ export function usePercentLoop({
     },
   }
 }
-
-

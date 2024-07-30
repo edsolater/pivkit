@@ -1,4 +1,4 @@
-import { MayFn, hasProperty, shrinkFn } from "@edsolater/fnkit"
+import { MayFn, hasProperty, setTimeoutWithSecondes, shrinkFn } from "@edsolater/fnkit"
 import { Accessor, createEffect, createMemo, createSignal, on } from "solid-js"
 
 interface DisclosureController {
@@ -31,7 +31,11 @@ export function createDisclosure(
   initValue: MayFn<boolean> = false,
   options: {
     locked?: boolean
-    /**only affact delay-* and canelDelayAction */
+
+    /**
+     * unit: s
+     * only affact delay-* and canelDelayAction
+     */
     delay?: number
     /* usually it is for debug */
     onClose?(): void
@@ -90,7 +94,7 @@ export function createDisclosure(
   const open: DisclosureController["open"] = (innerOptions) => {
     if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
       const delay = innerOptions?.delay ?? options.delay
-      delayActionId = globalThis.setTimeout(() => coreOn(), delay)
+      delayActionId = setTimeoutWithSecondes(() => coreOn(), delay)
     } else {
       coreOn()
     }
@@ -99,7 +103,7 @@ export function createDisclosure(
   const close: DisclosureController["close"] = (innerOptions) => {
     if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
       const delay = innerOptions?.delay ?? options.delay
-      delayActionId = globalThis.setTimeout(coreOff, delay)
+      delayActionId = setTimeoutWithSecondes(coreOff, delay)
     } else {
       coreOff()
     }
@@ -108,7 +112,7 @@ export function createDisclosure(
   const toggle: DisclosureController["toggle"] = (innerOptions) => {
     if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
       const delay = innerOptions?.delay ?? options.delay
-      delayActionId = globalThis.setTimeout(coreToggle, delay)
+      delayActionId = setTimeoutWithSecondes(coreToggle, delay)
     } else {
       coreToggle()
     }
@@ -117,7 +121,7 @@ export function createDisclosure(
   const set: DisclosureController["set"] = (v, innerOptions) => {
     if (hasProperty(options, "delay") || hasProperty(innerOptions, "delay")) {
       const delay = innerOptions?.delay ?? options.delay
-      delayActionId = globalThis.setTimeout(() => setIsOn(v), delay)
+      delayActionId = setTimeoutWithSecondes(() => setIsOn(v), delay)
     } else {
       setIsOn(v)
     }

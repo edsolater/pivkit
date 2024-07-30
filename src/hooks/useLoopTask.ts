@@ -1,8 +1,9 @@
+import { getTime, setIntervalWithSecondes } from "@edsolater/fnkit"
 import { createSignal, onCleanup, type Accessor } from "solid-js"
 
 export function useLoopTask<R>({
   cb,
-  delay = 1000,
+  delay = 1,
   immediate = true,
 }: {
   cb: () => R
@@ -22,7 +23,7 @@ export function useLoopTask<R>({
   function startLoop() {
     if (isRunning()) return () => {}
     setIsRunning(true)
-    intervalId = setInterval(() => {
+    intervalId = setIntervalWithSecondes(() => {
       invokeOnce()
     }, delay)
     if (immediate) {
@@ -38,7 +39,7 @@ export function useLoopTask<R>({
   }
 
   function invokeOnce() {
-    setLastInvokeTime(Date.now())
+    setLastInvokeTime(getTime())
     return cb?.()
   }
 

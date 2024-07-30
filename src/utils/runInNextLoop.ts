@@ -1,5 +1,5 @@
-import { AnyFn } from "@edsolater/fnkit"
+import { AnyFn, setTimeoutWithSecondes } from "@edsolater/fnkit"
 
 export function runInNextLoop(cb: AnyFn) {
-  setTimeout(cb)
+  setTimeoutWithSecondes(cb)
 }
