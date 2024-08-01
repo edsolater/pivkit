@@ -85,30 +85,30 @@ function loadIconDefaultICSS() {
           display: block;
           object-fit: cover;
           background-color: currentcolor;
-          mask: ${cssVar("--icon-image")} no-repeat center;
+          mask: ${cssVar("--icon-image")} no-repeat center / contain;
 
           &.${IconSize.xs} {
-            width: 12px;
-            height: 12px;
+            width: .75em;
+            height: .75em;
           }
           &.${IconSize.sm} {
-            width: 16px;
-            height: 16px;
+            width: 1em;
+            height: 1em;
           }
           &.${IconSize.smi} {
-            width: 20px;
-            height: 20px;
+            width: 1.25em;
+            height: 1.25em;
           }
           &.${IconSize.md}, 
           &${Object.values(IconSize)
             .map((c) => `:not(.${c})`)
             .join("")} {
-            width: 24px;
-            height: 24px;
+            width: 1.5em;
+            height: 1.5em;
           }
           &.${IconSize.lg} {
-            width: 32px;
-            height: 32px;
+            width: 2em;
+            height: 2em;
           }
           &.${IconSize.full} {
             width: 100%;

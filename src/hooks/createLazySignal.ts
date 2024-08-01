@@ -5,7 +5,7 @@ import { Signal, createEffect, createSignal, untrack } from "solid-js"
  * if it's promise, default is undefined
  * lazyValue is in track scope
  */
-export function createLazySignal<V>(lazyLoadInitValue: () => V): Signal<V> {
+export function createLazySignal<V>(lazyLoadInitValue: (set: (v: V) => void) => V): Signal<V> {
   const [hasAccessed, setHasAccessed] = createSignal(false)
   let innerOnFirstAccessFunction = lazyLoadInitValue
   const [value, _setValue] = createSignal<V | undefined>(undefined) // no need to type check
@@ -15,7 +15,7 @@ export function createLazySignal<V>(lazyLoadInitValue: () => V): Signal<V> {
       if (!hasAccessed()) {
         setHasAccessed(true)
         // Don't know how to avoid init get value twice
-        const value = innerOnFirstAccessFunction()
+        const value = innerOnFirstAccessFunction(_setValue)
         _setValue(() => value)
       }
     })
@@ -29,7 +29,7 @@ export function createLazySignal<V>(lazyLoadInitValue: () => V): Signal<V> {
       } else {
         const oldInnerOnFirstAccessFunction = innerOnFirstAccessFunction
         innerOnFirstAccessFunction = () => {
-          oldInnerOnFirstAccessFunction()
+          oldInnerOnFirstAccessFunction(_setValue)
           _setValue.apply(null, args)
           return value() as V
         }
@@ -39,7 +39,7 @@ export function createLazySignal<V>(lazyLoadInitValue: () => V): Signal<V> {
 
   createEffect(() => {
     if (!hasAccessed()) return
-    const value = lazyLoadInitValue()
+    const value = lazyLoadInitValue(_setValue)
     _setValue(() => value)
   })
   // @ts-expect-error force

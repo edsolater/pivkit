@@ -73,6 +73,7 @@ export function Text(kitProps: TextProps) {
 
 const defaultTextICSS = cacheFn(() =>
   parseICSSToClassName({
+    display: "inline",
     alignContent: "center", // make text vertical center
   }),
 )

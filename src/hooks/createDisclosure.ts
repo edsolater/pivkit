@@ -28,9 +28,10 @@ export type CreateDisclosureReturn = [Accessor<boolean>, DisclosureController]
 
 /** more piecer than createDisclosure */
 export function createDisclosure(
-  initValue: MayFn<boolean> = false,
+  defaultValue: MayFn<boolean> = false,
   options: {
     locked?: boolean
+    useDefaultValueOnlyWhenInit?: boolean
 
     /**
      * unit: s
@@ -45,31 +46,34 @@ export function createDisclosure(
     onToggle?(isOn: boolean): void
   } = {},
 ): CreateDisclosureReturn {
-  const defaultOn = createMemo(() => Boolean(shrinkFn(initValue)))
+  const defaultOn = createMemo(() => Boolean(shrinkFn(defaultValue)))
   const [isOn, _setIsOn] = createSignal(defaultOn())
 
-  createEffect(
-    on(
-      defaultOn,
-      (opened) => {
-        if (opened) {
-          coreOn()
-        } else {
-          coreOff()
-        }
-      },
-      { defer: true },
-    ),
-  )
+  if (!options.useDefaultValueOnlyWhenInit) {
+    createEffect(
+      on(
+        defaultOn,
+        (opened) => {
+          if (opened) {
+            coreOn()
+          } else {
+            coreOff()
+          }
+        },
+        { defer: true },
+      ),
+    )
+  }
 
   let delayActionId: any = 0
   const setIsOn = (is: boolean | ((b: boolean) => boolean)) => {
     if (options.locked) return
 
     _setIsOn((b) => {
-      if (b) options.onClose?.()
-      if (!b) options.onOpen?.()
-      return shrinkFn(is, [b])
+      const bl = shrinkFn(is, [b])
+      if (b) options.onOpen?.()
+      if (!b) options.onClose?.()
+      return bl
     })
   }
   const cancelDelayAction = () => {

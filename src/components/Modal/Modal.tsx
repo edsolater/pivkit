@@ -1,15 +1,14 @@
-import { createInvoker, mergeFunction } from "@edsolater/fnkit"
-import { Accessor, createEffect, createSignal } from "solid-js"
+import { isPromise, mergeFunction, setTimeoutWithSecondes } from "@edsolater/fnkit"
+import { Accessor, createEffect, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../../createKit"
-import { useClickOutside } from "../../webTools/hooks/useClickOutside"
-import { useDOMEventListener } from "../../webTools/hooks/useDOMEventListener"
+import { createLazySignal } from "../../hooks"
 import { createComponentContext, useComponentContext } from "../../hooks/createComponentContext"
 import { createDisclosure } from "../../hooks/createDisclosure"
 import { createRef } from "../../hooks/createRef"
 import { ICSS, Piv, PivProps, createPlugin } from "../../piv"
 import { renderHTMLDOM } from "../../piv/propHandlers/renderHTMLDOM"
-import { createController2 } from "../../utils/createController"
-import { PopoverPanel } from "../PopoverPanel"
+import { useClickOutside } from "../../webTools/hooks/useClickOutside"
+import { useDOMEventListener } from "../../webTools/hooks/useDOMEventListener"
 import { Text } from "../Text"
 
 export interface ModalController {
@@ -62,16 +61,27 @@ export function Modal(kitProps: ModalKitProps) {
   const closeModal = () => dialogDOM()?.close()
   const [innerOpen, { open, close, toggle }] = createDisclosure(() => Boolean(props.open), {
     onClose() {
+      console.log("close")
+      closeModal()
       props.onClose?.()
     },
     onOpen() {
+      console.log("open")
+      openModal()
       props.onOpen?.()
     },
   })
+  createEffect(() => {
+    console.log("innerOpen(): ", props.open, innerOpen())
+  })
+
   const { shouldRenderDOM } = useShouldRenderDOMDetector({ props, innerOpen })
 
   // sync dislog's  build-in close event with inner state
-  useDOMEventListener(dialogDOM, "close", createInvoker(close))
+  useDOMEventListener(dialogDOM, "close", () => {
+    console.log("should close by dom")
+    return close()
+  })
 
   // initly load modal show
   createEffect(() => {
@@ -86,10 +96,17 @@ export function Modal(kitProps: ModalKitProps) {
     return ev.preventDefault()
   })
 
+  const deferEnabled = createDerivate(innerOpen, resolveInNextMacroTask, false)
+
+  createEffect(() => {
+    console.log("deferEnabled(): ", deferEnabled())
+  })
+
   // click outside to close dialog
   useClickOutside(dialogContentDOM, {
-    disabled: () => !innerOpen(),
+    enabled: deferEnabled,
     onClickOutSide: () => {
+      console.log("click outside")
       close()
       closeModal()
     },
@@ -106,29 +123,27 @@ export function Modal(kitProps: ModalKitProps) {
     toggle: toggle,
   }
   loadController(modalController)
+
   return (
     <ModalContext.Provider value={modalController}>
-      <PopoverPanel open={shouldRenderDOM}>
-        <Piv<"dialog">
-          defineSelf={(selfProps) => renderHTMLDOM("dialog", selfProps)}
-          domRef={setDialogDOM}
-          shadowProps={shadowProps}
-          htmlProps={{ role: "dialog" }}
-          icss={{
-            border: "none",
-            padding: "0",
-            background: "transparent",
-            overflowY: "visible",
-            maxHeight: "100dvh",
-            maxWidth: "100dvw",
-            "&::backdrop": props.backdropICSS as any,
-          }}
-        >
-          <Piv domRef={setDialogContentDOM} icss={{ display: "contents" }}>
-            {props.children}
-          </Piv>
+      <Piv<"dialog">
+        defineSelf={(selfProps) => renderHTMLDOM("dialog", selfProps)}
+        domRef={setDialogDOM}
+        shadowProps={shadowProps}
+        icss={{
+          border: "none",
+          padding: "0",
+          background: "transparent",
+          overflowY: "visible",
+          maxHeight: "100dvh",
+          maxWidth: "100dvw",
+          "&::backdrop": props.backdropICSS as any,
+        }}
+      >
+        <Piv domRef={setDialogContentDOM} icss={{ display: "contents" }}>
+          {props.children}
         </Piv>
-      </PopoverPanel>
+      </Piv>
     </ModalContext.Provider>
   )
 }
@@ -182,4 +197,77 @@ function useShouldRenderDOMDetector(utils: { props: ModalProps; innerOpen: Acces
   }
 
   return { shouldRenderDOM }
+}
+
+/**
+ * Creates a derived signal from an existing accessor by applying a mapping function.
+ *
+ * @param oldAccessor - The original accessor.
+ * @param mapFn - The mapping function to apply to the original accessor's value.
+ * @returns The derived signal.
+ * @example
+ * const [count] = createSignal(0)
+ * const doubled = createDerivate(count, (v) => v * 2)
+ */
+function createDerivate<T, W>(oldAccessor: Accessor<T>, mapFn: (v: T) => Promise<W>): Accessor<W | undefined>
+function createDerivate<T, W>(oldAccessor: Accessor<T>, mapFn: (v: T) => Promise<W>, fallbackValue: W): Accessor<W>
+function createDerivate<T, W>(oldAccessor: Accessor<T>, mapFn: (v: T) => W): Accessor<W>
+function createDerivate<T, W>(
+  oldAccessor: Accessor<T>,
+  mapFn: (v: T) => W | Promise<W>,
+  fallbackValue?: W,
+): Accessor<W> {
+  const [signal, setSignal] = createLazySignal<W>((set) => {
+    const nv = mapFn(oldAccessor())
+    if (isPromise(nv)) {
+      nv.then((v) => set(v))
+      return fallbackValue as W
+    } else {
+      return nv
+    }
+  })
+  createEffect(
+    on(
+      oldAccessor,
+      () => {
+        const nv = mapFn(oldAccessor())
+        if (isPromise(nv)) {
+          nv.then((v) => setSignal(() => v))
+        } else {
+          setSignal(() => nv)
+        }
+      },
+      { defer: true },
+    ),
+  )
+  return signal
+}
+
+/**
+ * fn atom
+ * Returns the logical NOT of a value.
+ *
+ * @param v - The value to negate.
+ * @returns The logical NOT of the value.
+ * @example
+ * const [isOpen, setIsOpen] = createSignal(false)
+ * const isClosed = createDerivate(isOpen, not)
+ */
+function not<T>(v: T): boolean {
+  return !v
+}
+
+/**
+ * fn atom
+ * return a promise that solved in next macro task
+ *
+ * @param v
+ * @returns
+ */
+function resolveInNextMacroTask<T>(v: T): Promise<Awaited<T>> {
+  return new Promise<Awaited<T>>((resolve) => {
+    setTimeoutWithSecondes(() => {
+      resolve(Promise.resolve(v))
+    }, 0)
+  })
 }
