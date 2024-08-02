@@ -61,27 +61,19 @@ export function Modal(kitProps: ModalKitProps) {
   const closeModal = () => dialogDOM()?.close()
   const [innerOpen, { open, close, toggle }] = createDisclosure(() => Boolean(props.open), {
     onClose() {
-      console.log("close")
       closeModal()
       props.onClose?.()
     },
     onOpen() {
-      console.log("open")
       openModal()
       props.onOpen?.()
     },
-  })
-  createEffect(() => {
-    console.log("innerOpen(): ", props.open, innerOpen())
   })
 
   const { shouldRenderDOM } = useShouldRenderDOMDetector({ props, innerOpen })
 
   // sync dislog's  build-in close event with inner state
-  useDOMEventListener(dialogDOM, "close", () => {
-    console.log("should close by dom")
-    return close()
-  })
+  useDOMEventListener(dialogDOM, "close", () => close())
 
   // initly load modal show
   createEffect(() => {
@@ -98,17 +90,13 @@ export function Modal(kitProps: ModalKitProps) {
 
   const deferEnabled = createDerivate(innerOpen, resolveInNextMacroTask, false)
 
-  createEffect(() => {
-    console.log("deferEnabled(): ", deferEnabled())
-  })
+  createEffect(() => {})
 
   // click outside to close dialog
   useClickOutside(dialogContentDOM, {
     enabled: deferEnabled,
     onClickOutSide: () => {
-      console.log("click outside")
       close()
-      closeModal()
     },
   })
 

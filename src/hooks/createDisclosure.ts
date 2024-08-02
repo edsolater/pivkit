@@ -46,19 +46,20 @@ export function createDisclosure(
     onToggle?(isOn: boolean): void
   } = {},
 ): CreateDisclosureReturn {
-  const defaultOn = createMemo(() => Boolean(shrinkFn(defaultValue)))
-  const [isOn, _setIsOn] = createSignal(defaultOn())
+  const defaultOn = () => shrinkFn(defaultValue)
+  const [isInnerOn, _setIsInnerOn] = createSignal(defaultOn())
 
   if (!options.useDefaultValueOnlyWhenInit) {
     createEffect(
       on(
-        defaultOn,
-        (opened) => {
-          if (opened) {
-            coreOn()
-          } else {
-            coreOff()
-          }
+        [defaultOn],
+        ([outside]) => {
+          // accessor will be updated in next micro task, so have to use Promise.resolve() to wait the value change
+          Promise.resolve().then(() => {
+            if (outside !== isInnerOn()) {
+              outside ? coreOn() : coreOff()
+            }
+          })
         },
         { defer: true },
       ),
@@ -69,10 +70,16 @@ export function createDisclosure(
   const setIsOn = (is: boolean | ((b: boolean) => boolean)) => {
     if (options.locked) return
 
-    _setIsOn((b) => {
+    _setIsInnerOn((b) => {
       const bl = shrinkFn(is, [b])
-      if (b) options.onOpen?.()
-      if (!b) options.onClose?.()
+      if (!bl && b) {
+        options.onClose?.()
+        options.onToggle?.(false)
+      }
+      if (bl && !b) {
+        options.onOpen?.()
+        options.onToggle?.(true)
+      }
       return bl
     })
   }
@@ -82,17 +89,14 @@ export function createDisclosure(
   const coreOn = () => {
     cancelDelayAction()
     setIsOn(true)
-    options.onOpen?.()
   }
   const coreOff = () => {
     cancelDelayAction()
     setIsOn(false)
-    options.onClose?.()
   }
   const coreToggle = () => {
     cancelDelayAction()
     setIsOn((b) => !b)
-    options.onToggle?.(isOn())
   }
 
   const open: DisclosureController["open"] = (innerOptions) => {
@@ -139,5 +143,5 @@ export function createDisclosure(
     toggle,
     set,
   }
-  return [isOn, controller]
+  return [isInnerOn, controller]
 }
