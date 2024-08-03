@@ -29,6 +29,7 @@ export * from "./Tabs"
 export * from "./TagInput"
 export * from "./Text"
 export * from "./Title"
+export * from "./Iframe"
 
 // ---------------- plugin component ----------------
 export * from "./PluginWrapper"

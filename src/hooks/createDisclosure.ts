@@ -52,8 +52,8 @@ export function createDisclosure(
   if (!options.useDefaultValueOnlyWhenInit) {
     createEffect(
       on(
-        [defaultOn],
-        ([outside]) => {
+        defaultOn,
+        (outside) => {
           // accessor will be updated in next micro task, so have to use Promise.resolve() to wait the value change
           Promise.resolve().then(() => {
             if (outside !== isInnerOn()) {

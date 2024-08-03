@@ -49,8 +49,8 @@ export type ModalKitProps = KitProps<ModalProps, { controller: ModalController }
 export const ModalContext = createComponentContext<Partial<ModalController>>()
 
 /**
- * for details,
- * @see https://chakra-ui.com/docs/components/modal
+ * headless component (just for wrapper)
+ * 
  * sub-component:
  * - {@link ModalTitle \<ModalTitle\>} - register mobal title. Actually is {@link Text \<Text\>}
  */

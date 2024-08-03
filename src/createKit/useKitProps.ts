@@ -11,7 +11,7 @@ import {
 } from "@edsolater/fnkit"
 import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
-import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
+import { createControllerContext, getControllerObjFromControllerContext } from "../piv/ControllerContext"
 import { PivProps } from "../piv/Piv"
 import { getPropsFromPropContextContext } from "../piv/PropContext"
 import { loadPropsControllerRef } from "../piv/propHandlers/children"
@@ -23,6 +23,7 @@ import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { mergeProps } from "../piv/utils"
 import { AddDefaultPivProps, addDefaultPivProps } from "../piv/utils/addDefaultProps"
 import { omitItem } from "./utils"
+import type { JSXElement } from "solid-js"
 
 /** used for {@link useKitProps}'s option */
 export type KitPropsOptions<
@@ -93,44 +94,62 @@ export function useKitProps<
    */
   methods: AddDefaultPivProps<P, DefaultProps>
   loadController(controller: Controller): void
-  /** @deprecated */
+  /** @deprecated just for old component. use {@link loadControllerForKitParser} instead */
   lazyLoadController(controller: Controller | ((props: ParsedKitProps<DeAccessifyProps<P>>) => Controller)): void
-  contextController: any // no need to infer this type for you always force it !!!
+  parentContextControllers: any // no need to infer this type for you always force it !!!
   // TODO: imply it !!! For complicated DOM API always need this, this is a fast shortcut
   // componentRef
+  // ControllerContextProvider: (props: { children: JSXElement }) => JSXElement
 } {
   type RawProps = DeAccessifyProps<P>
 
   // TODO: should move to getParsedKitProps
   // wrap controllerContext based on props:innerController is only in `<Piv>`
-  const mergedContextController = createObjectWhenAccess(getControllerObjFromControllerContext)
 
   // if (propContextParsedProps.children === 'PropContext can pass to deep nested components') {
   //   console.log('kitProps raw: ', { ...propContextParsedProps })
   // }
-  const { loadController: lazyLoadController, getControllerCreator } = createComponentController<RawProps, Controller>(
-    rawOptions,
-  )
+  const { loadController: loadControllerForContext, getLoadedController } = createComponentControllerLoader<
+    RawProps,
+    Controller
+  >(rawOptions)
 
   const options = mergeObjects(
-    { controller: (props: ParsedKitProps<RawProps>) => getControllerCreator(props) },
+    { controller: (props: ParsedKitProps<RawProps>) => getLoadedController(props) },
     rawOptions,
   )
-  const { props, methods, shadowProps, loadController } = useKitPropParser(kitProps, options)
+
+  const {
+    props,
+    methods,
+    shadowProps,
+    loadController: loadControllerForKitParser,
+  } = useKitPropParser(kitProps, options)
 
   // for options' controller
-  if (hasProperty(rawOptions, "controller")) loadController(shrinkFn(rawOptions!.controller))
+  if (hasProperty(rawOptions, "controller")) loadControllerForKitParser(shrinkFn(rawOptions!.controller))
+
+  const loadController = (outsideFilledController: Controller) => {
+    const newMerged =
+      "innerController" in methods
+        ? mergeObjects(...arrify(methods.innerController), outsideFilledController)
+        : outsideFilledController
+    loadControllerForContext(newMerged)
+    loadControllerForKitParser(newMerged)
+  }
 
   return {
     props,
     methods,
     shadowProps,
-    loadController,
-    lazyLoadController: (controller: Controller | ((props: ParsedKitProps<RawProps>) => Controller)) => {
-      lazyLoadController(controller)
-      loadController(controller)
+    loadController: loadController,
+    lazyLoadController: loadController,
+    get parentContextControllers() {
+      return createObjectWhenAccess(getControllerObjFromControllerContext)
     },
-    contextController: mergedContextController,
+    // get ControllerContextProvider() {
+    //   return createControllerContext(options.name, getLoadedController(props))
+    // },
   }
 }
 
@@ -188,9 +207,10 @@ function useKitPropParser<
 
   let loadController: AnyFn = () => {}
 
-  if (hasProperty(kitProps, "ref")) {
+  if (hasProperty(kitProps, "ref") || hasProperty(kitProps, "controllerRef")) {
     loadController = (controller) => {
-      arrify(kitProps.ref).forEach((ref) => ref?.(shrinkFn(controller)))
+      const refReceivers = arrify(kitProps.ref).concat(arrify(kitProps.controllerRef))
+      refReceivers.forEach((ref) => ref?.(shrinkFn(controller)))
     }
   }
 
@@ -226,23 +246,20 @@ function useKitPropParser<
 /**
  * section 2: load controller
  */
-function createComponentController<
+function createComponentControllerLoader<
   RawProps extends ValidProps,
   Controller extends ValidController | unknown,
 >(options?: { debugName?: string }) {
-  const controllerFaker = new LazyLoadObj<(props: ParsedKitProps<RawProps>) => Controller>()
+  const controllerLazyLoadObj = new LazyLoadObj<(props: ParsedKitProps<RawProps>) => Controller>()
   const loadController = (inputController: Controller | ((props: ParsedKitProps<RawProps>) => Controller)) => {
-    const controllerCreator = typeof inputController === "function" ? inputController : () => inputController
-    if (options?.debugName === "debug") console.log("controllerCreator: ", inputController)
+    const controllerLoadFn = typeof inputController === "function" ? inputController : () => inputController
     //@ts-expect-error unknown ?
-    controllerFaker.load(controllerCreator)
-    if (options?.debugName === "debug")
-      console.log("2: ", controllerFaker.spawn(), controllerFaker.spawn() === controllerCreator)
+    controllerLazyLoadObj.load(controllerLoadFn)
   }
   return {
     loadController,
-    getControllerCreator: (props: ParsedKitProps<RawProps>) =>
-      controllerFaker.hasLoaded() ? controllerFaker.spawn()?.(props) : { hello: "say" },
+    getLoadedController: (props: ParsedKitProps<RawProps>) =>
+      controllerLazyLoadObj.hasLoaded() ? controllerLazyLoadObj.spawn()?.(props) : { hello: "say" },
   }
 }
 

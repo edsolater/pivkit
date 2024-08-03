@@ -19,6 +19,7 @@ const contextSetter = Symbol("contextSetter")
 
 /**
  * default solidjs's createContext is readonly
+ * this context is with setter
  * {@link createComponentContext} hook is used to create a context with set() , so user can change context value
  */
 export function createComponentContext<O extends AnyObj>(): ComponentContext<O> {
@@ -40,13 +41,12 @@ export function createComponentContext<O extends AnyObj>(): ComponentContext<O> 
 }
 
 /**
-//  * @deprecated just use {@link useComponentContext}
-* {@link useContext} with set() method
+ * {@link useContext} with set() method
  * @return a pair: [contextValue, setContextValue]
  */
 export function useComponentContext<O extends AnyObj>(
   context: ComponentContext<O>,
-): [contextValue: O, setContext: ComponentContextSetter<O>] {
+): [value: O, set: ComponentContextSetter<O>] {
   // @ts-ignore force
   const { store: contextValue, set: setContext } = useContext(context)
   return [contextValue, setContext]
