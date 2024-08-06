@@ -4,7 +4,7 @@ import { Piv, parseICSSToClassName, type CSSObject } from "../piv"
 import { cacheFn } from "@edsolater/fnkit"
 
 export interface TextRawProps {
-  inline?: boolean
+  block?: boolean
 
   /** use flexbox; align-items */
   centerY?: boolean
@@ -43,7 +43,7 @@ export function Text(kitProps: TextProps) {
 
   const icss = createMemo(() => {
     const icssRules = {} as CSSObject
-    if (props.inline) {
+    if (props.block) {
       icssRules.display ??= "inline-block"
     }
     if (props.centerX || props.center) {
