@@ -1,7 +1,7 @@
-import { createMemo } from "solid-js"
+import { cacheFn, isString } from "@edsolater/fnkit"
+import { createEffect, createMemo, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { Piv, parseICSSToClassName, type CSSObject } from "../piv"
-import { cacheFn } from "@edsolater/fnkit"
 
 export interface TextRawProps {
   block?: boolean
@@ -13,13 +13,18 @@ export interface TextRawProps {
   /** use flexbox; justify-items + align-items */
   center?: boolean
 
-  /** if true, it is 'text' */
+  /** if true, it is 'text'
+   * @deprecated
+   */
   editable?: boolean | "text" | "all"
   /**
+   *
    *  all widgets should have `props:v`, to handle it's duty's property \
    *  you should directily use `props.children` if possiable, this prop is for batch processing
    */
   value?: string | number
+  // {props.children} is props:value, sometimes you need to set a default value to avoid controlled component (like in editablePlugin, if in controlled mode, the cursor will always be at the end)
+  defaultValue?: string | number
 }
 
 export type TextProps = KitProps<TextRawProps>
@@ -30,6 +35,21 @@ export type TextProps = KitProps<TextRawProps>
  */
 export function Text(kitProps: TextProps) {
   const { props, shadowProps } = useKitProps(kitProps, { name: "Text" })
+
+  const value = createMemo(() =>
+    "value" in props ? props.value : "children" in props && isString(props.children) ? props.children : undefined,
+  )
+  const [innerValue, setInnerValue] = createSignal<string | number | undefined>(value() ?? props.defaultValue)
+
+  createEffect(
+    on(
+      value,
+      () => {
+        setInnerValue(value())
+      },
+      { defer: true },
+    ),
+  )
 
   const contentEditableValue = createMemo(() =>
     props.editable != null
@@ -66,7 +86,7 @@ export function Text(kitProps: TextProps) {
         contentEditable: contentEditableValue(),
       }}
     >
-      {kitProps.children}
+      {innerValue()}
     </Piv>
   )
 }
