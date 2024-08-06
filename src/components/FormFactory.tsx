@@ -1,9 +1,73 @@
-import { isObject } from "@edsolater/fnkit"
-import { JSX, type JSXElement } from "solid-js"
+import { isObject, type AnyObj } from "@edsolater/fnkit"
+import { createMemo, JSX, Show, type JSXElement } from "solid-js"
+import { createComponentContext, useComponentContext, useValidators } from "../hooks"
 
+const FormFactoryContext = createComponentContext<{ obj: object }>()
 /** a special component for creating element tree by pure js data
  *
  * @todo: how to turn pure object tree to component tree ?
+ * @example use object config
+ * <FormFactory
+ *  formObj={innerItemData}
+ *  keyOrder={["name", "tags"]}
+ *  widgetMap={{
+ *    // maybe it's not readable enough🤔, should more XML🤔?
+ *    // category: (value) => (
+ *    //   <Tag
+ *    //     bg={cssColorMix({ color: colors.card, percent: "60%" }, itemThemeColor())}
+ *    //     candidates={scheduleLinkItemCategories}
+ *    //     value={value}
+ *    //     defaultValue={value}
+ *    //     onChange={({ itemValue }) => {
+ *    //       const newCategory = itemValue() as ScheduleLinkItem["category"]
+ *    //       setInnerCacheItemData("category", newCategory)
+ *    //     }}
+ *    //   >
+ *    //     {value}
+ *    //   </Tag>
+ *    // ),
+ *    // name: (value) => (
+ *    //   <Text
+ *    //     icss={({ isEnabled }: EditablePluginPluginController) => ({
+ *    //       display: "inline-block",
+ *    //       width: "100%",
+ *    //       fontSize: "1.6em",
+ *    //       outline: isEnabled() ? "solid" : undefined,
+ *    //     })}
+ *    //     plugin={editablePlugin.config({
+ *    //       placeholder: "Title",
+ *    //       onInput: (newText) => setInnerCacheItemData({ name: newText }),
+ *    //       onEnabledChange: (b) => {
+ *    //         if (!b) {
+ *    //           props.onItemInfoChange?.(innerItemData)
+ *    //         }
+ *    //       },
+ *    //     })}
+ *    //   >
+ *    //     {value}
+ *    //   </Text>
+ *    // ),
+ *    tags: (value) => (
+ *      <List
+ *        icss={{
+ *          gridArea: "tags",
+ *          color: colors.textSecondary,
+ *          display: "flex",
+ *          flexWrap: "wrap",
+ *          gap: "8px",
+ *        }}
+ *        items={value?.split(" ")}
+ *      >
+ *        {(tag) => <Text icss={{ alignContent: "center" }}>{tag}</Text>}
+ *      </List>
+ *    ),
+ *    // comment: (value) => <Text>{value}</Text>,
+ *  }}
+ *>
+ * @example use sub-component
+ * <FormFactory formObj={innerItemData}>
+ *   <FormFactoryBlock name="comment">{(value) => <Text>{value}</Text>}</FormFactoryBlock>
+ * </FormFactory>
  */
 export function FormFactory<T extends Record<string, any>>(props: {
   /**
@@ -28,18 +92,42 @@ export function FormFactory<T extends Record<string, any>>(props: {
    * @example
    * widgetMap={{ comment: (value) => <Text>{value}</Text> }}
    */
-  widgetMap: { [K in keyof T]?: (value: T[K]) => JSXElement }
+  widgetMap?: { [K in keyof T]?: (value: T[K]) => JSXElement }
+  children?: JSXElement
 }) {
   return (
-    <>
-      {(props.keyOrder
-        ? Object.entries(props.formObj).sort(
-            ([keyA], [keyB]) => props.keyOrder!.indexOf(keyA) - props.keyOrder!.indexOf(keyB),
-          )
-        : Object.entries(props.formObj)
-      ).map(([key, value]) => props.widgetMap[key]?.(value))}
-    </>
+    <FormFactoryContext.Provider value={{ obj: props.formObj }}>
+      {props.widgetMap
+        ? (props.keyOrder
+            ? Object.entries(props.formObj).sort(([keyA], [keyB]) =>
+                props.keyOrder?.includes(keyA) && props.keyOrder.includes(keyB)
+                  ? props.keyOrder.indexOf(keyA) - props.keyOrder.indexOf(keyB)
+                  : 0,
+              )
+            : Object.entries(props.formObj)
+          ).map(([key, value]) => props.widgetMap?.[key]?.(value))
+        : undefined}
+      {props.children}
+    </FormFactoryContext.Provider>
   )
+}
+export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(props: {
+  name: F
+  children: (currentValue: T[F]) => JSXElement
+  /** always shown even value is undefined */
+  force?: boolean
+  /** by default when value is not undefined, component will show */
+  when?: (currentValue: T[F]) => any
+}) {
+  const [contextStore] = useComponentContext(FormFactoryContext)
+  const newValue = createMemo(() => contextStore.obj[props.name as keyof any])
+  const enabled = createMemo(() => {
+    if (props.force) return true
+    if (props.when) return props.when(newValue())
+    // when value is not undefined, component will show
+    return props.name in contextStore.obj
+  })
+  return <Show when={enabled()}>{props.children(newValue())}</Show>
 }
 
 function getByPath(obj: object, path: (string | number | symbol)[]) {
