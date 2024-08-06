@@ -23,7 +23,7 @@ export type UseClickOutsideOptions =
  */
 export function useClickOutside(els: ElementRefs, options?: UseClickOutsideOptions) {
   const parasedOptions = typeof options === "function" ? { onClickOutSide: options } : options
-  const isEnabled = createValidator({ enabled: parasedOptions?.enabled, disabled: parasedOptions?.disabled })
+  const isEnabled = createValidator(parasedOptions ?? {})
   createEffect(() => {
     const targetElements = getElementFromRefs(els)
     targetElements.forEach((el) => {

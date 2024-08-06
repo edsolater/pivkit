@@ -1,6 +1,8 @@
 import { isObject, type AnyObj } from "@edsolater/fnkit"
-import { createMemo, JSX, Show, type JSXElement } from "solid-js"
+import { createMemo, JSX, Show, type Accessor, type JSXElement } from "solid-js"
 import { createComponentContext, useComponentContext, useValidators } from "../hooks"
+import { useKitProps, type KitProps } from "../createKit"
+import { AddProps } from "../piv"
 
 const FormFactoryContext = createComponentContext<{ obj: object }>()
 /** a special component for creating element tree by pure js data
@@ -111,23 +113,34 @@ export function FormFactory<T extends Record<string, any>>(props: {
     </FormFactoryContext.Provider>
   )
 }
-export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(props: {
+
+type FormFactoryBlockProps<F extends keyof T, T extends AnyObj> = {
   name: F
-  children: (currentValue: T[F]) => JSXElement
+  children: (currentValue: Accessor<T[F]>) => JSXElement
   /** always shown even value is undefined */
   force?: boolean
   /** by default when value is not undefined, component will show */
-  when?: (currentValue: T[F]) => any
-}) {
+  when?: (currentValue: Accessor<T[F]>) => any
+}
+
+export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
+  kitProps: KitProps<FormFactoryBlockProps<F, T>, { noNeedDeAccessifyProps: ["children", "when"] }>,
+) {
+  const { props, methods, shadowProps } = useKitProps(kitProps, { noNeedDeAccessifyProps: ["children", "when"] })
+
   const [contextStore] = useComponentContext(FormFactoryContext)
   const newValue = createMemo(() => contextStore.obj[props.name as keyof any])
   const enabled = createMemo(() => {
     if (props.force) return true
-    if (props.when) return props.when(newValue())
+    if (props.when) return methods.when?.(newValue)
     // when value is not undefined, component will show
     return props.name in contextStore.obj
   })
-  return <Show when={enabled()}>{props.children(newValue())}</Show>
+  return (
+    <Show when={enabled()}>
+      <AddProps shadowProps={shadowProps}>{props.children(newValue)}</AddProps>
+    </Show>
+  )
 }
 
 function getByPath(obj: object, path: (string | number | symbol)[]) {
