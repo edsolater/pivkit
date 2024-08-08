@@ -1,7 +1,7 @@
-import { isObject, type AnyObj } from "@edsolater/fnkit"
-import { createMemo, JSX, Show, type Accessor, type JSXElement } from "solid-js"
-import { createComponentContext, useComponentContext, useValidators } from "../hooks"
+import { isObject, pipeFns, withAddDefault, type AnyObj } from "@edsolater/fnkit"
+import { createEffect, createMemo, JSX, Show, type Accessor, type JSXElement } from "solid-js"
 import { useKitProps, type KitProps } from "../createKit"
+import { createComponentContext, useComponentContext } from "../hooks"
 import { AddProps } from "../piv"
 
 const FormFactoryContext = createComponentContext<{ obj: object }>()
@@ -117,10 +117,18 @@ export function FormFactory<T extends Record<string, any>>(props: {
 type FormFactoryBlockProps<F extends keyof T, T extends AnyObj> = {
   name: F
   children: (currentValue: Accessor<T[F]>) => JSXElement
+
   /** always shown even value is undefined */
-  force?: boolean
-  /** by default when value is not undefined, component will show */
+  forceVisiable?: boolean
+
+  /**
+   * usually **no need** to set this. it will cover automaticly.
+   * by default when value is not undefined, component will show
+   */
   when?: (currentValue: Accessor<T[F]>) => any
+
+  /** applied when currnetValue is undefined (often this is a placeholder) */
+  defaultValue?: T[F]
 }
 
 export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
@@ -131,14 +139,16 @@ export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
   const [contextStore] = useComponentContext(FormFactoryContext)
   const newValue = createMemo(() => contextStore.obj[props.name as keyof any])
   const enabled = createMemo(() => {
-    if (props.force) return true
+    if (props.forceVisiable) return true
     if (props.when) return methods.when?.(newValue)
     // when value is not undefined, component will show
-    return props.name in contextStore.obj
+    return "defaultValue" in props || props.name in contextStore.obj
   })
   return (
     <Show when={enabled()}>
-      <AddProps shadowProps={shadowProps}>{props.children(newValue)}</AddProps>
+      <AddProps shadowProps={shadowProps}>
+        {props.children(pipeFns(newValue, withAddDefault(props.defaultValue, { applyWhen: "falsy" })))}
+      </AddProps>
     </Show>
   )
 }

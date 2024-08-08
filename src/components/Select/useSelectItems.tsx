@@ -32,10 +32,10 @@ export function useSelectItems<T>(options?: {
   value?: T
   defaultValue?: T
   /** value is used in onChange, value is also used as key */
-  getItemValue?: (item: T) => string | number
+  getItemValue?: (item: T) => string
   /** only invoked when options:value is not currentValue */
-  onChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string | number> }): void
-  onFocusChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string | number> }): void
+  onChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string> }): void
+  onFocusChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string> }): void
   onClear?(): void
 }) {
   //#region ------------------- item list -------------------
@@ -52,8 +52,8 @@ export function useSelectItems<T>(options?: {
   //#endregion
 
   //#region ---------------- items utils ----------------
-  function getItemValue(item: T | undefined): string | number {
-    return item ? options?.getItemValue?.(item) ?? defaultGetItemValue(item) : defaultGetItemValue(item)
+  function getItemValue(item: T | undefined): string {
+    return String(item ? options?.getItemValue?.(item) ?? defaultGetItemValue(item) : defaultGetItemValue(item))
   }
   //#endregion
 

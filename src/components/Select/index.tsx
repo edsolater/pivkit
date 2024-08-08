@@ -21,7 +21,7 @@ type FaceItemEventUtils<T extends SelectableItem> = {
   item: Accessor<T | undefined>
   index: Accessor<number | undefined>
   /** use this, for it's value won't change if item's struct change */
-  value: Accessor<string | number | undefined>
+  value: Accessor<string | undefined>
   triggerIsOpen: Accessor<boolean>
 }
 
@@ -30,7 +30,7 @@ export type ItemEventUtils<T extends SelectableItem> = {
   item: Accessor<T>
   index: Accessor<number>
   /** use this, for it's value won't change if item's struct change */
-  itemValue: Accessor<string | number>
+  itemValue: Accessor<string >
   isSelected: Accessor<boolean>
 }
 
@@ -43,7 +43,7 @@ export type SelectProps<T extends SelectableItem> = {
   value?: T
   defaultValue?: T
   /** value is used in onChange, value is also used as key */
-  getItemValue?: (item: T) => string | number
+  getItemValue?: (item: T) => string 
   onChange?(utils: ItemEventUtils<T>): void
 
   disabled?: boolean
