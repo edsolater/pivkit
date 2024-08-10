@@ -3,7 +3,7 @@ import { createEffect, createMemo, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { Piv, parseICSSToClassName } from "../piv"
 
-export interface TextRawProps {
+export interface TextProps {
   /**
    *
    *  all widgets should have `props:v`, to handle it's duty's property \
@@ -14,35 +14,45 @@ export interface TextRawProps {
   defaultValue?: string | number
 }
 
-export type TextProps = KitProps<TextRawProps>
+export type TextKitProps = KitProps<TextProps>
 
 /**
  * @componentType widget
  * if for layout , inner content should only be text
  */
-export function Text(kitProps: TextProps) {
+export function Text(kitProps: TextKitProps) {
   const { props, shadowProps } = useKitProps(kitProps, { name: "Text" })
 
-  const value = createMemo(() =>
-    "value" in props ? props.value : "children" in props && isString(props.children) ? props.children : undefined,
-  )
-  const [innerValue, setInnerValue] = createSignal<string | number | undefined>(value() ?? props.defaultValue)
+  if ("value" in kitProps || "defaultValue" in kitProps) {
+    // NOTE: is value and defaultValue in props
 
-  createEffect(
-    on(
-      value,
-      () => {
-        setInnerValue(value())
-      },
-      { defer: true },
-    ),
-  )
+    const value = createMemo(() =>
+      "value" in props ? props.value : "children" in props && isString(props.children) ? props.children : undefined,
+    )
+    const [innerValue, setInnerValue] = createSignal<string | number | undefined>(value() ?? props.defaultValue)
+    createEffect(
+      on(
+        value,
+        () => {
+          setInnerValue(value())
+        },
+        { defer: true },
+      ),
+    )
+    return (
+      <Piv shadowProps={shadowProps} icss={defaultTextICSS}>
+        {value() ?? innerValue()}
+      </Piv>
+    )
+  } else {
+    // NOTE: just use props.children to be faster
 
-  return (
-    <Piv shadowProps={shadowProps} icss={defaultTextICSS}>
-      {innerValue()}
-    </Piv>
-  )
+    return (
+      <Piv shadowProps={shadowProps} icss={defaultTextICSS}>
+        {props.children}
+      </Piv>
+    )
+  }
 }
 
 const defaultTextICSS = cacheFn(() =>
