@@ -2,6 +2,11 @@ import { cacheFn, isString } from "@edsolater/fnkit"
 import { createEffect, createMemo, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { Piv, parseICSSToClassName } from "../piv"
+import {
+  editablePlugin,
+  type EditablePluginOptions,
+  type EditablePluginPluginController,
+} from "../plugins/textEditablePlugin"
 
 export interface TextProps {
   /**
@@ -25,7 +30,6 @@ export function Text(kitProps: TextKitProps) {
 
   if ("value" in kitProps || "defaultValue" in kitProps) {
     // NOTE: is value and defaultValue in props
-
     const value = createMemo(() =>
       "value" in props ? props.value : "children" in props && isString(props.children) ? props.children : undefined,
     )
@@ -46,7 +50,6 @@ export function Text(kitProps: TextKitProps) {
     )
   } else {
     // NOTE: just use props.children to be faster
-
     return (
       <Piv shadowProps={shadowProps} icss={defaultTextICSS}>
         {props.children}
@@ -61,3 +64,10 @@ const defaultTextICSS = cacheFn(() =>
     alignContent: "center", // make text vertical center
   }),
 )
+
+/** have build-in editablePlugin to easier use */
+export function EditableText(
+  props: KitProps<TextProps & EditablePluginOptions, { controller: EditablePluginPluginController }>,
+) {
+  return <Text {...props} plugin={editablePlugin.config(props)} />
+}
