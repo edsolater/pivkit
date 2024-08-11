@@ -1,8 +1,8 @@
 import { isObject, pipeFns, withAddDefault, type AnyObj } from "@edsolater/fnkit"
-import { createEffect, createMemo, JSX, Show, type Accessor, type JSXElement } from "solid-js"
+import { createMemo, JSX, Show, type Accessor, type JSXElement } from "solid-js"
 import { useKitProps, type KitProps } from "../createKit"
 import { createComponentContext, useComponentContext } from "../hooks"
-import { AddProps } from "../piv"
+import { Box } from "./Boxes"
 
 const FormFactoryContext = createComponentContext<{ obj: object }>()
 /** a special component for creating element tree by pure js data
@@ -135,7 +135,6 @@ export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
   kitProps: KitProps<FormFactoryBlockProps<F, T>, { noNeedDeAccessifyProps: ["children", "when"] }>,
 ) {
   const { props, methods, shadowProps } = useKitProps(kitProps, { noNeedDeAccessifyProps: ["children", "when"] })
-
   const [contextStore] = useComponentContext(FormFactoryContext)
   const newValue = createMemo(() => contextStore.obj[props.name as keyof any])
   const enabled = createMemo(() => {
@@ -146,9 +145,9 @@ export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
   })
   return (
     <Show when={enabled()}>
-      <AddProps shadowProps={shadowProps}>
+      <Box shadowProps={shadowProps}>
         {props.children(pipeFns(newValue, withAddDefault(props.defaultValue, { applyWhen: "falsy" })))}
-      </AddProps>
+      </Box>
     </Show>
   )
 }

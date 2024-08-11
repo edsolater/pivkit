@@ -6,7 +6,7 @@ import {
   createLocalStorageStoreManager,
   createMemoryStoreManager,
   createSessionStorageStoreManager,
-} from "../../cacheManager"
+} from "../../storeManager"
 
 type ResourceUrl = string
 

@@ -1,6 +1,6 @@
 import { createEffect, createSignal, on, onMount, type Accessor, type Setter } from "solid-js"
-import { createLocalStorageStoreManager } from "./storageManagers"
-import { listenDomEvent } from "../utils";
+import { createIDBStoreManager, createLocalStorageStoreManager } from "./storageManagers"
+import { listenDomEvent } from "../utils"
 
 /**
  * @todo currently only localStorage is supported
@@ -62,3 +62,23 @@ export function useLocalStorageValue(
   return [value, setValue]
 }
 
+export function useIDBValue<V = any>(opts: {
+  dbName?: string
+  key: string
+  defaultValue?: V
+}): [Accessor<V | undefined>, Setter<V | undefined>] {
+  const [value, setValue] = createSignal<V | undefined>(opts.defaultValue)
+  const idbManager = createIDBStoreManager<V | undefined>({
+    dbName: opts.dbName ?? "useIDBValue",
+    storeName: opts.key,
+  })
+  createEffect(
+    on(value, async () => {
+      const storedValue = await idbManager.get(opts.key)
+      if (storedValue !== value()) {
+        idbManager.set(opts.key, value())
+      }
+    }),
+  )
+  return [value, setValue] as const
+}

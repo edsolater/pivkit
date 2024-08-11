@@ -17,8 +17,8 @@ export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>,
   createEffect(
     on(
       value,
-      () => {
-        subscribable.set(value)
+      (v) => {
+        subscribable.set(v)
       },
       { defer: true },
     ),

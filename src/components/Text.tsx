@@ -1,4 +1,4 @@
-import { cacheFn, isString } from "@edsolater/fnkit"
+import { cacheFn, isString, shrinkFn } from "@edsolater/fnkit"
 import { createEffect, createMemo, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { Piv, parseICSSToClassName } from "../piv"
@@ -43,6 +43,12 @@ export function Text(kitProps: TextKitProps) {
         { defer: true },
       ),
     )
+    // this is debug code!!
+    // createEffect(
+    //   on(innerValue, () => {
+    //     console.log("innerValue(): ", innerValue(), value(), shrinkFn(kitProps.defaultValue))
+    //   }),
+    // )
     return (
       <Piv shadowProps={shadowProps} icss={defaultTextICSS}>
         {value() ?? innerValue()}

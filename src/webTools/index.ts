@@ -2,5 +2,5 @@ export * from "./hooks"
 export * from "./utils"
 
 // ---------------- special features ----------------
-export * from "./cacheManager"
+export * from "./storeManager"
 export * from "./jFetch"
