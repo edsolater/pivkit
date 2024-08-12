@@ -2,68 +2,19 @@ import { isObject, pipeFns, withAddDefault, type AnyObj } from "@edsolater/fnkit
 import { createMemo, JSX, Show, type Accessor, type JSXElement } from "solid-js"
 import { useKitProps, type KitProps } from "../createKit"
 import { createComponentContext, useComponentContext } from "../hooks"
-import { Box } from "./Boxes"
+import { AddProps } from "../piv"
 
 const FormFactoryContext = createComponentContext<{ obj: object }>()
 /** a special component for creating element tree by pure js data
  *
  * @todo: how to turn pure object tree to component tree ?
+ * 
  * @example use object config
  * <FormFactory
  *  formObj={innerItemData}
  *  keyOrder={["name", "tags"]}
  *  widgetMap={{
- *    // maybe it's not readable enough🤔, should more XML🤔?
- *    // category: (value) => (
- *    //   <Tag
- *    //     bg={cssColorMix({ color: colors.card, percent: "60%" }, itemThemeColor())}
- *    //     candidates={scheduleLinkItemCategories}
- *    //     value={value}
- *    //     defaultValue={value}
- *    //     onChange={({ itemValue }) => {
- *    //       const newCategory = itemValue() as ScheduleLinkItem["category"]
- *    //       setInnerCacheItemData("category", newCategory)
- *    //     }}
- *    //   >
- *    //     {value}
- *    //   </Tag>
- *    // ),
- *    // name: (value) => (
- *    //   <Text
- *    //     icss={({ isEnabled }: EditablePluginPluginController) => ({
- *    //       display: "inline-block",
- *    //       width: "100%",
- *    //       fontSize: "1.6em",
- *    //       outline: isEnabled() ? "solid" : undefined,
- *    //     })}
- *    //     plugin={editablePlugin.config({
- *    //       placeholder: "Title",
- *    //       onInput: (newText) => setInnerCacheItemData({ name: newText }),
- *    //       onEnabledChange: (b) => {
- *    //         if (!b) {
- *    //           props.onItemInfoChange?.(innerItemData)
- *    //         }
- *    //       },
- *    //     })}
- *    //   >
- *    //     {value}
- *    //   </Text>
- *    // ),
- *    tags: (value) => (
- *      <List
- *        icss={{
- *          gridArea: "tags",
- *          color: colors.textSecondary,
- *          display: "flex",
- *          flexWrap: "wrap",
- *          gap: "8px",
- *        }}
- *        items={value?.split(" ")}
- *      >
- *        {(tag) => <Text icss={{ alignContent: "center" }}>{tag}</Text>}
- *      </List>
- *    ),
- *    // comment: (value) => <Text>{value}</Text>,
+ *    comment: (value) => <Text>{value}</Text>,
  *  }}
  *>
  * @example use sub-component
@@ -145,9 +96,9 @@ export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
   })
   return (
     <Show when={enabled()}>
-      <Box shadowProps={shadowProps}>
-        {props.children(pipeFns(newValue, withAddDefault(props.defaultValue, { applyWhen: "falsy" })))}
-      </Box>
+      <AddProps shadowProps={shadowProps}>
+        {kitProps.children(pipeFns(newValue, withAddDefault(props.defaultValue, { applyWhen: "falsy" })))}
+      </AddProps>
     </Show>
   )
 }

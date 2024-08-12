@@ -1,4 +1,4 @@
-import { AnyFn, AnyObj, arrify, isString, mergeObjects, shakeNil, switchCase } from "@edsolater/fnkit"
+import { AnyFn, AnyObj, arrify, isNonEmptyObject, isString, mergeObjects, switchCase } from "@edsolater/fnkit"
 import { arriablePivPropsNames } from "../Piv"
 import { ValidProps } from "../typeTools"
 import { getKeys } from "./getKeys"
@@ -34,7 +34,7 @@ export function mergeProps<P extends ValidProps | undefined>(...propsObjs: P[]):
   // @ts-ignore
   if (propsObjs.length <= 1) return propsObjs[0] ?? {}
   // ready to parse
-  const props = shakeNil(arrify(propsObjs))
+  const props = arrify(propsObjs).filter(isNonEmptyObject)
   // @ts-ignore
   if (props.length <= 1) return props[0] ?? {}
 

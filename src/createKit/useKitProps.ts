@@ -4,14 +4,19 @@ import {
   arrify,
   createObjectWhenAccess,
   hasProperty,
+  isArray,
+  isNonEmptyObject,
+  isObject,
+  map,
   mergeObjects,
+  omit,
   pipeDo,
   shrinkFn,
   type AnyFn,
 } from "@edsolater/fnkit"
 import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
-import { createControllerContext, getControllerObjFromControllerContext } from "../piv/ControllerContext"
+import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
 import { PivProps } from "../piv/Piv"
 import { getPropsFromPropContextContext } from "../piv/PropContext"
 import { loadPropsControllerRef } from "../piv/propHandlers/children"
@@ -23,7 +28,6 @@ import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
 import { mergeProps } from "../piv/utils"
 import { AddDefaultPivProps, addDefaultPivProps } from "../piv/utils/addDefaultProps"
 import { omitItem } from "./utils"
-import type { JSXElement } from "solid-js"
 
 /** used for {@link useKitProps}'s option */
 export type KitPropsOptions<
@@ -130,12 +134,12 @@ export function useKitProps<
   if (hasProperty(rawOptions, "controller")) loadControllerForKitParser(shrinkFn(rawOptions!.controller))
 
   const loadController = (outsideFilledController: Controller) => {
-    const newMerged =
+    const newMergedController =
       "innerController" in methods
         ? mergeObjects(...arrify(methods.innerController), outsideFilledController)
         : outsideFilledController
-    loadControllerForContext(newMerged)
-    loadControllerForKitParser(newMerged)
+    loadControllerForContext(newMergedController)
+    loadControllerForKitParser(newMergedController)
   }
 
   return {
@@ -220,7 +224,16 @@ function useKitPropParser<
     : controllerFromOptions
 
   // inject controller to props:innerController (📝!!!important notice, for lazyLoadController props:innerController will always be a prop of any component useKitProps)
-  const needPassDownProps = mergeProps(preparsedProps, { innerController: controller } as PivProps)
+
+  // if handle children in uikit self, should don't pass props:children to `<Piv>`, because it will handle children again. This may cause some bug
+  const needPassPropsChildren = options?.needAccessify
+    ? options.needAccessify.includes("children")
+    : !options?.noNeedDeAccessifyProps?.includes("children")
+
+  const needPassToChildrenProps = mergeProps(
+    needPassPropsChildren ? preparsedProps : omit(preparsedProps, "children"),
+    { innerController: controller } as PivProps,
+  )
 
   const deAccessfiedProps = pipeDo(preparsedProps, (props) => {
     const verboseAccessifyPropNames =
@@ -240,7 +253,7 @@ function useKitPropParser<
   // in design, is it good?🤔
   // registerControllerInCreateKit(proxyController, rawProps.id)
 
-  return { props: deAccessfiedProps, methods: preparsedProps, shadowProps: needPassDownProps, loadController }
+  return { props: deAccessfiedProps, methods: preparsedProps, shadowProps: needPassToChildrenProps, loadController }
 }
 
 /**
@@ -259,7 +272,7 @@ function createComponentControllerLoader<
   return {
     loadController,
     getLoadedController: (props: ParsedKitProps<RawProps>) =>
-      controllerLazyLoadObj.hasLoaded() ? controllerLazyLoadObj.spawn()?.(props) : { hello: "say" },
+      controllerLazyLoadObj.hasLoaded() ? controllerLazyLoadObj.spawn()?.(props) : { hello: "say world" },
   }
 }
 
@@ -269,3 +282,16 @@ export type DeKitProps<
   DefaultProps extends Partial<DeAccessifyProps<P>> = {},
 > = ParsedKitProps<AddDefaultPivProps<DeAccessifyProps<P>, DefaultProps>> &
   Omit<PivProps<HTMLTag, Controller>, keyof DeAccessifyProps<P>>
+
+/**
+ * snapshot current value
+ * mainly for object and array. cause they are reference type, if Proxy is used, it's inner can not be console.log. so should snapshot it
+ *
+ */
+export function snapshot<T>(value: T): T {
+  if (isObject(value) || isArray(value)) {
+    return map(value, (v) => snapshot(v)) as any
+  } else {
+    return value
+  }
+}
