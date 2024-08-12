@@ -1,5 +1,6 @@
 import { Accessor, createEffect, createMemo, createSignal } from "solid-js"
 import { isNumber, isObject, isString, shrinkFn } from "@edsolater/fnkit"
+import { useKitProps, type KitProps } from "../../createKit"
 
 /**
  * used in {@link useSelectItems}
@@ -25,21 +26,31 @@ function defaultGetItemValue(item: any): string | number {
  *
  * value should be unique, it is used as unique key
  */
-export function useSelectItems<T>(options?: {
-  items?: T[]
+export function useSelectItems<T>(
+  kitOptions: KitProps<{
+    items?: T[]
 
-  //if both value and defaultValue are not specified, the first item will be used as default value
-  value?: T
-  defaultValue?: T
-  /** value is used in onChange, value is also used as key */
-  getItemValue?: (item: T) => string
-  /** only invoked when options:value is not currentValue */
-  onChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string> }): void
-  onFocusChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string> }): void
-  onClear?(): void
-}) {
+    //if both value and defaultValue are not specified, the first item will be used as default value
+    value?: T
+    defaultValue?: T
+    /** value is used in onChange, value is also used as key */
+    getItemValue?: (item: T) => string
+    /** only invoked when options:value is not currentValue */
+    onChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string> }): void
+    onFocusChange?(utils: { item: Accessor<T>; index: Accessor<number>; itemValue: Accessor<string> }): void
+    onClear?(): void
+  }>,
+) {
+  //TODO: maybe sub-module of `useKitProps` --- `useAccessifyOptions` is better
+  const { props: options, methods: rawOptions } = useKitProps(kitOptions, {
+    name: "useSelectItems",
+    noNeedDeAccessifyProps: ["getItemValue"],
+  })
   //#region ------------------- item list -------------------
   const [itemList, setItemList] = createSignal(options?.items ?? [])
+  createEffect(() => {
+    setItemList(options?.items ?? [])
+  })
   function updateItemList(newItems: T[]) {
     setItemList(newItems)
   }
@@ -53,7 +64,7 @@ export function useSelectItems<T>(options?: {
 
   //#region ---------------- items utils ----------------
   function getItemValue(item: T | undefined): string {
-    return String(item ? options?.getItemValue?.(item) ?? defaultGetItemValue(item) : defaultGetItemValue(item))
+    return String(item ? rawOptions?.getItemValue?.(item) ?? defaultGetItemValue(item) : defaultGetItemValue(item))
   }
   //#endregion
 

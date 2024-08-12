@@ -5,20 +5,43 @@ import { createIDBStoreManager } from "../webTools"
 
 /**
  * useful for subscribe to a subscribable
+ * if subscribable is a big store, use options.pick to pick a part of it
  * @param subscribable
  * @returns
  */
-export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>, Setter<T>] {
-  const [value, setValue] = createSignal(subscribable())
-  createEffect(() => {
-    const { unsubscribe } = subscribable.subscribe(setValue)
+export function useSubscribable<T, U>(
+  subscribable: Subscribable<T>,
+  options: {
+    pick: (subscribeValue: T) => U
+    set: (newValue: U, s: Subscribable<T>) => void
+  },
+): [Accessor<U>, Setter<U>]
+export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>, Setter<T>]
+export function useSubscribable<T>(
+  subscribable: Subscribable<T>,
+  options?: {
+    pick?: (subscribeValue: T) => any
+    set?: (newValue: any, s: Subscribable<T>) => void
+  },
+): [Accessor<any>, Setter<any>] {
+  const getPickedValue = (subscribeValue) => (options?.pick ? options.pick(subscribeValue) : subscribeValue)
+  const setPickedValue = (newValue) => {
+    options?.set ? options.set(newValue, subscribable) : subscribable.set(newValue)
+  }
+
+  const initValue = getPickedValue(subscribable())
+  const [value, setValue] = createSignal(initValue)
+
+  onMount(() => {
+    const { unsubscribe } = subscribable.subscribe((v) => setValue(getPickedValue(v)))
     onCleanup(unsubscribe)
   })
+
   createEffect(
     on(
       value,
       (v) => {
-        subscribable.set(v)
+        setPickedValue(v)
       },
       { defer: true },
     ),
