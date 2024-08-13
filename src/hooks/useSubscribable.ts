@@ -13,7 +13,7 @@ export function useSubscribable<T, U>(
   subscribable: Subscribable<T>,
   options: {
     pick: (subscribeValue: T) => U
-    set: (newValue: U, s: Subscribable<T>) => void
+    onSet: (newValue: U, s: Subscribable<T>) => void
   },
 ): [Accessor<U>, Setter<U>]
 export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>, Setter<T>]
@@ -21,12 +21,12 @@ export function useSubscribable<T>(
   subscribable: Subscribable<T>,
   options?: {
     pick?: (subscribeValue: T) => any
-    set?: (newValue: any, s: Subscribable<T>) => void
+    onSet?: (newValue: any, s: Subscribable<T>) => void
   },
 ): [Accessor<any>, Setter<any>] {
   const getPickedValue = (subscribeValue) => (options?.pick ? options.pick(subscribeValue) : subscribeValue)
   const setPickedValue = (newValue) => {
-    options?.set ? options.set(newValue, subscribable) : subscribable.set(newValue)
+    options?.onSet ? options.onSet(newValue, subscribable) : subscribable.set(newValue)
   }
 
   const initValue = getPickedValue(subscribable())

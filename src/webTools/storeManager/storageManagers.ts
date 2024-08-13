@@ -55,9 +55,15 @@ export function createSessionStorageStoreManager<T = unknown>(): StoreManager<T>
   }
 }
 
+type IDBStoreEntry = {
+  key: IDBValidKey
+  value: any
+}
+
 export type IDBStoreManager<V> = {
   set: (key: IDBValidKey, body: V) => Promise<void>
   get: (key: IDBValidKey | IDBKeyRange) => Promise<V | undefined>
+  getAll: () => Promise<IDBStoreEntry[] | undefined>
   has: (key: IDBValidKey | IDBKeyRange) => Promise<boolean>
   delete: (key: IDBValidKey | IDBKeyRange) => Promise<void>
   forEach: (callback: (value: V, key: IDBValidKey) => void) => Promise<void>
@@ -76,12 +82,8 @@ export function createIDBStoreManager<T = unknown>({
 }): IDBStoreManager<T> {
   const dbOpenRequest = globalThis.indexedDB.open(dbName, version)
 
-  let resolve: (value: IDBDatabase) => void
-  let reject: (reason?: any) => void
-  const db = new Promise<IDBDatabase>((innerResolve, innerReject) => {
-    resolve = innerResolve
-    reject = innerReject
-  })
+  const { promise: db, resolve, reject } = Promise.withResolvers<IDBDatabase>()
+
   dbOpenRequest.onerror = (event) => {
     reject((event.target as IDBOpenDBRequest).error)
   }
@@ -125,6 +127,7 @@ export function createIDBStoreManager<T = unknown>({
     },
     set,
     get,
+    getAll,
     has,
     delete: deleteItem,
     forEach,
@@ -141,14 +144,8 @@ export function createIDBStoreManager<T = unknown>({
   async function get(key: IDBValidKey | IDBKeyRange) {
     return db
       .then((db) => {
-        let resolve: (value: T) => void
-        let reject: (reason?: any) => void
-        const result = new Promise<T>((innerResolve, innerReject) => {
-          resolve = innerResolve
-          reject = innerReject
-        })
-        const transaction = db.transaction(storeName, "readonly")
-        const request = transaction.objectStore(storeName).get(key)
+        const { promise: result, resolve, reject } = Promise.withResolvers<T>()
+        const request = db.transaction(storeName, "readonly").objectStore(storeName).get(key)
         request.addEventListener("success", (event) => {
           resolve((event.target as IDBRequest).result)
         })
@@ -160,6 +157,37 @@ export function createIDBStoreManager<T = unknown>({
       .catch((e) => {
         console.error(e)
         return undefined
+      })
+  }
+
+  async function getAll() {
+    return db
+      .then((db) => {
+        const { promise: result, resolve, reject } = Promise.withResolvers<IDBStoreEntry[]>()
+        const objectStore = db.transaction(storeName, "readonly").objectStore(storeName)
+        const cursorRequest = objectStore.openCursor()
+
+        const allEntries: IDBStoreEntry[] = []
+
+        cursorRequest.addEventListener("success", (event) => {
+          const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
+          if (cursor) {
+            allEntries.push({ key: cursor.key, value: cursor.value })
+            cursor.continue()
+          } else {
+            resolve(allEntries)
+          }
+        })
+
+        cursorRequest.addEventListener("error", (event) => {
+          reject((event.target as IDBRequest).error)
+        })
+
+        return result
+      })
+      .catch((e) => {
+        console.error(e)
+        return []
       })
   }
   async function deleteItem(key: IDBValidKey | IDBKeyRange) {
@@ -179,6 +207,7 @@ export function createIDBStoreManager<T = unknown>({
     forEach,
     set,
     get,
+    getAll,
     delete: deleteItem,
     has,
   }
