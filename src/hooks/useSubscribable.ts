@@ -1,6 +1,6 @@
-import { Subscribable } from "@edsolater/fnkit"
-import { Accessor, createEffect, createSignal, on, onCleanup, onMount, type Setter } from "solid-js"
-import { type SetStoreFunction, createStore, unwrap, reconcile } from "solid-js/store"
+import { asyncInvoke, isShallowEqual, Subscribable } from "@edsolater/fnkit"
+import { Accessor, createEffect, createSignal, on, onCleanup, onMount, untrack, type Setter } from "solid-js"
+import { createStore, reconcile, unwrap, type SetStoreFunction } from "solid-js/store"
 import { createIDBStoreManager } from "../webTools"
 
 /**
@@ -12,28 +12,56 @@ import { createIDBStoreManager } from "../webTools"
 export function useSubscribable<T, U>(
   subscribable: Subscribable<T>,
   options: {
-    pick: (subscribeValue: T) => U
-    onSet: (newValue: U, s: Subscribable<T>) => void
+    /** only if raw subscribable is deep*/
+    targetPath?: string
+    /** @deprecated */
+    onPickFromSubscribable: (subscribeValue: T) => U
+    /** @deprecated */
+    onSetToSubscribable: (newValue: U, subscribable: Subscribable<T>) => void
   },
 ): [Accessor<U>, Setter<U>]
 export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>, Setter<T>]
 export function useSubscribable<T>(
   subscribable: Subscribable<T>,
   options?: {
-    pick?: (subscribeValue: T) => any
-    onSet?: (newValue: any, s: Subscribable<T>) => void
+    onPickFromSubscribable?: (subscribeValue: T) => any
+    onSetToSubscribable?: (newValue: any, currentValue: any) => any
   },
 ): [Accessor<any>, Setter<any>] {
-  const getPickedValue = (subscribeValue) => (options?.pick ? options.pick(subscribeValue) : subscribeValue)
+  // when it's innerValue, don't assign again
+  let newSetInnerValue: T | undefined
+
+  const getPickedValue = (subscribeValue) =>
+    options?.onPickFromSubscribable ? options.onPickFromSubscribable(subscribeValue) : subscribeValue
   const setPickedValue = (newValue) => {
-    options?.onSet ? options.onSet(newValue, subscribable) : subscribable.set(newValue)
+    options?.onSetToSubscribable ? options.onSetToSubscribable(newValue, subscribable) : subscribable.set(newValue)
   }
 
   const initValue = getPickedValue(subscribable())
-  const [value, setValue] = createSignal(initValue)
+  const [value, _setValue] = createSignal(initValue)
+
+  // @ts-expect-error force
+  const setValue: Setter<any> = (v) => {
+    if (isShallowEqual(v, untrack(value))) return
+    _setValue(v)
+  }
 
   onMount(() => {
-    const { unsubscribe } = subscribable.subscribe((v) => setValue(getPickedValue(v)))
+    const { unsubscribe } = subscribable.subscribe(
+      (v) => {
+        asyncInvoke(() => {
+          const newNeedToSetValue = getPickedValue(v)
+          if (newNeedToSetValue === newSetInnerValue) {
+            newSetInnerValue = undefined
+            return
+          } else {
+            newSetInnerValue = newNeedToSetValue
+            setValue(newNeedToSetValue)
+          }
+        })
+      },
+      { immediately: false },
+    )
     onCleanup(unsubscribe)
   })
 
@@ -41,7 +69,16 @@ export function useSubscribable<T>(
     on(
       value,
       (v) => {
-        setPickedValue(v)
+        asyncInvoke(() => {
+          const newNeedToSetValue = v
+          if (newNeedToSetValue === newSetInnerValue) {
+            newSetInnerValue = undefined
+            return
+          } else {
+            newSetInnerValue = newNeedToSetValue
+            setPickedValue(v)
+          }
+        })
       },
       { defer: true },
     ),

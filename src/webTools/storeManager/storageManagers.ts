@@ -1,3 +1,5 @@
+import { shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
+
 interface StoreManager<V = unknown> {
   set: (key: string, body: V) => Promise<void>
   get: (key: string) => Promise<V | undefined>
@@ -61,7 +63,7 @@ type IDBStoreEntry = {
 }
 
 export type IDBStoreManager<V> = {
-  set: (key: IDBValidKey, body: V) => Promise<void>
+  set: (key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: Promise<V | undefined>]>) => Promise<void>
   get: (key: IDBValidKey | IDBKeyRange) => Promise<V | undefined>
   getAll: () => Promise<IDBStoreEntry[] | undefined>
   has: (key: IDBValidKey | IDBKeyRange) => Promise<boolean>
@@ -133,13 +135,17 @@ export function createIDBStoreManager<T = unknown>({
     forEach,
   })
 
-  async function set(key: IDBValidKey, body: T) {
-    db.then((db) => {
-      const transaction = db.transaction(storeName, "readwrite")
-      transaction.objectStore(storeName).put(body, key)
-    }).catch((e) => {
-      console.error(e)
-    })
+  async function set(key: IDBValidKey, body: MayFn<MayPromise<T | undefined>, [prev: Promise<T | undefined>]>) {
+    return db
+      .then((db) => {
+        const transaction = db.transaction(storeName, "readwrite")
+        const prevValue = get(key)
+        const newValue = shrinkFn(body, [prevValue])
+        Promise.resolve(newValue).then((value) => transaction.objectStore(storeName).put(value, key))
+      })
+      .catch((e) => {
+        console.error(e)
+      })
   }
   async function get(key: IDBValidKey | IDBKeyRange) {
     return db
