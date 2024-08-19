@@ -1,22 +1,24 @@
 import { MayFn, shrinkFn } from "@edsolater/fnkit"
-import { For, JSXElement, createMemo, type Accessor } from "solid-js"
+import { For, JSXElement, Show, createMemo, type Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { createRef } from "../hooks/createRef"
 import { AddProps, Fragnment, PivChild, parsePivChildren } from "../piv"
 
 export interface LoopController {}
 
-type ComponentStructure = (...anys: any[]) => JSXElement
-
 export type LoopProps<T> = {
   /** only for inner */
   $isList?: boolean
 
   /** `<List>` has default `<Box>` wrapper, but `<Loop>` has not*/
-  renderWrapper?: ComponentStructure
-  renderListItemWrapper?: ComponentStructure
+  renderWrapper?: (...anys: any[]) => JSXElement
+  renderListItemWrapper?: (...anys: any[]) => JSXElement
+  //TODO: implement this
+  renderPlaceholder?: (...anys: any[]) => JSXElement
 
   items?: MayFn<Iterable<T>>
+  /** used when items' length is 0, so noting to render originally */
+  fallbackItem?: T
 
   renderDivider?: MayFn<PivChild, [payload: { prevIndex: Accessor<number>; currentIndex: Accessor<number> }]>
   sortCompareFn?: (a: T, b: T) => number
@@ -41,6 +43,9 @@ export function Loop<T>(kitProps: LoopKitProps<T>) {
   // [configs]
   const allItems = createMemo(() => {
     const sourceItems = Array.from(shrinkFn(props.items ?? []) as T[])
+    if (sourceItems.length === 0 && "fallbackItem" in props) {
+      return [props.fallbackItem] as T[]
+    }
     const sorter = kitProps.sortCompareFn
     const sorted = sorter && sourceItems.length > 1 ? sourceItems.sort(sorter) : sourceItems
     return sorted
@@ -65,7 +70,9 @@ export function Loop<T>(kitProps: LoopKitProps<T>) {
   )
   return (
     <BoxWrapper domRef={setRef} shadowProps={shadowProps}>
-      {content}
+      <Show when={itemLength() > 0} fallback={props.renderPlaceholder}>
+        {content}
+      </Show>
     </BoxWrapper>
   )
 }
