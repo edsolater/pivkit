@@ -8,7 +8,7 @@ const FormFactoryContext = createComponentContext<{ obj: object }>()
 /** a special component for creating element tree by pure js data
  *
  * @todo: how to turn pure object tree to component tree ?
- * 
+ *
  * @example use object config
  * <FormFactory
  *  formObj={innerItemData}
@@ -69,28 +69,36 @@ type FormFactoryBlockProps<F extends keyof T, T extends AnyObj> = {
   name: F
   children: (currentValue: Accessor<T[F]>) => JSXElement
 
-  /** always shown even value is undefined */
-  forceVisiable?: boolean
+  /**
+   *  always shown even value is undefined
+   * @default true
+   */
+  visiable?: boolean
 
   /**
    * usually **no need** to set this. it will cover automaticly.
    * by default when value is not undefined, component will show
    */
-  when?: (currentValue: Accessor<T[F]>) => any
+  visiableWhen?: (currentValue: Accessor<T[F]>) => any
 
   /** applied when currnetValue is undefined (often this is a placeholder) */
   defaultValue?: T[F]
 }
 
 export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
-  kitProps: KitProps<FormFactoryBlockProps<F, T>, { noNeedDeAccessifyProps: ["children", "when"] }>,
+  kitProps: KitProps<FormFactoryBlockProps<F, T>, { noNeedDeAccessifyProps: ["children", "visiableWhen"] }>,
 ) {
-  const { props, methods, shadowProps } = useKitProps(kitProps, { noNeedDeAccessifyProps: ["children", "when"] })
+  const { props, methods, shadowProps } = useKitProps(kitProps, {
+    noNeedDeAccessifyProps: ["children", "when"],
+    defaultProps: {
+      visiable: true,
+    },
+  })
   const [contextStore] = useComponentContext(FormFactoryContext)
   const newValue = createMemo(() => contextStore.obj[props.name as keyof any])
   const enabled = createMemo(() => {
-    if (props.forceVisiable) return true
-    if (props.when) return methods.when?.(newValue)
+    if (props.visiable) return true
+    if (methods.visiableWhen) return methods.visiableWhen?.(newValue)
     // when value is not undefined, component will show
     return "defaultValue" in props || props.name in contextStore.obj
   })

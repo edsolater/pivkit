@@ -5,7 +5,6 @@ import {
   createObjectWhenAccess,
   hasProperty,
   isArray,
-  isNonEmptyObject,
   isObject,
   map,
   mergeObjects,
