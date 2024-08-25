@@ -3,6 +3,15 @@ import { Accessor, createEffect, createSignal, on, onCleanup, onMount, untrack, 
 import { createStore, reconcile, unwrap, type SetStoreFunction } from "solid-js/store"
 import { createIDBStoreManager } from "../webTools"
 
+type SignalReturnedPair<U> = [
+  accessor: Accessor<U>,
+  setter: Setter<U>,
+  utils: {
+    /* update inner data from param:Subscribable */
+    refresh(): void
+  },
+]
+
 /**
  * useful for subscribe to a subscribable
  * if subscribable is a big store, use options.pick to pick a part of it
@@ -19,15 +28,15 @@ export function useSubscribable<T, U>(
     /** @deprecated */
     onSetToSubscribable: (newValue: U, subscribable: Subscribable<T>) => void
   },
-): [Accessor<U>, Setter<U>]
-export function useSubscribable<T>(subscribable: Subscribable<T>): [Accessor<T>, Setter<T>]
+): SignalReturnedPair<U>
+export function useSubscribable<T>(subscribable: Subscribable<T>): SignalReturnedPair<T>
 export function useSubscribable<T>(
   subscribable: Subscribable<T>,
   options?: {
     onPickFromSubscribable?: (subscribeValue: T) => any
     onSetToSubscribable?: (newValue: any, currentValue: any) => any
   },
-): [Accessor<any>, Setter<any>] {
+): SignalReturnedPair<any> {
   // when it's innerValue, don't assign again
   let newSetInnerValue: T | undefined
 
@@ -46,19 +55,23 @@ export function useSubscribable<T>(
     _setValue(v)
   }
 
+  function setFromRawSubscribableValue(v: any): void {
+    const newNeedToSetValue = getPickedValue(v)
+    if (newNeedToSetValue === newSetInnerValue) {
+      newSetInnerValue = undefined
+    } else {
+      newSetInnerValue = newNeedToSetValue
+      setValue(newNeedToSetValue)
+    }
+  }
+  /* update inner data from param:Subscribable */
+  function forceRefreshFromSubscribable() {
+    setFromRawSubscribableValue(subscribable())
+  }
   onMount(() => {
     const { unsubscribe } = subscribable.subscribe(
       (v) => {
-        asyncInvoke(() => {
-          const newNeedToSetValue = getPickedValue(v)
-          if (newNeedToSetValue === newSetInnerValue) {
-            newSetInnerValue = undefined
-            return
-          } else {
-            newSetInnerValue = newNeedToSetValue
-            setValue(newNeedToSetValue)
-          }
-        })
+        asyncInvoke(() => setFromRawSubscribableValue(v))
       },
       { immediately: false },
     )
@@ -83,7 +96,7 @@ export function useSubscribable<T>(
       { defer: true },
     ),
   )
-  return [value, setValue]
+  return [value, setValue, { refresh: forceRefreshFromSubscribable }]
 }
 
 /**
