@@ -10,7 +10,8 @@ import { ItemBox, ItemBoxKitProps } from "../ItemBox"
 import { Loop } from "../Loop"
 import { useSelectItems } from "./useSelectItems"
 import { useClickOutside } from "../../webTools"
-export { useSelectItems } from "./useSelectItems"
+export * from "./useSelectItems"
+export * from "./SelectPanel"
 export type SelectableItem = unknown
 
 type SelectableController = {
@@ -30,7 +31,7 @@ export type ItemEventUtils<T extends SelectableItem> = {
   item: Accessor<T>
   index: Accessor<number>
   /** use this, for it's value won't change if item's struct change */
-  itemValue: Accessor<string >
+  itemValue: Accessor<string>
   isSelected: Accessor<boolean>
 }
 
@@ -43,7 +44,7 @@ export type SelectProps<T extends SelectableItem> = {
   value?: T
   defaultValue?: T
   /** value is used in onChange, value is also used as key */
-  getItemValue?: (item: T) => string 
+  getItemValue?: (item: T) => string
   onChange?(utils: ItemEventUtils<T>): void
 
   disabled?: boolean

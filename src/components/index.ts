@@ -30,6 +30,7 @@ export * from "./TagInput"
 export * from "./Text"
 export * from "./Title"
 export * from "./Iframe"
+export * from "./Tooltip"
 
 // ---------------- plugin component ----------------
 export * from "./PluginWrapper"
