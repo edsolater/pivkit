@@ -34,13 +34,14 @@ export function useGestureHover(el: ElementRefs, options: GestureHoverOptions): 
   return { isHover }
 }
 
+// TODO: delay version is strange, need to fix it
 export function attachGestureHover(el: ElementRefs, options: GestureHoverOptions) {
   const cleanFns = [] as AnyFn[]
 
   if (options.disable) return { cancel: () => false }
   const els = getElementFromRefs(el)
   if (!els.length) return { cancel: () => false }
-  let hoverDelayTimerId: number | undefined
+  let hoverDelayTimerId: any
   const hoverStartHandler = (ev: PointerEvent) => {
     if (options.disable) return
     clearTimeout(hoverDelayTimerId)
@@ -48,7 +49,7 @@ export function attachGestureHover(el: ElementRefs, options: GestureHoverOptions
       hoverDelayTimerId = setTimeoutWithSecondes(() => {
         options.onHover?.({ is: "start", ev })
         options.onHoverStart?.({ ev })
-      }, options.startDelay) as any
+      }, options.startDelay)
     } else {
       options.onHover?.({ is: "start", ev })
       options.onHoverStart?.({ ev })
@@ -61,7 +62,7 @@ export function attachGestureHover(el: ElementRefs, options: GestureHoverOptions
       hoverDelayTimerId = setTimeoutWithSecondes(() => {
         options.onHover?.({ is: "end", ev })
         options.onHoverEnd?.({ ev })
-      }, options.endDelay) as any
+      }, options.endDelay)
     } else {
       options.onHover?.({ ev, is: "end" })
       options.onHoverEnd?.({ ev })
