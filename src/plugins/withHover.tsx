@@ -12,7 +12,7 @@ export const useHoverPlugin = createPlugin<Omit<GestureHoverOptions, "el">, Gest
   const [dom, setDom] = createRef<HTMLElement>()
 
   // usually, state is created by hook
-  const state = useGestureHover({ ...options, el: dom })
+  const state = useGestureHover(dom, options)
 
   const pluginCore = () => ({ domRef: setDom })
   return {

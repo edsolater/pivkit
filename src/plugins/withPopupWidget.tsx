@@ -1,10 +1,10 @@
-import { addDefaultProperties } from "@edsolater/fnkit"
-import { createEffect, createMemo, on, type Accessor } from "solid-js"
-import type { PivChild } from "../piv/typeTools"
+import { children, createEffect, createMemo, on, type Accessor, type JSXElement } from "solid-js"
 import { PopoverPanel } from "../components"
-import { createUUID, createDomRef, createDisclosure } from "../hooks"
+import { createDisclosure, createDomRef, createUUID } from "../hooks"
 import { createPlugin, type Plugin } from "../piv"
-import { focusFirstFocusableChild } from "../webTools"
+import type { PivChild } from "../piv/typeTools"
+import { focusFirstFocusableChild, useGestureHover } from "../webTools"
+import { useClick } from "../webTools/hooks/useClick"
 
 export type PopupWidgetPluginController = {
   isOpen: Accessor<boolean>
@@ -26,20 +26,28 @@ export type PopupDirection =
   | `${BaseDir} ${"center" | NoSameDirection<BaseDir> | `span-${NoSameDirection<BaseDir>}`}`
 
 export type PopupWidgetPluginOptions = {
+  $debug?: boolean
   /** REQUIRED */
-  popElement: (utils: PopupWidgetPluginController) => PivChild
+  popElement: (utils: PopupWidgetPluginController) => JSXElement
 
+  /** if set true, popoverMode must be auto */
   defaultOpen?: boolean
 
   //TODO: imply it !!
   open?: boolean
 
-  noStyle?: boolean
-
   isWrapperAddProps?: boolean
-  /** user can close popup panel when user click the outside */
-  canBackdropClose?: boolean
 
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/popover
+   *
+   * - auto : The popover is shown when the user interacts with the element, and hidden when the user interacts with a different element.
+   * - manual : The popover is shown when the user interacts with the element, and remains visible until the user dismisses it.
+   */
+  popoverMode?: "auto" /* default */ | "manual"
+  triggerBy?: "click" /* default */ | "hover"
+
+  elementHtmlTitle?: string
   /** when open popup, focus on the popup panel's first focusable element child */
   shouldFocusChildWhenOpen?: boolean
 
@@ -53,12 +61,15 @@ export type PopupWidgetPluginOptions = {
 export type PopupWidgetPlugin = Plugin<PopupWidgetPluginOptions>
 
 //TODO: move to pivkit
-/** special plugin */
+/** special plugin
+ *
+ * inner use Popover API
+ */
 export const withPopupWidget: PopupWidgetPlugin = createPlugin((opts) => {
-  const options = addDefaultProperties(opts, { noStyle: true })
+  const options = opts
   const uuid = createUUID()
-  const { dom: popoverTriggerDom, setDom: setPopoverTriggerDom } = createDomRef()
-  const { dom: popoverContentDom, setDom: setPopoverContentDom } = createDomRef()
+  const { dom: triggerDom, setDom: setPopoverTriggerDom } = createDomRef()
+  const { dom: contentDom, setDom: setPopoverContentDom } = createDomRef()
 
   const [isOn, { toggle, open, close }] = createDisclosure(options.defaultOpen, {
     onToggle(toOpen) {
@@ -83,11 +94,32 @@ export const withPopupWidget: PopupWidgetPlugin = createPlugin((opts) => {
     createEffect(
       on(isOn, (on) => {
         if (on) {
-          focusFirstFocusableChild(popoverContentDom())
+          focusFirstFocusableChild(contentDom())
         }
       }),
     )
   }
+
+  if (options.$debug) {
+    createEffect(() => {
+      console.log("isOn(): ", isOn())
+    })
+  }
+
+  //#region ---------------- how to invoke trigger ----------------
+  if (options.triggerBy === "hover") {
+    useGestureHover([triggerDom, contentDom], {
+      onHoverStart: () => open(),
+      onHoverEnd: () => close(),
+      endDelay: 0.5,
+    })
+  } else {
+    // default triggerBy: click
+    useClick(triggerDom, {
+      onClick: () => toggle(),
+    })
+  }
+  //#endregion
 
   return () => ({
     domRef: setPopoverTriggerDom,
@@ -96,14 +128,16 @@ export const withPopupWidget: PopupWidgetPlugin = createPlugin((opts) => {
       anchorName: `--pop-anchor-${uuid}`,
     },
     onClick: ({ ev }) => {
-      open()
+      toggle()
     },
+    htmlProps: "htmlTitle" in options ? { title: options.elementHtmlTitle } : undefined,
     defineNextSibling: (
       <PopoverPanel
+        $debug={options.$debug}
         domRef={setPopoverContentDom}
         open={isOn}
         isWrapperAddProps={options.isWrapperAddProps}
-        canBackdropClose={options.canBackdropClose}
+        popoverMode={options.popoverMode}
         icss={[
           {
             marginRight: gapInfo().leftHaveGap ? "8px" : undefined,

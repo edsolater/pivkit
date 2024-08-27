@@ -1,5 +1,5 @@
-import { assert } from "@edsolater/fnkit"
-import { Show, createEffect, createSignal, on } from "solid-js"
+import { assert, omit, setTimeoutWithSecondes } from "@edsolater/fnkit"
+import { Show, children, createEffect, createSignal, on, onCleanup, onMount, untrack, type JSXElement } from "solid-js"
 import { AddProps, Piv, createDomRef, createStaticICSS, listenDomEvent, useKitProps, type KitProps } from ".."
 
 export type PopoverPanelController = {
@@ -10,9 +10,16 @@ export type PopoverPanelController = {
 }
 
 export type PopoverPanelProps = {
+  $debug?: boolean
   defaultOpen?: boolean
   open?: boolean
-  canBackdropClose?: boolean
+  /**
+   * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/popover
+   *
+   * - auto : The popover is shown when the user interacts with the element, and hidden when the user interacts with a different element.
+   * - manual : The popover is shown when the user interacts with the element, and remains visible until the user dismisses it.
+   */
+  popoverMode?: "auto" /* default */ | "manual"
   isWrapperAddProps?: boolean
   onClose?: () => void
   onBeforeClose?: () => void
@@ -26,6 +33,7 @@ const icssPopoverStyle = createStaticICSS("PopoverPanel", () => ({
     margin: "unset",
   },
 }))
+
 /**
  *
  * NOTE: inner children will always be rendered, if you want to lazy load children, you should use `<Show>` to wrap your child
@@ -42,22 +50,23 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
   createEffect(() => {
     const el = dom()
     if (!el) return
-    listenDomEvent(el, "toggle", ({ ev }) => {
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/toggle_event
+    const { cancel } = listenDomEvent(el, "toggle", ({ ev }) => {
       // @ts-expect-error force
-      const isClosed = ev.newState === "closed"
-      if (isClosed) {
+      if (ev.newState === "closed" && ev.oldState === "open" && untrack(isOpen)) {
         setIsOpen(false)
         props.onClose?.()
       }
     })
+
+    onCleanup(() => cancel())
   })
 
   createEffect(
     on(isOpen, (open) => {
-      if (shouldRender()) {
-        return
-      } else {
-        return setShouldRender(open)
+      if (!shouldRender()) {
+        setShouldRender(open)
       }
     }),
   )
@@ -106,7 +115,7 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
       {props.isWrapperAddProps ? (
         <AddProps
           shadowProps={shadowProps}
-          htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }}
+          htmlProps={{ popover: props.popoverMode ?? "auto" }}
           domRef={setDom}
           icss={icssPopoverStyle}
         >
@@ -115,7 +124,7 @@ export function PopoverPanel(kitProps: KitProps<PopoverPanelProps, { controller:
       ) : (
         <Piv
           shadowProps={shadowProps}
-          htmlProps={{ popover: props.canBackdropClose ? "auto" : "manual" }}
+          htmlProps={{ popover: props.popoverMode ?? "auto" }}
           domRef={setDom}
           icss={icssPopoverStyle}
         >

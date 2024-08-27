@@ -14,6 +14,8 @@ export type PopoverPluginOptions = Omit<PopoverLocationHookOptions, "isTriggerOn
 }
 
 /**
+ * @deprecated
+ *
  * **headless Hooks**
  * only logic not style
  * when hooks startWith 'make', it means u can use this hook to make a composition of component by plugins
@@ -30,8 +32,7 @@ export function buildPopover(options?: PopoverPluginOptions) {
 
   // invoke trigger
   if (options?.triggerBy === "hover") {
-    useGestureHover({
-      el: buttonDom,
+    useGestureHover(buttonDom, {
       onHoverStart: open,
       onHoverEnd: close,
     })
@@ -84,11 +85,7 @@ export function buildPopover(options?: PopoverPluginOptions) {
           console.log("✅ pick popover plugin")
           return (originalNode) => {
             console.log("✅ load popover plugin")
-            return (
-              <PopoverPanel class="popovers" canBackdropClose>
-                {originalNode}
-              </PopoverPanel>
-            )
+            return <PopoverPanel class="popovers">{originalNode}</PopoverPanel>
           }
         },
         domRef: setPanelDom,
