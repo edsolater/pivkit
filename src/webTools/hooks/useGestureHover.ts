@@ -18,7 +18,7 @@ export interface GestureHoverStates {
   isHover: Accessor<boolean>
 }
 
-export function useGestureHover(el: ElementRefs, options: GestureHoverOptions): GestureHoverStates {
+export function useGestureHover(el: ElementRefs, options?: GestureHoverOptions): GestureHoverStates {
   const [isHover, { open: turnonHover, close: turnoffHover }] = createDisclosure()
   createEffect(() => {
     const cevManager = attachGestureHover(el, {
@@ -26,7 +26,7 @@ export function useGestureHover(el: ElementRefs, options: GestureHoverOptions): 
       onHover(info) {
         const isOn = info.is === "start"
         isOn ? turnonHover() : turnoffHover()
-        options.onHover?.(info)
+        options?.onHover?.(info)
       },
     })
     onCleanup(cevManager.cancel)
@@ -69,6 +69,9 @@ export function attachGestureHover(el: ElementRefs, options: GestureHoverOptions
     }
   }
   els.forEach((el) => {
+    if ("el" in el) {
+      console.trace("el: ", el)
+    }
     const cev1 = listenDomEvent(el, "pointerenter", ({ ev }) => hoverStartHandler(ev))
     cleanFns.push(cev1.cancel)
     const cev2 = listenDomEvent(el, "pointerleave", ({ ev }) => hoverEndHandler(ev))

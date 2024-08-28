@@ -5,6 +5,7 @@ import { createPlugin, type Plugin } from "../piv"
 import type { PivChild } from "../piv/typeTools"
 import { focusFirstFocusableChild, useGestureHover } from "../webTools"
 import { useClick } from "../webTools/hooks/useClick"
+import { icssClickable } from "../styles"
 
 export type PopupWidgetPluginController = {
   isOpen: Accessor<boolean>
@@ -116,6 +117,7 @@ export const withPopupWidget: PopupWidgetPlugin = createPlugin((opts) => {
   } else {
     // default triggerBy: click
     useClick(triggerDom, {
+      enabled: () => !isOn(),
       onClick: () => toggle(),
     })
   }
@@ -123,13 +125,13 @@ export const withPopupWidget: PopupWidgetPlugin = createPlugin((opts) => {
 
   return () => ({
     domRef: setPopoverTriggerDom,
-    icss: {
-      // https://developer.chrome.com/blog/anchor-positioning-api?hl=zh-cn
-      anchorName: `--pop-anchor-${uuid}`,
-    },
-    onClick: ({ ev }) => {
-      toggle()
-    },
+    icss: [
+      {
+        // https://developer.chrome.com/blog/anchor-positioning-api?hl=zh-cn
+        anchorName: `--pop-anchor-${uuid}`,
+      },
+      icssClickable(),
+    ],
     htmlProps: "htmlTitle" in options ? { title: options.elementHtmlTitle } : undefined,
     defineNextSibling: (
       <PopoverPanel
@@ -152,7 +154,7 @@ export const withPopupWidget: PopupWidgetPlugin = createPlugin((opts) => {
             // right: "anchor(right)",
             // bottom: "anchor(bottom)",
             insetArea: options.popupDirection ?? ("bottom span-right" as PopupDirection),
-            positionTryOptions: "flip-block, flip-inline",
+            positionTryFallbacks: "flip-block, flip-inline",
           },
         ]}
         onClose={() => {

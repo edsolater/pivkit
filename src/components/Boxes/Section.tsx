@@ -1,5 +1,5 @@
 import { KitProps, useKitProps } from "../../createKit"
-import { Piv } from "../../piv"
+import { Piv, renderAsHTMLSection } from "../../piv"
 import { icssNewCompositedLayer } from "../../styles"
 
 export type SectionProps = {
@@ -13,5 +13,7 @@ export type SectionKitProps = KitProps<SectionProps>
  */
 export function Section(rawProps: SectionKitProps) {
   const { shadowProps, props } = useKitProps(rawProps, { name: "Section" })
-  return <Piv class={props.name} shadowProps={shadowProps} icss={icssNewCompositedLayer} />
+  return (
+    <Piv defineSelf={renderAsHTMLSection} class={props.name} shadowProps={shadowProps} icss={icssNewCompositedLayer} />
+  )
 }
