@@ -5,7 +5,7 @@ import { createDomRef, createSyncSignal } from "../hooks"
 import { createPlugin, type PivProps, type Plugin } from "../piv"
 import { cssOpacity } from "../styles"
 
-export type EditablePluginPluginController = {
+export type EditablePluginController = {
   isEnabled: Accessor<boolean>
 }
 
@@ -48,55 +48,53 @@ export type EditablePluginKitOptions = KitProps<EditablePluginOptions>
 
 //TODO: contenteditable should also be a buildin plugin in `<Text />`
 /** special plugin */
-export const withEditable: Plugin<EditablePluginKitOptions, EditablePluginPluginController> = createPlugin(
-  (kitOptions) => {
-    const { props: options } = useKitProps(kitOptions, {
-      defaultProps: {
-        startEditWhenClick: true,
-        endEditWhenClickOutside: true,
-        okWhenTypeEnter: true,
-        initEditCursorPlacement: "end",
-      },
-    })
-    const { dom: selfDom, setDom: setSelfDom } = createDomRef()
+export const withEditable: Plugin<EditablePluginKitOptions, EditablePluginController> = createPlugin((kitOptions) => {
+  const { props: options } = useKitProps(kitOptions, {
+    defaultProps: {
+      startEditWhenClick: true,
+      endEditWhenClickOutside: true,
+      okWhenTypeEnter: true,
+      initEditCursorPlacement: "end",
+    },
+  })
+  const { dom: selfDom, setDom: setSelfDom } = createDomRef()
 
-    const [isEnabled, setIsEnabled] = createSyncSignal({
-      value: () => Boolean(options.isEnabled),
-      onSet(value) {
-        options.onEnabledChange?.(value)
-      },
-    })
+  const [isEnabled, setIsEnabled] = createSyncSignal({
+    value: () => Boolean(options.isEnabled),
+    onSet(value) {
+      options.onEnabledChange?.(value)
+    },
+  })
 
-    return {
-      plugin: () =>
-        ({
-          domRef: (el) => {
-            if (options.$debug) {
-              console.log("el: ", el, options.$debug)
-            }
-            return setSelfDom(el)
-          },
-          htmlProps: {
-            "data-placeholder": options.placeholder,
-          },
-          icss: () => ({
-            "&:empty": {
-              color: cssOpacity("currentColor", 0.4),
-              "&::before": {
-                content: "attr(data-placeholder)",
-              },
+  return {
+    plugin: () =>
+      ({
+        domRef: (el) => {
+          if (options.$debug) {
+            console.log("el: ", el, options.$debug)
+          }
+          return setSelfDom(el)
+        },
+        htmlProps: {
+          "data-placeholder": options.placeholder,
+        },
+        icss: () => ({
+          "&:empty": {
+            color: cssOpacity("currentColor", 0.4),
+            "&::before": {
+              content: "attr(data-placeholder)",
             },
-          }),
-        }) as PivProps,
-      state: { isEnabled },
-    }
-  },
-)
+          },
+        }),
+      }) as PivProps,
+    state: { isEnabled },
+  }
+})
 
 /** component version of {@link withEditable} */
 export function EditablePluginWrapper(
   rawProps: Omit<EditablePluginKitOptions, "children"> & {
-    children?: (state: EditablePluginPluginController) => JSXElement
+    children?: (state: EditablePluginController) => JSXElement
   },
 ) {
   return (

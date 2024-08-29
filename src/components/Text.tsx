@@ -1,12 +1,8 @@
-import { cacheFn, isString, shrinkFn } from "@edsolater/fnkit"
+import { cacheFn, isString } from "@edsolater/fnkit"
 import { createEffect, createMemo, createSignal, on } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { Piv, parseICSSToClassName } from "../piv"
-import {
-  editablePlugin,
-  type EditablePluginOptions,
-  type EditablePluginPluginController,
-} from "../plugins/textEditablePlugin"
+import { withEditable, type EditablePluginController, type EditablePluginOptions } from "../plugins"
 
 export interface TextProps {
   /**
@@ -73,7 +69,7 @@ const defaultTextICSS = cacheFn(() =>
 
 /** have build-in editablePlugin to easier use */
 export function EditableText(
-  props: KitProps<TextProps & EditablePluginOptions, { controller: EditablePluginPluginController }>,
+  props: KitProps<TextProps & EditablePluginOptions, { controller: EditablePluginController }>,
 ) {
-  return <Text {...props} plugin={editablePlugin.config(props)} />
+  return <Text {...props} plugin={withEditable.config(props)} />
 }
