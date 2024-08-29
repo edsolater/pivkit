@@ -154,7 +154,7 @@ export const withPopupWidget: PopupWidgetPlugin = createPlugin((opts) => {
             // right: "anchor(right)",
             // bottom: "anchor(bottom)",
             insetArea: options.popupDirection ?? ("bottom span-right" as PopupDirection),
-            positionTryFallbacks: "flip-block, flip-inline",
+            positionTry: "flip-block, flip-inline",
           },
         ]}
         onClose={() => {
