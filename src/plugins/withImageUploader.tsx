@@ -1,4 +1,4 @@
-import { type Accessor, type JSXElement } from "solid-js"
+import { createEffect, onCleanup, type Accessor, type JSXElement } from "solid-js"
 import { PluginWrapper } from "../components"
 import { type KitProps, useKitProps } from "../createKit"
 import { createDomRef, createSyncSignal } from "../hooks"
@@ -21,7 +21,7 @@ export type ImageUploaderPluginOptions = {
   onEnabledChange?: (isEnabled: boolean) => void
   /** when innerText is empty. placeholderText will always has .4 opacity */
   placeholder?: string
-  onInput?: (newText: string) => void
+  onImagePaste?: (imageBlob: Blob) => void
   /**
    * start edit when click
    * @default true
@@ -53,7 +53,26 @@ export const withImageUploader: Plugin<ImageUploaderPluginKitOptions, ImageUploa
     })
     const { dom: selfDom, setDom: setSelfDom } = createDomRef()
 
-    const [isEnabled, setIsEnabled] = createSyncSignal({
+    createEffect(() => {
+      const el = selfDom()
+      if (!el) return
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === "childList") {
+            const imageElement = Array.from(mutation.addedNodes).find(isHTMLImg) as HTMLImageElement
+            const src = getImageSrc(imageElement)
+            const blob = base64ImageStringToBlob(src)
+            options.onImagePaste?.(blob)
+          }
+        })
+      })
+      observer.observe(el, { childList: true })
+      onCleanup(() => {
+        observer.disconnect()
+      })
+    })
+
+    const [inPluginEnabled, setIsPluginEnabled] = createSyncSignal({
       value: () => Boolean(options.isEnabled),
       onSet(value) {
         options.onEnabledChange?.(value)
@@ -63,14 +82,9 @@ export const withImageUploader: Plugin<ImageUploaderPluginKitOptions, ImageUploa
     return {
       plugin: () =>
         ({
-          domRef: (el) => {
-            if (options.$debug) {
-              console.log("el: ", el, options.$debug)
-            }
-            return setSelfDom(el)
-          },
+          domRef: (el) => setSelfDom(el),
           htmlProps: {
-            "data-placeholder": options.placeholder,
+            contentEditable: "inherit",
           },
           icss: () => ({
             "&:empty": {
@@ -81,7 +95,7 @@ export const withImageUploader: Plugin<ImageUploaderPluginKitOptions, ImageUploa
             },
           }),
         }) as PivProps,
-      state: { isEnabled },
+      state: { isEnabled: inPluginEnabled },
     }
   },
 )
@@ -93,9 +107,72 @@ export function ImageUploaderPluginWrapper(
   },
 ) {
   return (
-    <PluginWrapper plugin={withImageUploader} isEnabled={rawProps.isEnabled} onInput={rawProps.onInput}>
+    <PluginWrapper plugin={withImageUploader} isEnabled={rawProps.isEnabled} onImagePaste={rawProps.onImagePaste}>
       {rawProps.children}
     </PluginWrapper>
   )
 }
 
+/**
+ * Retrieves the source URL of an image element.
+ *
+ * @param img - The HTMLImageElement to retrieve the source URL from.
+ * @returns The source URL of the image.
+ */
+function getImageSrc(img: HTMLImageElement) {
+  return img.src
+}
+
+/**
+ *
+ * Checks if a given node is an instance of HTMLImageElement.
+ *
+ * @param node - The node to check.
+ * @returns True if the node is an instance of HTMLImageElement, false otherwise.
+ */
+const isHTMLImg = (node: Node): boolean => node instanceof HTMLImageElement
+
+/**
+ * util function
+ *
+ * Converts a prefixed base64 image string to a Blob object.
+ *
+ * @param base64String - The base64 image string to convert.
+ * @returns A Blob object representing the image.
+ * @throws {Error} If the base64 image string is invalid.
+ * @example
+ * const base64String = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAABkCAYAAABue..."
+ * const blob = base64ImageStringToBlob(base64String)
+ */
+function base64ImageStringToBlob(base64String: string) {
+  const matches = base64String.match(/^data:image\/([a-zA-Z0-9]+);base64,/)
+  if (!matches) {
+    throw new Error("Invalid base64 image string")
+  }
+  const imageType = matches[1]
+  const unprefixedBase64Data = base64String.replace(/^data:image\/[a-zA-Z0-9]+;base64,/, "")
+  return base64ToBlob(unprefixedBase64Data, `image/${imageType}`)
+}
+
+/**
+ * util function
+ *
+ * Converts a raw base64 string to a Blob object.
+ *
+ * @param base64String - The base64 string to convert.
+ * @param type - The MIME type of the resulting Blob object.
+ * @returns A Blob object representing the converted base64 string.
+ *
+ * @example
+ * const base64String = "iVBORw0KGgoAAAANSUhEUgAAABQAAABkCAYAAABue..."
+ * const blob = base64ToBlob(base64String, "image/png")
+ */
+function base64ToBlob(base64String: string, type: string) {
+  const binStr = atob(base64String)
+  const len = binStr.length
+  const arr = new Uint8Array(len)
+  for (let i = 0; i < len; i++) {
+    arr[i] = binStr.charCodeAt(i)
+  }
+  return new Blob([arr], { type })
+}

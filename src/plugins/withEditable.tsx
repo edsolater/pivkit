@@ -1,9 +1,10 @@
-import { type Accessor, type JSXElement } from "solid-js"
+import { createEffect, type Accessor, type JSXElement } from "solid-js"
 import { PluginWrapper } from "../components"
 import { type KitProps, useKitProps } from "../createKit"
 import { createDomRef, createSyncSignal } from "../hooks"
 import { createPlugin, type PivProps, type Plugin } from "../piv"
 import { cssOpacity } from "../styles"
+import { useDOMEventListener, useClickOutside } from "../webTools"
 
 export type EditablePluginController = {
   isEnabled: Accessor<boolean>
@@ -59,11 +60,97 @@ export const withEditable: Plugin<EditablePluginKitOptions, EditablePluginContro
   })
   const { dom: selfDom, setDom: setSelfDom } = createDomRef()
 
-  const [isEnabled, setIsEnabled] = createSyncSignal({
+  const [isPluginEnabled, setIsPluginEnabled] = createSyncSignal({
     value: () => Boolean(options.isEnabled),
     onSet(value) {
       options.onEnabledChange?.(value)
     },
+  })
+
+  useDOMEventListener(selfDom, "click", () => {
+    if (options.startEditWhenClick) {
+      setIsPluginEnabled(true)
+    }
+  })
+
+  // make element focus when enabled
+  createEffect(() => {
+    const selfEl = selfDom()
+    if (!selfEl) return
+    // make elemet contenteditable
+    selfEl.setAttribute("contenteditable", "plaintext-only")
+
+    if (isPluginEnabled()) {
+      // Focus the element to ensure that the selection is visible
+      selfEl.setAttribute("tabindex", "0")
+      selfEl.focus()
+    } else {
+      selfEl.removeAttribute("tabindex")
+      selfEl.blur()
+    }
+    //if hasn's cursor , then mannually set cursor
+    if (!hasCursor()) {
+      const initEditCursorPlacement = options.initEditCursorPlacement // default to "end"
+
+      // Create a new range
+      const range = document.createRange()
+      const selection = window.getSelection()
+      if (!selection) return
+
+      // Attempt to find a text node within selfEl
+      let textNode = null as Text | null
+      let position: number = 0
+      if (initEditCursorPlacement === "end") {
+        for (const child of selfEl.childNodes) {
+          if (isDomNodeTextNode(child)) {
+            textNode = child
+            position = textNode.length // End of the text node
+            break
+          }
+        }
+      }
+
+      if (textNode) {
+        // If a text node is found, set the range start to the text node with the determined position
+        range.setStart(textNode, position)
+      } else {
+        // If no text node is found and the cursor is set to start, fall back to setting the range on selfEl
+        // This is a fallback and may not always result in visible cursor if selfEl has no text content
+        range.setStart(selfEl, 0)
+      }
+
+      range.collapse(true) // Collapse the range to the start position to move the cursor
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
+  })
+
+  useDOMEventListener(selfDom, "input", ({ el }) => {
+    const allText = el.textContent
+    options.onInput?.(allText ?? "")
+  })
+
+  if (options.endEditWhenClickOutside) {
+    useClickOutside(selfDom, {
+      enabled: isPluginEnabled,
+      onClickOutSide: () => {
+        setIsPluginEnabled(false)
+      },
+    })
+  }
+
+  useDOMEventListener(selfDom, "keydown", ({ ev }) => {
+    if (ev.key === "Enter") {
+      // handle enter
+      if (options.onEnter) {
+        options.onEnter?.(selfDom()?.textContent ?? "")
+      }
+
+      // if okWhenTypeEnter, then disable
+      if (options.okWhenTypeEnter) {
+        setIsPluginEnabled(false)
+      }
+    }
   })
 
   return {
@@ -87,7 +174,7 @@ export const withEditable: Plugin<EditablePluginKitOptions, EditablePluginContro
           },
         }),
       }) as PivProps,
-    state: { isEnabled },
+    state: { isEnabled: isPluginEnabled },
   }
 })
 
