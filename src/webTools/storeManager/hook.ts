@@ -1,6 +1,7 @@
 import { createEffect, createSignal, on, onMount, type Accessor, type Setter } from "solid-js"
-import { createIDBStoreManager, createLocalStorageStoreManager } from "./storageManagers"
+import { createLocalStorageStoreManager } from "./storageManagers"
 import { listenDomEvent } from "../utils"
+import { createIDBStoreManager } from "../idb"
 
 /**
  * @todo currently only localStorage is supported

@@ -1,5 +1,5 @@
 import { type AnyFn, type MayPromise } from "@edsolater/fnkit"
-import { createIDBStoreManager } from "./storageManagers"
+import { createIDBStoreManager } from "../idb"
 import { toStringKey, type ToStringKeyOptions } from "./toStringKey"
 
 type CacheEntry<F extends AnyFn> = [

@@ -2,11 +2,11 @@ import { getTime, getTimestamp, isCurrentDateAfter, switchCase, type MayPromise 
 import { type JFetchMiddlewareFn } from "../jFetch"
 import { isResponse } from "../utils/isResponse"
 import {
-  createIDBStoreManager,
   createLocalStorageStoreManager,
   createMemoryStoreManager,
   createSessionStorageStoreManager,
 } from "../../storeManager"
+import { createIDBStoreManager } from "../../idb"
 
 type ResourceUrl = string
 

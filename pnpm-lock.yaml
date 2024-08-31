@@ -41,10 +41,10 @@ importers:
         version: 22.5.1
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.3.0
-        version: 8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1)(typescript@5.5.4))(eslint@9.9.1)(typescript@5.5.4)
+        version: 8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1)(typescript@5.4.2))(eslint@9.9.1)(typescript@5.4.2)
       '@typescript-eslint/parser':
         specifier: ^8.3.0
-        version: 8.3.0(eslint@9.9.1)(typescript@5.5.4)
+        version: 8.3.0(eslint@9.9.1)(typescript@5.4.2)
       concurrently:
         specifier: ^8.2.2
         version: 8.2.2
@@ -83,16 +83,16 @@ importers:
         version: 1.0.0-beta.2(babel-preset-solid@1.8.22(@babel/core@7.25.2))(solid-js@1.8.22)
       storybook-solidjs-vite:
         specifier: 1.0.0-beta.2
-        version: 1.0.0-beta.2(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.5.4)(vite@5.4.2(@types/node@22.5.1))
+        version: 1.0.0-beta.2(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.4.2)(vite@5.4.2(@types/node@22.5.1))
       tsup:
         specifier: ^8.2.4
-        version: 8.2.4(postcss@8.4.41)(typescript@5.5.4)(yaml@2.5.0)
+        version: 8.2.4(postcss@8.4.41)(typescript@5.4.2)(yaml@2.5.0)
       tsup-preset-solid:
         specifier: ^2.2.0
-        version: 2.2.0(esbuild@0.23.1)(solid-js@1.8.22)(tsup@8.2.4(postcss@8.4.41)(typescript@5.5.4)(yaml@2.5.0))
+        version: 2.2.0(esbuild@0.23.1)(solid-js@1.8.22)(tsup@8.2.4(postcss@8.4.41)(typescript@5.4.2)(yaml@2.5.0))
       typescript:
-        specifier: ^5.5.4
-        version: 5.5.4
+        specifier: 5.4.2
+        version: 5.4.2
       vite:
         specifier: ^5.4.2
         version: 5.4.2(@types/node@22.5.1)
@@ -1266,11 +1266,11 @@ packages:
       react-dom:
         optional: true
 
-  '@storybook/builder-vite@8.3.0-alpha.10':
-    resolution: {integrity: sha512-DrPXKWoRWJKLppIWs8Cp01/TTheI9+du0PEyRIxj7xV+4RsxgGLJuYRspnoh6Qv866FVM+M9Lza3gl7KttJI+w==}
+  '@storybook/builder-vite@8.3.0-beta.0':
+    resolution: {integrity: sha512-8DePr6K1t6PAqQ5N5FXYpSXoM6aJTQWt0pMu1Zhy8QUYXGB0IDBbvVzUJK2q2/yL4Hecf4G0KJTQAeYOpFqS0w==}
     peerDependencies:
       '@preact/preset-vite': '*'
-      storybook: ^8.3.0-alpha.10
+      storybook: ^8.3.0-beta.0
       typescript: '>= 4.3.x'
       vite: ^4.0.0 || ^5.0.0
       vite-plugin-glimmerx: '*'
@@ -1293,10 +1293,10 @@ packages:
     peerDependencies:
       storybook: ^8.2.9
 
-  '@storybook/csf-plugin@8.3.0-alpha.10':
-    resolution: {integrity: sha512-onwXGi+nhPB3jLplQVxYt/E4EMij7zC9BWw/bPWgQin7z0mbpRVfmxXm6HSitZcBdt09B+sh0+gO5W0hC7/0AA==}
+  '@storybook/csf-plugin@8.3.0-beta.0':
+    resolution: {integrity: sha512-CpXUFgNkwB9JwNE95QEL4mLRUyY/2uZbj+rEAn/5fBn0jCwbyOqaMG4wcgyvzaYa3dgWzJlXzz0qBr+zqW1PJw==}
     peerDependencies:
-      storybook: ^8.3.0-alpha.10
+      storybook: ^8.3.0-beta.0
 
   '@storybook/csf@0.1.11':
     resolution: {integrity: sha512-dHYFQH3mA+EtnCkHXzicbLgsvzYjcDJ1JWsogbItZogkPHgSJM/Wr71uMkcvw8v9mmCyP4NpXJuu6bPoVsOnzg==}
@@ -3563,8 +3563,8 @@ packages:
     resolution: {integrity: sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g==}
     engines: {node: '>= 0.6'}
 
-  typescript@5.5.4:
-    resolution: {integrity: sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==}
+  typescript@5.4.2:
+    resolution: {integrity: sha512-+2/g0Fds1ERlP6JsakQQDXjZdZMM+rqpamFZJEKh4kwTIn3iDkgKtby0CeNd5ATNZ4Ry1ax15TMx0W2V+miizQ==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -5107,9 +5107,9 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@storybook/builder-vite@8.3.0-alpha.10(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.5.4)(vite@5.4.2(@types/node@22.5.1))':
+  '@storybook/builder-vite@8.3.0-beta.0(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.4.2)(vite@5.4.2(@types/node@22.5.1))':
     dependencies:
-      '@storybook/csf-plugin': 8.3.0-alpha.10(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
+      '@storybook/csf-plugin': 8.3.0-beta.0(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))
       '@types/find-cache-dir': 3.2.1
       browser-assert: 1.2.1
       es-module-lexer: 1.5.4
@@ -5121,7 +5121,7 @@ snapshots:
       ts-dedent: 2.2.0
       vite: 5.4.2(@types/node@22.5.1)
     optionalDependencies:
-      typescript: 5.5.4
+      typescript: 5.4.2
     transitivePeerDependencies:
       - supports-color
 
@@ -5168,7 +5168,7 @@ snapshots:
       storybook: 8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2))
       unplugin: 1.12.2
 
-  '@storybook/csf-plugin@8.3.0-alpha.10(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))':
+  '@storybook/csf-plugin@8.3.0-beta.0(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))':
     dependencies:
       storybook: 8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2))
       unplugin: 1.12.2
@@ -5379,34 +5379,34 @@ snapshots:
 
   '@types/uuid@9.0.8': {}
 
-  '@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1)(typescript@5.5.4))(eslint@9.9.1)(typescript@5.5.4)':
+  '@typescript-eslint/eslint-plugin@8.3.0(@typescript-eslint/parser@8.3.0(eslint@9.9.1)(typescript@5.4.2))(eslint@9.9.1)(typescript@5.4.2)':
     dependencies:
       '@eslint-community/regexpp': 4.11.0
-      '@typescript-eslint/parser': 8.3.0(eslint@9.9.1)(typescript@5.5.4)
+      '@typescript-eslint/parser': 8.3.0(eslint@9.9.1)(typescript@5.4.2)
       '@typescript-eslint/scope-manager': 8.3.0
-      '@typescript-eslint/type-utils': 8.3.0(eslint@9.9.1)(typescript@5.5.4)
-      '@typescript-eslint/utils': 8.3.0(eslint@9.9.1)(typescript@5.5.4)
+      '@typescript-eslint/type-utils': 8.3.0(eslint@9.9.1)(typescript@5.4.2)
+      '@typescript-eslint/utils': 8.3.0(eslint@9.9.1)(typescript@5.4.2)
       '@typescript-eslint/visitor-keys': 8.3.0
       eslint: 9.9.1
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare: 1.4.0
-      ts-api-utils: 1.3.0(typescript@5.5.4)
+      ts-api-utils: 1.3.0(typescript@5.4.2)
     optionalDependencies:
-      typescript: 5.5.4
+      typescript: 5.4.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.3.0(eslint@9.9.1)(typescript@5.5.4)':
+  '@typescript-eslint/parser@8.3.0(eslint@9.9.1)(typescript@5.4.2)':
     dependencies:
       '@typescript-eslint/scope-manager': 8.3.0
       '@typescript-eslint/types': 8.3.0
-      '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.5.4)
+      '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.4.2)
       '@typescript-eslint/visitor-keys': 8.3.0
       debug: 4.3.6
       eslint: 9.9.1
     optionalDependencies:
-      typescript: 5.5.4
+      typescript: 5.4.2
     transitivePeerDependencies:
       - supports-color
 
@@ -5415,21 +5415,21 @@ snapshots:
       '@typescript-eslint/types': 8.3.0
       '@typescript-eslint/visitor-keys': 8.3.0
 
-  '@typescript-eslint/type-utils@8.3.0(eslint@9.9.1)(typescript@5.5.4)':
+  '@typescript-eslint/type-utils@8.3.0(eslint@9.9.1)(typescript@5.4.2)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.5.4)
-      '@typescript-eslint/utils': 8.3.0(eslint@9.9.1)(typescript@5.5.4)
+      '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.4.2)
+      '@typescript-eslint/utils': 8.3.0(eslint@9.9.1)(typescript@5.4.2)
       debug: 4.3.6
-      ts-api-utils: 1.3.0(typescript@5.5.4)
+      ts-api-utils: 1.3.0(typescript@5.4.2)
     optionalDependencies:
-      typescript: 5.5.4
+      typescript: 5.4.2
     transitivePeerDependencies:
       - eslint
       - supports-color
 
   '@typescript-eslint/types@8.3.0': {}
 
-  '@typescript-eslint/typescript-estree@8.3.0(typescript@5.5.4)':
+  '@typescript-eslint/typescript-estree@8.3.0(typescript@5.4.2)':
     dependencies:
       '@typescript-eslint/types': 8.3.0
       '@typescript-eslint/visitor-keys': 8.3.0
@@ -5438,18 +5438,18 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.6.3
-      ts-api-utils: 1.3.0(typescript@5.5.4)
+      ts-api-utils: 1.3.0(typescript@5.4.2)
     optionalDependencies:
-      typescript: 5.5.4
+      typescript: 5.4.2
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.3.0(eslint@9.9.1)(typescript@5.5.4)':
+  '@typescript-eslint/utils@8.3.0(eslint@9.9.1)(typescript@5.4.2)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@9.9.1)
       '@typescript-eslint/scope-manager': 8.3.0
       '@typescript-eslint/types': 8.3.0
-      '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.5.4)
+      '@typescript-eslint/typescript-estree': 8.3.0(typescript@5.4.2)
       eslint: 9.9.1
     transitivePeerDependencies:
       - supports-color
@@ -7435,9 +7435,9 @@ snapshots:
     dependencies:
       internal-slot: 1.0.7
 
-  storybook-solidjs-vite@1.0.0-beta.2(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.5.4)(vite@5.4.2(@types/node@22.5.1)):
+  storybook-solidjs-vite@1.0.0-beta.2(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.4.2)(vite@5.4.2(@types/node@22.5.1)):
     dependencies:
-      '@storybook/builder-vite': 8.3.0-alpha.10(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.5.4)(vite@5.4.2(@types/node@22.5.1))
+      '@storybook/builder-vite': 8.3.0-beta.0(storybook@8.2.9(@babel/preset-env@7.25.4(@babel/core@7.25.2)))(typescript@5.4.2)(vite@5.4.2(@types/node@22.5.1))
     transitivePeerDependencies:
       - '@preact/preset-vite'
       - storybook
@@ -7620,9 +7620,9 @@ snapshots:
 
   tree-kill@1.2.2: {}
 
-  ts-api-utils@1.3.0(typescript@5.5.4):
+  ts-api-utils@1.3.0(typescript@5.4.2):
     dependencies:
-      typescript: 5.5.4
+      typescript: 5.4.2
 
   ts-dedent@2.2.0: {}
 
@@ -7632,16 +7632,16 @@ snapshots:
 
   tslib@2.7.0: {}
 
-  tsup-preset-solid@2.2.0(esbuild@0.23.1)(solid-js@1.8.22)(tsup@8.2.4(postcss@8.4.41)(typescript@5.5.4)(yaml@2.5.0)):
+  tsup-preset-solid@2.2.0(esbuild@0.23.1)(solid-js@1.8.22)(tsup@8.2.4(postcss@8.4.41)(typescript@5.4.2)(yaml@2.5.0)):
     dependencies:
       esbuild-plugin-solid: 0.5.0(esbuild@0.23.1)(solid-js@1.8.22)
-      tsup: 8.2.4(postcss@8.4.41)(typescript@5.5.4)(yaml@2.5.0)
+      tsup: 8.2.4(postcss@8.4.41)(typescript@5.4.2)(yaml@2.5.0)
     transitivePeerDependencies:
       - esbuild
       - solid-js
       - supports-color
 
-  tsup@8.2.4(postcss@8.4.41)(typescript@5.5.4)(yaml@2.5.0):
+  tsup@8.2.4(postcss@8.4.41)(typescript@5.4.2)(yaml@2.5.0):
     dependencies:
       bundle-require: 5.0.0(esbuild@0.23.1)
       cac: 6.7.14
@@ -7661,7 +7661,7 @@ snapshots:
       tree-kill: 1.2.2
     optionalDependencies:
       postcss: 8.4.41
-      typescript: 5.5.4
+      typescript: 5.4.2
     transitivePeerDependencies:
       - jiti
       - supports-color
@@ -7683,7 +7683,7 @@ snapshots:
       media-typer: 0.3.0
       mime-types: 2.1.35
 
-  typescript@5.5.4: {}
+  typescript@5.4.2: {}
 
   ufo@1.5.4: {}
 
