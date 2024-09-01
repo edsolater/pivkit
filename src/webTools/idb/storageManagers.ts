@@ -6,18 +6,19 @@ type IDBStoreEntry = {
   value: any
 }
 
-export type IDBStoreManager<V> = {
-  set: (key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: Promise<V | undefined>]>) => Promise<void>
-  get: (key: IDBValidKey | IDBKeyRange) => Promise<V | undefined>
-  getAll: () => Promise<IDBStoreEntry[] | undefined>
-  has: (key: IDBValidKey | IDBKeyRange) => Promise<boolean>
-  delete: (key: IDBValidKey | IDBKeyRange) => Promise<void>
-  forEach: (callback: (value: V, key: IDBValidKey) => void) => Promise<void>
+export interface IDBStoreManager<V> {
+  set(key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: Promise<V | undefined>]>): Promise<void>
+  get(key: IDBValidKey | IDBKeyRange): Promise<V | undefined>
+  getAll(): Promise<IDBStoreEntry[] | undefined>
+  has(key: IDBValidKey | IDBKeyRange): Promise<boolean>
+  delete(key: IDBValidKey | IDBKeyRange): Promise<void>
+  forEach(callback: (value: V, key: IDBValidKey) => void): Promise<void>
 
   version: Promise<number>
+  close(): void
 }
 
-type CreateIDBStoreManagerConfiguration<T = any> = {
+export type IDBStoreManagerConfiguration<T = any> = {
   dbName: string
   storeName?: string
   /** usually don't need to specify this
@@ -46,7 +47,7 @@ export function createIDBStoreManager<T = unknown>({
   dbName,
   storeName = "default",
   onStoreLoaded,
-}: CreateIDBStoreManagerConfiguration<T>): IDBStoreManager<T> {
+}: IDBStoreManagerConfiguration<T>): IDBStoreManager<T> {
   const db = automaticlyOpenIDB(dbName, storeName)
 
   async function forEach(callback: (value: T, key: IDBValidKey) => void) {
@@ -69,6 +70,10 @@ export function createIDBStoreManager<T = unknown>({
     })
   }
 
+  async function close(): Promise<void> {
+    return db.then((db) => db.close())
+  }
+
   //init actions
   onStoreLoaded?.({
     get store() {
@@ -83,6 +88,7 @@ export function createIDBStoreManager<T = unknown>({
     get version() {
       return db.then((db) => db.version)
     },
+    close,
   })
 
   async function set(key: IDBValidKey, body: MayFn<MayPromise<T | undefined>, [prev: Promise<T | undefined>]>) {
@@ -169,6 +175,7 @@ export function createIDBStoreManager<T = unknown>({
     get version() {
       return db.then((db) => db.version)
     },
+    close,
   }
 }
 
@@ -177,13 +184,13 @@ export function createIDBStoreManager<T = unknown>({
  * @example
  * setToIDB({dbName: "myDB", storeName: "myStore"}, "key", "value")
  */
-export function setToIDB<V>(
-  config: CreateIDBStoreManagerConfiguration,
+export async function setToIDB<V>(
+  config: IDBStoreManagerConfiguration,
   key: IDBValidKey,
   body: V | (() => V),
 ): Promise<void> {
   const manager = createIDBStoreManager(config)
-  return manager.set(key, body)
+  return manager.set(key, body).finally(() => manager.close())
 }
 
 /**
@@ -191,7 +198,10 @@ export function setToIDB<V>(
  * @example
  * getFromIDB({dbName: "myDB", storeName: "myStore"}, "key")
  */
-export function getFromIDB<V>(config: CreateIDBStoreManagerConfiguration, key: IDBValidKey): Promise<V | undefined> {
+export async function getFromIDB<V>(
+  config: IDBStoreManagerConfiguration,
+  key: IDBValidKey,
+): Promise<V | undefined> {
   const manager = createIDBStoreManager(config)
-  return manager.get(key)
+  return manager.get(key).finally(() => manager.close())
 }
