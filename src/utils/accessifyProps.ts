@@ -1,14 +1,26 @@
-import { AnyFn, AnyObj, isFunction, isObject, isString, mutateObject } from "@edsolater/fnkit"
+import {
+  AnyFn,
+  AnyObj,
+  isFunction,
+  isObject,
+  isPromise,
+  isString,
+  mutateObject,
+  type MayPromise,
+} from "@edsolater/fnkit"
 import type { DePivkitCallback, PivkitCallback } from "../piv/propHandlers/mergifyProps"
 import type { ValidController } from "../piv/typeTools"
 
 export type Accessify<V, Controller extends ValidController | unknown = unknown> = V | ((controller: Controller) => V)
-export type DeAccessify<V> = V extends Accessify<infer T, any> ? T : V
-
+export type DeAccessify<V> = V extends AnyFn ? ReturnType<V> : V
+// Accessify + Promisify
+export type Kitify<V, Controller extends ValidController | unknown = unknown> = Accessify<MayPromise<V>, Controller>
+// Accessify + Promisify
+export type DeKitify<V> = Awaited<DeAccessify<V>>
 /**
  * propertyName start with 'on' or end with 'Fn' will treate as origin
  */
-export type AccessifyProps<P extends AnyObj, Controller extends ValidController | unknown = unknown> = {
+export type KitifyProps<P extends AnyObj, Controller extends ValidController | unknown = unknown> = {
   [K in keyof P]: K extends `on${string}` // callback onXXX should no auto-accessified
     ? PivkitCallback<P[K]>
     : K extends
@@ -21,10 +33,10 @@ export type AccessifyProps<P extends AnyObj, Controller extends ValidController 
       ? P[K]
       : P[K] extends AnyFn | undefined
         ? P[K]
-        : Accessify<P[K], Controller>
+        : Kitify<P[K], Controller>
 }
 
-export type DeAccessifyProps<P> = {
+export type DeKitifyProps<P> = {
   [K in keyof P]: K extends `on${string}` // callback onXXX should no auto-accessified
     ? DePivkitCallback<P[K]>
     : K extends
@@ -35,7 +47,7 @@ export type DeAccessifyProps<P> = {
           | `controllerRef`
           | "children"
       ? P[K]
-      : Exclude<P[K], AnyFn> // <-- bug here, type error
+      : DeKitify<P[K]> // <-- bug here, type error
 }
 
 // type C = KitProps<{ onCb: (util: { say: "hello" }) => void }>
@@ -45,18 +57,17 @@ export type DeAccessifyProps<P> = {
 /**
  * propertyName start with 'on' will treate as function
  */
-export function accessifyProps<P extends AnyObj, Controller extends ValidController | unknown = unknown>(
-  props: P,
-  controller?: Controller,
-  /** default is on* and domRef and controllerRef, but you can add more */
-  needAccessifyProps?: string[],
-  debug?: boolean,
-): DeAccessifyProps<P> {
-  // why slower than just reduce? 🤔
-  return mutateObject(props, ({ value, key }) => {
+export function deKitifyProps<P extends AnyObj, Controller extends ValidController | unknown = unknown>(options: {
+  props: P
+  controller?: Controller
+  needAccessifyProps?: string[]
+  debug?: boolean
+  onPromiseResolve?(key: keyof any, value: any): void
+}): DeKitifyProps<P> {
+  return mutateObject(options.props, ({ value, key }) => {
     const isPreferOriginalValue =
       isString(key) &&
-      ((needAccessifyProps ? !needAccessifyProps?.includes(key) : false) ||
+      ((options.needAccessifyProps ? !options.needAccessifyProps?.includes(key) : false) ||
         key.startsWith("on") ||
         key.startsWith("define") ||
         key.startsWith("merge:") ||
@@ -66,34 +77,17 @@ export function accessifyProps<P extends AnyObj, Controller extends ValidControl
         key === "plugin" ||
         key === "shadowProps")
     const needAccessify = isFunction(value) && !isPreferOriginalValue
-    return needAccessify ? value(controller) : value
-  }) as DeAccessifyProps<P>
-  // const accessifiedProps = Object.defineProperties(
-  //   {},
-  //   Reflect.ownKeys(props).reduce((acc: any, key) => {
-  //     acc[key] = {
-  //       enumerable: true,
-  //       get() {
-  //         const v = props[key]
-  //         /** will do nothing even it is a function */
-  //         const isPreferOriginalValue =
-  //           isString(key) &&
-  //           ((needAccessifyProps ? !needAccessifyProps?.includes(key) : false) ||
-  //             key.startsWith('on') ||
-  //             key.startsWith('define:') ||
-  //             key.startsWith('merge:') ||
-  //             key === 'domRef' ||
-  //             key === 'controllerRef' ||
-  //             key === 'plugin' ||
-  //             key === 'shadowProps')
-  //         const needAccessify = isFunction(v) && !isPreferOriginalValue
-  //         return needAccessify ? v(controller) : v
-  //       },
-  //     }
-  //     return acc
-  //   }, {} as PropertyDescriptorMap),
-  // ) as DeAccessifyProps<P>
-  // return accessifiedProps
+    const mayPromiseValue = needAccessify ? value(options.controller) : value
+    if (isPromise(mayPromiseValue)) {
+      mayPromiseValue.then((resolvedValue) => {
+        options.onPromiseResolve?.(key, resolvedValue)
+      })
+      const promise = mayPromiseValue // this value is a promise
+      return getPromiseDefault(promise)
+    } else {
+      return mayPromiseValue // this value is not a promise
+    }
+  }) as DeKitifyProps<P>
 }
 
 export function fixFunctionParams<F extends AnyFn, P extends any[] = Parameters<F>>(originalFn: F, preParams: P): F {
@@ -118,4 +112,33 @@ function shallowMergeTwoArray(old: any[], arr2: any[]) {
       return vb ?? va
     }
   })
+}
+
+// TODO: move to fnkit
+/**
+ * a useful helper function to deal with promise default value.
+ *
+ * mainly for ui structure like:solidjs to get default value from unsolved promise
+ * !!MUTATELY
+ */
+function getPromiseDefault<P extends Promise<any>>(
+  promise: P | undefined,
+): P extends { default: unknown } ? P["default"] : undefined {
+  if (!isObject(promise)) {
+    throw new Error("promise is not an object, strange🤔, input:", promise)
+  }
+  // @ts-expect-error no need to check
+  return promise?.default
+}
+
+// TODO: move to fnkit
+/**
+ *
+ * a useful helper function to deal with promise default value.
+ *
+ * mainly for ui structure like:solidjs to set default value to unsolved promise
+ * !!MUTATELY
+ */
+function setPromiseDefault<P extends Promise<any>, T>(promise: P, value: T): P & { default: T } {
+  return Object.assign(promise, { default: value })
 }

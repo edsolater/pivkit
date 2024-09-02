@@ -1,5 +1,5 @@
 import { MayArray, MayDeepArray } from "@edsolater/fnkit"
-import { AccessifyProps } from ".."
+import { KitifyProps } from ".."
 import { CallbackRef, PivProps } from "../piv/Piv"
 import { GetPluginParams, Pluginable } from "../piv/propHandlers/plugin"
 import { HTMLTag, ValidController, ValidProps } from "../piv/typeTools"
@@ -17,7 +17,7 @@ type KitPropsInstance<
   Plugins extends MayDeepArray<Pluginable<any>>,
   TagName extends HTMLTag,
   NeedAccessifyProps extends keyof RawProps,
-> = AccessifyProps<Pick<RawProps, NeedAccessifyProps>, Controller> &
+> = KitifyProps<Pick<RawProps, NeedAccessifyProps>, Controller> &
   Omit<RawProps, NeedAccessifyProps> &
   Omit<PivProps<TagName, Controller>, keyof RawProps | "plugin" | "shadowProps"> &
   Omit<GetPluginParams<Plugins>, keyof RawProps | "plugin" | "shadowProps"> &

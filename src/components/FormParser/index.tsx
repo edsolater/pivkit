@@ -99,7 +99,7 @@ export function SchemaParser<T extends FormSchema>(
   return (
     <Loop
       shadowProps={shadowProps}
-      items={Object.entries(props.schema)}
+      items={Object.entries(props.schema as T)}
       icss={{ display: "flex", flexDirection: "column", gap: "4px" }}
     >
       {([key, value]) => (

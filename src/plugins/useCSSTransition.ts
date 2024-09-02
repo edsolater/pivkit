@@ -5,7 +5,7 @@ import { runtimeObject } from "@edsolater/fnkit"
 import { createDomRef } from "../hooks"
 import { createRef } from "../hooks/createRef"
 import { createPlugin, CSSObject, PivProps, type ICSS } from "../piv"
-import { Accessify, accessifyProps } from "../utils/accessifyProps"
+import { Accessify, deKitifyProps } from "../utils/accessifyProps"
 import { createController2 } from "../utils/createController"
 
 type TransitionPhase =
@@ -72,7 +72,7 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
     to: targetPhase,
     contentDom,
   }))
-  const opts = accessifyProps(additionalOpts, controller)
+  const opts = deKitifyProps({ props: additionalOpts, controller })
   const [contentDom, setContentDom] = createRef<HTMLElement>()
   const transitionPhaseIcss = () => {
     const basic = {

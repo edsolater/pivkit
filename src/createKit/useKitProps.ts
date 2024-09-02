@@ -13,7 +13,8 @@ import {
   shrinkFn,
   type AnyFn,
 } from "@edsolater/fnkit"
-import { DeAccessifyProps, accessifyProps, getUIKitTheme, hasUIKitTheme } from ".."
+import { createStore } from "solid-js/store"
+import { DeKitifyProps, deKitifyProps, getUIKitTheme, hasUIKitTheme } from ".."
 import { getPropsFromAddPropContext } from "../piv/AddProps"
 import { getControllerObjFromControllerContext } from "../piv/ControllerContext"
 import { PivProps } from "../piv/Piv"
@@ -80,10 +81,10 @@ export type ParsedKitProps<RawProps extends ValidProps> = Omit<RawProps, "plugin
 export function useKitProps<
   P extends ValidProps,
   Controller extends ValidController = ValidController,
-  DefaultProps extends Partial<DeAccessifyProps<P>> = {},
+  DefaultProps extends Partial<DeKitifyProps<P>> = {},
 >(
   kitProps: P,
-  rawOptions?: KitPropsOptions<DeAccessifyProps<P>, Controller, DefaultProps>,
+  rawOptions?: KitPropsOptions<DeKitifyProps<P>, Controller, DefaultProps>,
 ): {
   /** not declared self props means it's shadowProps */
   shadowProps: any
@@ -98,13 +99,13 @@ export function useKitProps<
   methods: AddDefaultPivProps<P, DefaultProps>
   loadController(controller: Controller): void
   /** @deprecated just for old component. use {@link loadControllerForKitParser} instead */
-  lazyLoadController(controller: Controller | ((props: ParsedKitProps<DeAccessifyProps<P>>) => Controller)): void
+  lazyLoadController(controller: Controller | ((props: ParsedKitProps<DeKitifyProps<P>>) => Controller)): void
   parentContextControllers: any // no need to infer this type for you always force it !!!
   // TODO: imply it !!! For complicated DOM API always need this, this is a fast shortcut
   // componentRef
   // ControllerContextProvider: (props: { children: JSXElement }) => JSXElement
 } {
-  type RawProps = DeAccessifyProps<P>
+  type RawProps = DeKitifyProps<P>
 
   // TODO: should move to getParsedKitProps
   // wrap controllerContext based on props:innerController is only in `<Piv>`
@@ -160,7 +161,6 @@ export function useKitProps<
  * parse some special props of component. such as shadowProps, plugin, controller, etc.
  */
 //TODO: should not build-in parse controllerRef
-// TODO: should optional props accept promisify input
 function useKitPropParser<
   RawProps extends ValidProps,
   Controller extends ValidController = ValidController,
@@ -172,12 +172,12 @@ function useKitPropParser<
 ): {
   props: ParsedKitProps<AddDefaultPivProps<RawProps, DefaultProps>> &
     Omit<PivProps<HTMLTag, Controller>, keyof RawProps>
-  methods: AddDefaultPivProps<RawProps, DefaultProps>
+  methods: any
   shadowProps: any
   loadController: AnyFn
 } {
   const controllerFromOptions = options?.controller
-    ? createObjectWhenAccess(() => options.controller!(deAccessfiedProps))
+    ? createObjectWhenAccess(() => options.controller!(deKitifiedProps))
     : {}
 
   // merge kit props
@@ -234,7 +234,12 @@ function useKitPropParser<
     { innerController: controller } as PivProps,
   )
 
-  const deAccessfiedProps = pipeDo(preparsedProps, (props) => {
+  console.time("useKitProps create store")
+  const propsAsyncStore = createStore({})
+  console.timeEnd("useKitProps create store")
+
+  //TODO: rename pipeDo to pipeHandle
+  const deKitifiedProps = pipeDo(preparsedProps, (props) => {
     const verboseAccessifyPropNames =
       options?.needAccessify ??
       (options?.noNeedDeAccessifyChildren
@@ -243,16 +248,16 @@ function useKitPropParser<
     const needAccessifyProps = options?.noNeedDeAccessifyProps
       ? omitItem(verboseAccessifyPropNames, options.noNeedDeAccessifyProps)
       : verboseAccessifyPropNames
-    return accessifyProps(props, controller, needAccessifyProps, Boolean(options?.debugName))
+    return deKitifyProps({ props, controller, needAccessifyProps, debug: Boolean(options?.debugName) })
   }) as any /* too difficult to type */
 
   // fullfill input props:controllerRef
-  if (hasProperty(kitProps, "controllerRef") && controller) loadPropsControllerRef(deAccessfiedProps, controller)
+  if (hasProperty(kitProps, "controllerRef") && controller) loadPropsControllerRef(deKitifiedProps, controller)
 
   // in design, is it good?🤔
   // registerControllerInCreateKit(proxyController, rawProps.id)
 
-  return { props: deAccessfiedProps, methods: preparsedProps, shadowProps: needPassToChildrenProps, loadController }
+  return { props: deKitifiedProps, methods: preparsedProps, shadowProps: needPassToChildrenProps, loadController }
 }
 
 /**
@@ -278,9 +283,8 @@ function createComponentControllerLoader<
 export type DeKitProps<
   P extends ValidProps,
   Controller extends ValidController = ValidController,
-  DefaultProps extends Partial<DeAccessifyProps<P>> = {},
-> = ParsedKitProps<AddDefaultPivProps<DeAccessifyProps<P>, DefaultProps>> &
-  Omit<PivProps<HTMLTag, Controller>, keyof DeAccessifyProps<P>>
+  DefaultProps extends Partial<DeKitifyProps<P>> = {},
+> = ParsedKitProps<AddDefaultPivProps<DeKitifyProps<P>, DefaultProps>> & Omit<PivProps<HTMLTag, Controller>, keyof P>
 
 /**
  * snapshot current value
