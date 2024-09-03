@@ -72,7 +72,7 @@ export function useCSSTransition(additionalOpts: CSSTransactionOptions = {}) {
     to: targetPhase,
     contentDom,
   }))
-  const opts = deKitifyProps({ props: additionalOpts, controller })
+  const opts = deKitifyProps({ props: additionalOpts, controller } as any) // FIXME: why pnpm build error
   const [contentDom, setContentDom] = createRef<HTMLElement>()
   const transitionPhaseIcss = () => {
     const basic = {

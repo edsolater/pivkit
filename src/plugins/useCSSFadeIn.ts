@@ -12,7 +12,7 @@ type UseFadeInOptions = KitifyProps<{
 
 // TODO: should be plugin
 export function useCSSFadeIn(additionalOpts: UseFadeInOptions) {
-  const options = deKitifyProps({ props: additionalOpts })
+  const options = deKitifyProps({ props: additionalOpts } as any) // FIXME: when pnpm build error?🤔
 
   // TODO: should have util 👉 covert from getter to signal
   const [show, setShow] = createSignal(options.show ?? false)

@@ -1,11 +1,12 @@
 import {
   AnyFn,
   AnyObj,
+  changeObjectValue,
+  getPromiseDefault,
   isFunction,
   isObject,
   isPromise,
   isString,
-  mutateObject,
   type MayPromise,
 } from "@edsolater/fnkit"
 import type { DePivkitCallback, PivkitCallback } from "../piv/propHandlers/mergifyProps"
@@ -56,15 +57,17 @@ export type DeKitifyProps<P> = {
 
 /**
  * propertyName start with 'on' will treate as function
+ *
+ * core of {@link useKitPropParser} and {@link useKitProps}
  */
 export function deKitifyProps<P extends AnyObj, Controller extends ValidController | unknown = unknown>(options: {
   props: P
   controller?: Controller
   needAccessifyProps?: string[]
   debug?: boolean
-  onPromiseResolve?(key: keyof any, value: any): void
+  onPromise?(params: { key: keyof any; defaultValue: any; onResolve: (cb: (v: any) => void) => void }): void
 }): DeKitifyProps<P> {
-  return mutateObject(options.props, ({ value, key }) => {
+  return changeObjectValue(options.props, ({ originalValue, key }) => {
     const isPreferOriginalValue =
       isString(key) &&
       ((options.needAccessifyProps ? !options.needAccessifyProps?.includes(key) : false) ||
@@ -76,14 +79,24 @@ export function deKitifyProps<P extends AnyObj, Controller extends ValidControll
         key === "controllerRef" ||
         key === "plugin" ||
         key === "shadowProps")
-    const needAccessify = isFunction(value) && !isPreferOriginalValue
-    const mayPromiseValue = needAccessify ? value(options.controller) : value
+    const needAccessify = isFunction(originalValue) && !isPreferOriginalValue
+    const mayPromiseValue = needAccessify ? originalValue(options.controller) : originalValue
     if (isPromise(mayPromiseValue)) {
+      let resolveCallback: ((v: any) => void) | undefined = undefined
+      const registResolveCallback = (cb: (v: any) => void) => {
+        resolveCallback = cb
+      }
+      const invokeResolveCallback = (v: any) => {
+        resolveCallback?.(v)
+      }
       mayPromiseValue.then((resolvedValue) => {
-        options.onPromiseResolve?.(key, resolvedValue)
+        invokeResolveCallback(resolvedValue)
       })
-      const promise = mayPromiseValue // this value is a promise
-      return getPromiseDefault(promise)
+      const promiseDefaultValue = getPromiseDefault(
+        mayPromiseValue, // this value is a promise
+      )
+      options.onPromise?.({ key, defaultValue: promiseDefaultValue, onResolve: registResolveCallback })
+      return promiseDefaultValue
     } else {
       return mayPromiseValue // this value is not a promise
     }
@@ -112,33 +125,4 @@ function shallowMergeTwoArray(old: any[], arr2: any[]) {
       return vb ?? va
     }
   })
-}
-
-// TODO: move to fnkit
-/**
- * a useful helper function to deal with promise default value.
- *
- * mainly for ui structure like:solidjs to get default value from unsolved promise
- * !!MUTATELY
- */
-function getPromiseDefault<P extends Promise<any>>(
-  promise: P | undefined,
-): P extends { default: unknown } ? P["default"] : undefined {
-  if (!isObject(promise)) {
-    throw new Error("promise is not an object, strange🤔, input:", promise)
-  }
-  // @ts-expect-error no need to check
-  return promise?.default
-}
-
-// TODO: move to fnkit
-/**
- *
- * a useful helper function to deal with promise default value.
- *
- * mainly for ui structure like:solidjs to set default value to unsolved promise
- * !!MUTATELY
- */
-function setPromiseDefault<P extends Promise<any>, T>(promise: P, value: T): P & { default: T } {
-  return Object.assign(promise, { default: value })
 }

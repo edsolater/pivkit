@@ -234,10 +234,6 @@ function useKitPropParser<
     { innerController: controller } as PivProps,
   )
 
-  console.time("useKitProps create store")
-  const propsAsyncStore = createStore({})
-  console.timeEnd("useKitProps create store")
-
   //TODO: rename pipeDo to pipeHandle
   const deKitifiedProps = pipeDo(preparsedProps, (props) => {
     const verboseAccessifyPropNames =
@@ -248,8 +244,26 @@ function useKitPropParser<
     const needAccessifyProps = options?.noNeedDeAccessifyProps
       ? omitItem(verboseAccessifyPropNames, options.noNeedDeAccessifyProps)
       : verboseAccessifyPropNames
-    return deKitifyProps({ props, controller, needAccessifyProps, debug: Boolean(options?.debugName) })
+    return deKitifyProps({
+      props,
+      controller,
+      needAccessifyProps,
+      debug: Boolean(options?.debugName),
+      onPromise({ key, defaultValue, onResolve }) {
+        // console.log("key, value: ", key, defaultValue)
+        // @ts-expect-error no need to type
+        setPropsAsyncStore(key, defaultValue)
+        onResolve((v) => {
+          // @ts-expect-error no need to type
+          setPropsAsyncStore(key, v)
+        })
+      },
+    })
   }) as any /* too difficult to type */
+
+  //! Async State Store in solid
+  const [asyncPropsStore, setPropsAsyncStore] = createStore({})
+  // console.log("success propsAsyncStore: ", propsAsyncStore)
 
   // fullfill input props:controllerRef
   if (hasProperty(kitProps, "controllerRef") && controller) loadPropsControllerRef(deKitifiedProps, controller)
@@ -257,7 +271,12 @@ function useKitPropParser<
   // in design, is it good?🤔
   // registerControllerInCreateKit(proxyController, rawProps.id)
 
-  return { props: deKitifiedProps, methods: preparsedProps, shadowProps: needPassToChildrenProps, loadController }
+  return {
+    props: createMergedAsyncProps(deKitifiedProps, asyncPropsStore),
+    methods: preparsedProps,
+    shadowProps: needPassToChildrenProps,
+    loadController,
+  }
 }
 
 /**
@@ -297,4 +316,13 @@ export function snapshot<T>(value: T): T {
   } else {
     return value
   }
+}
+
+/**
+ * only used for {@link useKitProps} to create mergedProps
+ */
+function createMergedAsyncProps(justProps: any, asyncStore: any) {
+  return new Proxy(justProps, {
+    get: (target, key) => (key in asyncStore ? asyncStore[key] : target[key]),
+  })
 }
