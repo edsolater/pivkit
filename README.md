@@ -44,3 +44,8 @@ determin what component looks like
 if use hooks to hold state, the user's component's code will be too complicated to understand
 
 - `<Detector>` detect state (hover)
+
+# useKitProps - a very important hook
+Main idea:
+- normal props can accept promise and fn which return value   
+  

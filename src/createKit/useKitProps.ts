@@ -3,9 +3,11 @@ import {
   MayArray,
   arrify,
   createObjectWhenAccess,
+  getPromiseDefault,
   hasProperty,
   isArray,
   isObject,
+  isPromise,
   map,
   mergeObjects,
   omit,
@@ -159,6 +161,15 @@ export function useKitProps<
 
 /**
  * parse some special props of component. such as shadowProps, plugin, controller, etc.
+ *
+ * TODO: FIXME: async(promise version props) still can't reactive.
+ *
+ * for example, props:src can't auto-change now
+ *
+ * ``` ts
+ * const asyncSrc = configPromiseDefault(getBlobUrlFromIDBKey(key, idbPathConfig), undefined)
+ * return <Image src={increasingAtom() % 2 ? "/logo-with-text.svg" : asyncSrc} /> // should switch key also, but
+ * ```
  */
 //TODO: should not build-in parse controllerRef
 function useKitPropParser<
@@ -249,14 +260,18 @@ function useKitPropParser<
       controller,
       needAccessifyProps,
       debug: Boolean(options?.debugName),
-      onPromise({ key, defaultValue, onResolve }) {
+      onValueDetect({ key, value }) {
         // console.log("key, value: ", key, defaultValue)
-        // @ts-expect-error no need to type
-        setPropsAsyncStore(key, defaultValue)
-        onResolve((v) => {
+        if (isPromise(value) || key in asyncPropsStore) {
           // @ts-expect-error no need to type
-          setPropsAsyncStore(key, v)
-        })
+          setPropsAsyncStore(key, getPromiseDefault(value))
+          if (isPromise(value)) {
+            value.then((v) => {
+              // @ts-expect-error no need to type
+              setPropsAsyncStore(key, v)
+            })
+          }
+        }
       },
     })
   }) as any /* too difficult to type */

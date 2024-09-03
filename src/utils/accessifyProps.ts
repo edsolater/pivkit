@@ -65,7 +65,7 @@ export function deKitifyProps<P extends AnyObj, Controller extends ValidControll
   controller?: Controller
   needAccessifyProps?: string[]
   debug?: boolean
-  onPromise?(params: { key: keyof any; defaultValue: any; onResolve: (cb: (v: any) => void) => void }): void
+  onValueDetect?(params: { key: keyof any; value: any }): void
 }): DeKitifyProps<P> {
   return changeObjectValue(options.props, ({ originalValue, key }) => {
     const isPreferOriginalValue =
@@ -81,25 +81,8 @@ export function deKitifyProps<P extends AnyObj, Controller extends ValidControll
         key === "shadowProps")
     const needAccessify = isFunction(originalValue) && !isPreferOriginalValue
     const mayPromiseValue = needAccessify ? originalValue(options.controller) : originalValue
-    if (isPromise(mayPromiseValue)) {
-      let resolveCallback: ((v: any) => void) | undefined = undefined
-      const registResolveCallback = (cb: (v: any) => void) => {
-        resolveCallback = cb
-      }
-      const invokeResolveCallback = (v: any) => {
-        resolveCallback?.(v)
-      }
-      mayPromiseValue.then((resolvedValue) => {
-        invokeResolveCallback(resolvedValue)
-      })
-      const promiseDefaultValue = getPromiseDefault(
-        mayPromiseValue, // this value is a promise
-      )
-      options.onPromise?.({ key, defaultValue: promiseDefaultValue, onResolve: registResolveCallback })
-      return promiseDefaultValue
-    } else {
-      return mayPromiseValue // this value is not a promise
-    }
+    options.onValueDetect?.({ key, value: mayPromiseValue })
+    return mayPromiseValue // this value is not a promise
   }) as DeKitifyProps<P>
 }
 
