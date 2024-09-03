@@ -96,7 +96,7 @@ export function useKitProps<
    * TODO: access the props of this will omit the props of output:shadowProps
    * will not inject controller(input function will still be function, not auto-invoke, often used in `on-like` or )
    */
-  methods: AddDefaultPivProps<P, DefaultProps>
+  rawProps: AddDefaultPivProps<P, DefaultProps>
   loadController(controller: Controller): void
   /** @deprecated just for old component. use {@link loadControllerForKitParser} instead */
   lazyLoadController(controller: Controller | ((props: ParsedKitProps<DeKitifyProps<P>>) => Controller)): void
@@ -125,7 +125,7 @@ export function useKitProps<
 
   const {
     props,
-    methods,
+    rawProps,
     shadowProps,
     loadController: loadControllerForKitParser,
   } = useKitPropParser(kitProps, options)
@@ -135,8 +135,8 @@ export function useKitProps<
 
   const loadController = (outsideFilledController: Controller) => {
     const newMergedController =
-      "innerController" in methods
-        ? mergeObjects(...arrify(methods.innerController), outsideFilledController)
+      "innerController" in rawProps
+        ? mergeObjects(...arrify(rawProps.innerController), outsideFilledController)
         : outsideFilledController
     loadControllerForContext(newMergedController)
     loadControllerForKitParser(newMergedController)
@@ -144,7 +144,7 @@ export function useKitProps<
 
   return {
     props,
-    methods,
+    rawProps,
     shadowProps,
     loadController: loadController,
     lazyLoadController: loadController,
@@ -172,7 +172,7 @@ function useKitPropParser<
 ): {
   props: ParsedKitProps<AddDefaultPivProps<RawProps, DefaultProps>> &
     Omit<PivProps<HTMLTag, Controller>, keyof RawProps>
-  methods: any
+  rawProps: any
   shadowProps: any
   loadController: AnyFn
 } {
@@ -273,7 +273,7 @@ function useKitPropParser<
 
   return {
     props: createMergedAsyncProps(deKitifiedProps, asyncPropsStore),
-    methods: preparsedProps,
+    rawProps: preparsedProps,
     shadowProps: needPassToChildrenProps,
     loadController,
   }

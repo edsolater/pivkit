@@ -87,7 +87,7 @@ function DefaultSelectPanelItem(props: { item: SelectableItemObj }) {
  * })}
  */
 export function SelectPanel<T extends SelectableItem>(kitProps: KitProps<SelectPanelProps<T>>) {
-  const { props, methods, shadowProps, loadController } = useKitProps(kitProps, { name: "SelectPanel" })
+  const { props, rawProps, shadowProps, loadController } = useKitProps(kitProps, { name: "SelectPanel" })
   const candidates = createMemo(() => (props.candidates ? Array.from(props.candidates).map(toSelectableItemObj) : []))
   const defaultItem = createMemo(() =>
     props.defaultValue ? candidates().find((c) => c.value === props.defaultValue) : undefined,
@@ -121,7 +121,7 @@ export function SelectPanel<T extends SelectableItem>(kitProps: KitProps<SelectP
   )
 
   // compute render functions
-  const renderItem = methods.renderItem ?? defaultRenderItem
+  const renderItem = rawProps.renderItem ?? defaultRenderItem
 
   // keyboard shortcut
   useShortcutsRegister(dom, {

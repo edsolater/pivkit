@@ -71,7 +71,7 @@ export type SelectKitProps<T extends SelectableItem> = KitProps<SelectProps<T>>
  * if for layout , don't render important content in Box
  */
 export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
-  const { shadowProps, props, methods, lazyLoadController } = useKitProps(rawProps, { name: "Select" })
+  const { shadowProps, props, rawProps, lazyLoadController } = useKitProps(rawProps, { name: "Select" })
 
   const { dom: selectFaceDom, setDom: setSelectFaceDom } = createDomRef()
   const { dom: selectListDom, setDom: setSelectListDom } = createDomRef()
@@ -90,12 +90,12 @@ export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
     useSelectItems<T>({
       items: props.items,
       defaultValue: props.defaultValue,
-      getItemValue: methods.getItemValue,
+      getItemValue: rawProps.getItemValue,
       onChange: props.onChange,
     })
 
   // compute render functions
-  const { renderTriggerItem, renderItem, renderTriggerItemArrow } = buildRenderFunction<T>(methods, props)
+  const { renderTriggerItem, renderItem, renderTriggerItemArrow } = buildRenderFunction<T>(rawProps, props)
 
   // keyboard shortcut
   useShortcutsRegister(

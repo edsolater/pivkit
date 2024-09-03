@@ -42,7 +42,7 @@ export function useSelectItems<T>(
   }>,
 ) {
   //TODO: maybe sub-module of `useKitProps` --- `useAccessifyOptions` is better
-  const { props: options, methods: rawOptions } = useKitProps(kitOptions, {
+  const { props: options, rawProps: rawOptions } = useKitProps(kitOptions, {
     name: "useSelectItems",
     noNeedDeAccessifyProps: ["getItemValue"],
   })

@@ -88,7 +88,7 @@ type FormFactoryBlockProps<F extends keyof T, T extends AnyObj> = {
 export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
   kitProps: KitProps<FormFactoryBlockProps<F, T>, { noNeedDeAccessifyProps: ["children", "visiableWhen"] }>,
 ) {
-  const { props, methods, shadowProps } = useKitProps(kitProps, {
+  const { props, rawProps, shadowProps } = useKitProps(kitProps, {
     noNeedDeAccessifyProps: ["children", "when"],
     defaultProps: {
       visiable: true,
@@ -98,7 +98,7 @@ export function FormFactoryBlock<T extends AnyObj, F extends keyof T>(
   const newValue = createMemo(() => contextStore.obj[props.name as keyof any])
   const enabled = createMemo(() => {
     if (props.visiable) return true
-    if (methods.visiableWhen) return methods.visiableWhen?.(newValue)
+    if (rawProps.visiableWhen) return rawProps.visiableWhen?.(newValue)
     // when value is not undefined, component will show
     return "defaultValue" in props || props.name in contextStore.obj
   })
