@@ -70,8 +70,8 @@ export type SelectKitProps<T extends SelectableItem> = KitProps<SelectProps<T>>
 /**
  * if for layout , don't render important content in Box
  */
-export function Select<T extends SelectableItem>(rawProps: SelectKitProps<T>) {
-  const { shadowProps, props, rawProps, lazyLoadController } = useKitProps(rawProps, { name: "Select" })
+export function Select<T extends SelectableItem>(kitProps: SelectKitProps<T>) {
+  const { shadowProps, props, rawProps, lazyLoadController } = useKitProps(kitProps, { name: "Select" })
 
   const { dom: selectFaceDom, setDom: setSelectFaceDom } = createDomRef()
   const { dom: selectListDom, setDom: setSelectListDom } = createDomRef()
