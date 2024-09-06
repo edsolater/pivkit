@@ -1,4 +1,4 @@
-import { shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
+import { mapGet, shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
 import { automaticlyOpenIDB } from "./openDB"
 
 type IDBStoreEntry = {
@@ -124,29 +124,7 @@ export function createIDBStoreManager<T = unknown>({
 
   async function getAll() {
     return db
-      .then((db) => {
-        const { promise: result, resolve, reject } = Promise.withResolvers<IDBStoreEntry[]>()
-        const objectStore = db.transaction(storeName, "readonly").objectStore(storeName)
-        const cursorRequest = objectStore.openCursor()
-
-        const allEntries: IDBStoreEntry[] = []
-
-        cursorRequest.addEventListener("success", (event) => {
-          const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
-          if (cursor) {
-            allEntries.push({ key: cursor.key, value: cursor.value })
-            cursor.continue()
-          } else {
-            resolve(allEntries)
-          }
-        })
-
-        cursorRequest.addEventListener("error", (event) => {
-          reject((event.target as IDBRequest).error)
-        })
-
-        return result
-      })
+      .then((db) => getStoreObjectEntries({ db, storeName }))
       .catch((e) => {
         console.error(e)
         return []
@@ -184,7 +162,7 @@ export function createIDBStoreManager<T = unknown>({
  * @example
  * setToIDB({dbName: "myDB", storeName: "myStore"}, "key", "value")
  */
-export async function setToIDB<V>(
+export async function setIDBStoreValue<V>(
   config: IDBStoreManagerConfiguration,
   key: IDBValidKey,
   body: V | (() => V),
@@ -198,10 +176,69 @@ export async function setToIDB<V>(
  * @example
  * getFromIDB({dbName: "myDB", storeName: "myStore"}, "key")
  */
-export async function getFromIDB<V>(
+export async function getIDBStoreValue<V>(
   config: IDBStoreManagerConfiguration,
   key: IDBValidKey,
 ): Promise<V | undefined> {
   const manager = createIDBStoreManager(config)
   return manager.get(key).finally(() => manager.close())
+}
+
+/**
+ * Retrieves all the entries from the indexedDB stores in the specified database.
+ * @param config - The configuration object containing the database name.
+ * @returns A promise that resolves to an object containing the entries for each store in the database, or undefined if there was an error.
+ * @example
+ * getIDBScreenShot({ dbName: "myDB" }).then((entries) => {
+ *   console.log(entries);
+ * });
+ */
+export async function getIDBScreenshot(config: { dbName: string }): Promise<
+  | {
+      [StoreName: string]: IDBStoreEntry[]
+    }
+  | undefined
+> {
+  return automaticlyOpenIDB(config.dbName).then((db) => {
+    const storeEntriesOfStores = Array.from(db.objectStoreNames).map((storeName) =>
+      getStoreObjectEntries({ db, storeName }).then((entries) => ({ storeName, entries })),
+    )
+    const storeObjects = Promise.all(storeEntriesOfStores).then((storeEntries) =>
+      Object.fromEntries(storeEntries.map(({ storeName, entries }) => [storeName, entries])),
+    )
+    return storeObjects
+  })
+}
+
+/**
+ * Retrieves the entries from the specified store in the indexedDB database.
+ * @param params - The parameters object containing the database and store names.
+ * @returns A promise that resolves to an array of entries from the specified store, or undefined if there was an error.
+ * @example
+ * getStoreObjectEntries({ db: myDB, storeName: "myStore" }).then((entries) => {
+ *   console.log(entries);
+ * });
+ */
+async function getStoreObjectEntries(params: { db: IDBDatabase; storeName: string }): Promise<IDBStoreEntry[]> {
+  const { promise: storeEntries, resolve, reject } = Promise.withResolvers<IDBStoreEntry[]>()
+  const objectStore = params.db.transaction(params.storeName, "readonly").objectStore(params.storeName)
+  const cursorRequest = objectStore.openCursor()
+
+  const allEntries: IDBStoreEntry[] = []
+
+  cursorRequest.addEventListener("success", (event) => {
+    const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
+    if (cursor) {
+      allEntries.push({ key: cursor.key, value: cursor.value })
+      cursor.continue()
+    } else {
+      resolve(allEntries)
+    }
+  })
+
+  cursorRequest.addEventListener("error", (event) => {
+    reject((event.target as IDBRequest).error)
+  })
+
+  return storeEntries
 }

@@ -36,10 +36,10 @@ function closeAllConnections(dbName: string): void {
  * @param dbName
  * @param storeName
  */
-export async function automaticlyOpenIDB(dbName: string, storeName: string): Promise<IDBDatabase> {
-  const db = openDB({ dbName, onUpgradeNeeded: (db) => db.createObjectStore(storeName) })
+export async function automaticlyOpenIDB(dbName: string, storeName?: string): Promise<IDBDatabase> {
+  const db = openDB({ dbName, onUpgradeNeeded: storeName ? (db) => db.createObjectStore(storeName) : undefined })
 
-  const noNeedUpgrade = await db.then((db) => db.objectStoreNames.contains(storeName))
+  const noNeedUpgrade = storeName ? await db.then((db) => db.objectStoreNames.contains(storeName)) : true
   if (noNeedUpgrade) {
     return recordDBConnection(dbName, db)
   } else {
@@ -54,7 +54,7 @@ export async function automaticlyOpenIDB(dbName: string, storeName: string): Pro
       dbName,
       version: dbNewestVersion + 1,
       onUpgradeNeeded: (ndb) => {
-        ndb.createObjectStore(storeName)
+        if (storeName) ndb.createObjectStore(storeName)
         // migrateAllOldStoreObjects({ oldDB: oldDB, newDB: ndb })
       },
     })
