@@ -1,10 +1,7 @@
 import { mapGet, shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
 import { automaticlyOpenIDB } from "./openDB"
-
-type IDBStoreEntry = {
-  key: IDBValidKey
-  value: any
-}
+import { IDBStoreEntry } from "./utils/idbStoreEntry"
+import { getStoreObjectEntries } from "./utils/idbStoreEntry"
 
 export interface IDBStoreManager<V> {
   set(key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: Promise<V | undefined>]>): Promise<void>
@@ -165,10 +162,10 @@ export function createIDBStoreManager<T = unknown>({
 export async function setIDBStoreValue<V>(
   config: IDBStoreManagerConfiguration,
   key: IDBValidKey,
-  body: V | (() => V),
+  value: V | ((prev: V | undefined) => V),
 ): Promise<void> {
   const manager = createIDBStoreManager(config)
-  return manager.set(key, body).finally(() => manager.close())
+  return manager.set(key, value).finally(() => manager.close())
 }
 
 /**
@@ -182,83 +179,4 @@ export async function getIDBStoreValue<V>(
 ): Promise<V | undefined> {
   const manager = createIDBStoreManager(config)
   return manager.get(key).finally(() => manager.close())
-}
-
-/**
- * Screenshots: multi serious of entries
- */
-export type IDBScreenshot = {
-  [storeName: string]: IDBStoreEntry[]
-}
-
-/**
- * Retrieves all the entries from the indexedDB stores in the specified database.
- * @param config - The configuration object containing the database name.
- * @returns A promise that resolves to an object containing the entries for each store in the database, or undefined if there was an error.
- * @example
- * getIDBScreenShot({ dbName: "myDB" }).then((entries) => {
- *   console.log(entries);
- * });
- */
-export async function getIDBScreenshot(config: { dbName: string }): Promise<IDBScreenshot | undefined> {
-  return automaticlyOpenIDB(config.dbName).then((db) => {
-    const storeEntriesOfStores = Array.from(db.objectStoreNames).map((storeName) =>
-      getStoreObjectEntries({ db, storeName }).then((entries) => ({ storeName, entries })),
-    )
-    const storeObjects = Promise.all(storeEntriesOfStores).then((storeEntries) =>
-      Object.fromEntries(storeEntries.map(({ storeName, entries }) => [storeName, entries])),
-    )
-    return storeObjects
-  })
-}
-
-/**
- * see {@link setIDBFromScreenshot}'s function name
- * @param config.dbName idb name
- * @param screenshot an object with storeName as key and entries(key + value) as value
- */
-export function setIDBFromScreenshot(config: { dbName: string }, screenshot: IDBScreenshot) {
-  const db = automaticlyOpenIDB(config.dbName)
-  db.then((db) => {
-    const transaction = db.transaction(Array.from(db.objectStoreNames), "readwrite")
-    for (const [storeName, entries] of Object.entries(screenshot)) {
-      const store = transaction.objectStore(storeName)
-      for (const { key, value } of entries) {
-        store.put(value, key)
-      }
-    }
-  })
-}
-
-/**
- * Retrieves the entries from the specified store in the indexedDB database.
- * @param params - The parameters object containing the database and store names.
- * @returns A promise that resolves to an array of entries from the specified store, or undefined if there was an error.
- * @example
- * getStoreObjectEntries({ db: myDB, storeName: "myStore" }).then((entries) => {
- *   console.log(entries);
- * });
- */
-async function getStoreObjectEntries(params: { db: IDBDatabase; storeName: string }): Promise<IDBStoreEntry[]> {
-  const { promise: storeEntries, resolve, reject } = Promise.withResolvers<IDBStoreEntry[]>()
-  const objectStore = params.db.transaction(params.storeName, "readonly").objectStore(params.storeName)
-  const cursorRequest = objectStore.openCursor()
-
-  const allEntries: IDBStoreEntry[] = []
-
-  cursorRequest.addEventListener("success", (event) => {
-    const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result
-    if (cursor) {
-      allEntries.push({ key: cursor.key, value: cursor.value })
-      cursor.continue()
-    } else {
-      resolve(allEntries)
-    }
-  })
-
-  cursorRequest.addEventListener("error", (event) => {
-    reject((event.target as IDBRequest).error)
-  })
-
-  return storeEntries
 }
