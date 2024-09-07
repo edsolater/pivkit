@@ -35,6 +35,9 @@ export interface InputProps {
   autoFocus?: boolean
 
   placeholder?: string
+
+  // TODO: imply it!!
+  tooltip?: string
   /** disabled = disableOutSideValue + disableUserInput */
   disabled?: boolean
   // onUserInput + onProgramInput
