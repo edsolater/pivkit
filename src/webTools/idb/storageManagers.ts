@@ -48,7 +48,7 @@ export function createIDBStoreManager<T = unknown>({
   storeName = "default",
   onStoreLoaded,
 }: IDBStoreManagerConfiguration<T>): IDBStoreManager<T> {
-  const db = automaticlyOpenIDB(dbName, storeName)
+  const db = automaticlyOpenIDB(dbName, { includesStoreNames: [storeName] })
 
   async function forEach(callback: (value: T, key: IDBValidKey) => void) {
     db.then((db) => {
@@ -185,6 +185,13 @@ export async function getIDBStoreValue<V>(
 }
 
 /**
+ * Screenshots: multi serious of entries
+ */
+export type IDBScreenshot = {
+  [storeName: string]: IDBStoreEntry[]
+}
+
+/**
  * Retrieves all the entries from the indexedDB stores in the specified database.
  * @param config - The configuration object containing the database name.
  * @returns A promise that resolves to an object containing the entries for each store in the database, or undefined if there was an error.
@@ -193,12 +200,7 @@ export async function getIDBStoreValue<V>(
  *   console.log(entries);
  * });
  */
-export async function getIDBScreenshot(config: { dbName: string }): Promise<
-  | {
-      [StoreName: string]: IDBStoreEntry[]
-    }
-  | undefined
-> {
+export async function getIDBScreenshot(config: { dbName: string }): Promise<IDBScreenshot | undefined> {
   return automaticlyOpenIDB(config.dbName).then((db) => {
     const storeEntriesOfStores = Array.from(db.objectStoreNames).map((storeName) =>
       getStoreObjectEntries({ db, storeName }).then((entries) => ({ storeName, entries })),
@@ -207,6 +209,24 @@ export async function getIDBScreenshot(config: { dbName: string }): Promise<
       Object.fromEntries(storeEntries.map(({ storeName, entries }) => [storeName, entries])),
     )
     return storeObjects
+  })
+}
+
+/**
+ * see {@link setIDBFromScreenshot}'s function name
+ * @param config.dbName idb name
+ * @param screenshot an object with storeName as key and entries(key + value) as value
+ */
+export function setIDBFromScreenshot(config: { dbName: string }, screenshot: IDBScreenshot) {
+  const db = automaticlyOpenIDB(config.dbName)
+  db.then((db) => {
+    const transaction = db.transaction(Array.from(db.objectStoreNames), "readwrite")
+    for (const [storeName, entries] of Object.entries(screenshot)) {
+      const store = transaction.objectStore(storeName)
+      for (const { key, value } of entries) {
+        store.put(value, key)
+      }
+    }
   })
 }
 

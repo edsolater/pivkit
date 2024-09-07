@@ -1,4 +1,4 @@
-import { isNumber, type ID, type MayPromise } from "@edsolater/fnkit"
+import { isNumber, shakeNil, wrapArr, type ID, type MayPromise } from "@edsolater/fnkit"
 
 const connectedDBs = new Map<string, Set<MayPromise<IDBDatabase>>>() // a collection of connected databases
 
@@ -34,12 +34,26 @@ function closeAllConnections(dbName: string): void {
  *
  * thus, you can use this function to open indexedDB without worrying about the version, it will automatically upgrade to the newest version
  * @param dbName
- * @param storeName
+ * @param options.storeName [optional] will check whether all of the storeNames exist, if not, will create them
  */
-export async function automaticlyOpenIDB(dbName: string, storeName?: string): Promise<IDBDatabase> {
-  const db = openDB({ dbName, onUpgradeNeeded: storeName ? (db) => db.createObjectStore(storeName) : undefined })
+export async function automaticlyOpenIDB(
+  dbName: string,
+  options?: { includesStoreNames?: string[] },
+): Promise<IDBDatabase> {
+  const db = openDB({
+    dbName,
+    onUpgradeNeeded: (db) => {
+      options?.includesStoreNames?.forEach((storeName) => {
+        if (!db.objectStoreNames.contains(storeName)) {
+          db.createObjectStore(storeName)
+        }
+      })
+    },
+  })
 
-  const noNeedUpgrade = storeName ? await db.then((db) => db.objectStoreNames.contains(storeName)) : true
+  const noNeedUpgrade = options?.includesStoreNames
+    ? await db.then((db) => options?.includesStoreNames?.every((storeName) => db.objectStoreNames.contains(storeName)))
+    : true
   if (noNeedUpgrade) {
     return recordDBConnection(dbName, db)
   } else {
@@ -54,8 +68,11 @@ export async function automaticlyOpenIDB(dbName: string, storeName?: string): Pr
       dbName,
       version: dbNewestVersion + 1,
       onUpgradeNeeded: (ndb) => {
-        if (storeName) ndb.createObjectStore(storeName)
-        // migrateAllOldStoreObjects({ oldDB: oldDB, newDB: ndb })
+        options?.includesStoreNames?.forEach((storeName) => {
+          if (!ndb.objectStoreNames.contains(storeName)) {
+            ndb.createObjectStore(storeName)
+          }
+        })
       },
     })
     return recordDBConnection(dbName, newDB)
