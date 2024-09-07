@@ -32,11 +32,8 @@ type EventIdMap = Map<
 // TODO: why not use native cancel controller
 const listenerCacheMaps = new WeakMap<HTMLElement | Document | Window, EventIdMap>()
 
-export type EventCallback<
-  K extends keyof HTMLElementEventMap,
-  El extends HTMLElement | Document | Window | undefined | null,
-> = {
-  ev: HTMLElementEventMap[K]
+export type EventCallback<K extends keyof any, El extends HTMLElement | Document | Window | undefined | null> = {
+  ev: K extends keyof HTMLElementEventMap ? HTMLElementEventMap[K] : Event
   el: El
   eventListenerController: EventListenerController
   isSelf(): boolean
@@ -47,10 +44,21 @@ export type EventCallback<
 }
 
 // TODO: !!! move to webTools
-export function listenDomEvent<
-  El extends HTMLElement | Document | Window | undefined | null,
-  K extends keyof HTMLElementEventMap,
->(
+export function listenDomEvent<El extends HTMLElement | undefined | null, K extends keyof HTMLElementEventMap>(
+  el: El,
+  eventName: K,
+  fn: (payload: EventCallback<K, El>) => void,
+  /** default is `{ passive: true }` */
+  options?: EventListenerOptions,
+): EventListenerController
+export function listenDomEvent<El extends Document | undefined | null, K extends keyof DocumentEventMap>(
+  el: El,
+  eventName: K,
+  fn: (payload: EventCallback<K, El>) => void,
+  /** default is `{ passive: true }` */
+  options?: EventListenerOptions,
+): EventListenerController
+export function listenDomEvent<El extends Window | undefined | null, K extends keyof WindowEventMap>(
   el: El,
   eventName: K,
   fn: (payload: EventCallback<K, El>) => void,
@@ -92,7 +100,7 @@ export function listenDomEvent<
     if (options?.onlyTargetIsSelf && el !== ev.target) return
     fn({
       el,
-      ev: ev as HTMLElementEventMap[K],
+      ev: ev as any,
       eventListenerController: controller,
       isSelf: () => el === ev.target,
       isBubbled: () => el !== ev.target,

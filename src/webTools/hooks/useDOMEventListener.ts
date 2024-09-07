@@ -31,13 +31,14 @@ export function useDOMEventListener<El extends ElementRefs, K extends keyof HTML
  * register DOM Event Listener
  * use auto cleanup
  */
-export function useDocumentEventListener<K extends keyof HTMLElementEventMap>(
+export function useDocumentEventListener<K extends keyof DocumentEventMap>(
   eventName: K,
-  fn: (payload: { ev: HTMLElementEventMap[K]; el: Document; eventListenerController: EventListenerController }) => void,
+  fn: (payload: { ev: DocumentEventMap[K]; el: Document; eventListenerController: EventListenerController }) => void,
   /** default is `{ passive: true }` */
   options?: EventListenerOptions,
 ) {
   createEffect(() => {
+    // @ts-expect-error too complicated to check
     const { cancel: cancel } = listenDomEvent(globalThis.document, eventName, fn, options)
     onCleanup(cancel)
   })
@@ -47,14 +48,15 @@ export function useDocumentEventListener<K extends keyof HTMLElementEventMap>(
  * register DOM Event Listener
  * use auto cleanup
  */
-export function useWindowEventListener<K extends keyof HTMLElementEventMap>(
+export function useWindowEventListener<K extends keyof WindowEventHandlers>(
   eventName: K,
-  fn: (payload: { ev: HTMLElementEventMap[K]; el: Window; eventListenerController: EventListenerController }) => void,
+  fn: (payload: { ev: WindowEventHandlers[K]; el: Window; eventListenerController: EventListenerController }) => void,
   /** default is `{ passive: true }` */
   options?: EventListenerOptions,
 ) {
   createEffect(() => {
-    const { cancel: cancel } = listenDomEvent(globalThis.window, eventName, fn, options)
+    // @ts-expect-error too complicated to check
+    const { cancel: cancel } = listenDomEvent(window, eventName, fn, options)
     onCleanup(cancel)
   })
 }
