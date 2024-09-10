@@ -27,7 +27,7 @@
     "development": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/dev.js"
+        "default": "./dist/index.js"
       }
     },
     "import": {
@@ -38,7 +38,7 @@
   "typesVersions": {},
   "scripts": {
     "dev": "vite serve dev",
-    "build": "tsup",
+    "build": "vite build",
     "test": "concurrently pnpm:test:*",
     "test:client": "vitest",
     "test:ssr": "pnpm run test:client --mode ssr",
@@ -58,7 +58,8 @@
     "@edsolater/fnkit": "^0.2.2",
     "csstype": "^3.1.3",
     "goober": "^2.1.14",
-    "solid-js": "^1.8.22"
+    "solid-js": "^1.8.22",
+    "vite-plugin-dts": "^4.2.1"
   },
   "devDependencies": {
     "@storybook/addon-essentials": "^8.2.9",
