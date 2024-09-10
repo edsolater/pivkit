@@ -1,5 +1,6 @@
 import { KitProps, useKitProps } from "../../createKit"
-import { Box, BoxProps } from "./Box"
+import { Piv } from "../../piv"
+import { BoxProps } from "./Box"
 
 export type GroupProps = BoxProps & {
   /**
@@ -16,5 +17,5 @@ export type GroupProps = BoxProps & {
 export function Group(kitProps: KitProps<GroupProps>) {
   const { props, shadowProps } = useKitProps(kitProps, { name: "Group" })
   /* ---------------------------------- props -------------------------------- */
-  return <Box class={props.name} shadowProps={shadowProps} icss={props.ghost ? { display: "contents" } : undefined} />
+  return <Piv class={props.name} shadowProps={shadowProps} icss={props.ghost ? { display: "contents" } : undefined} />
 }

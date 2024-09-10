@@ -33,7 +33,13 @@ type EventIdMap = Map<
 const listenerCacheMaps = new WeakMap<HTMLElement | Document | Window, EventIdMap>()
 
 export type EventCallback<K extends keyof any, El extends HTMLElement | Document | Window | undefined | null> = {
-  ev: K extends keyof HTMLElementEventMap ? HTMLElementEventMap[K] : Event
+  ev: K extends keyof DocumentEventMap
+    ? DocumentEventMap[K]
+    : K extends keyof WindowEventMap
+      ? WindowEventMap[K]
+      : K extends keyof HTMLElementEventMap
+        ? HTMLElementEventMap[K]
+        : Event
   el: El
   eventListenerController: EventListenerController
   isSelf(): boolean
