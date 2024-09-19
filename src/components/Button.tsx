@@ -154,6 +154,7 @@ export function Button(kitProps: ButtonKitProps) {
   )
 }
 
+// TODO: no css-in-js anymore
 /**
  * use global css to style basic button theme
  */

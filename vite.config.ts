@@ -1,22 +1,21 @@
 import { defineConfig } from "vite"
-import solid from "vite-plugin-solid"
-import path from "path"
 import dts from "vite-plugin-dts"
+import solid from "vite-plugin-solid"
 
 export default defineConfig({
   plugins: [
     solid(),
     dts({
-      tsconfigPath: path.resolve(__dirname, "tsconfig.json"),
+      tsconfigPath: "./tsconfig.json",
       staticImport: true,
       insertTypesEntry: true,
     }),
   ],
   build: {
     lib: {
-      entry: path.resolve(__dirname, "src/index.ts"),
+      entry: "./src/index.ts",
       formats: ["es"],
-      fileName: "index",
+      fileName: (format, entryName) => `${entryName}.js`,
     },
     rollupOptions: {
       external: ["solid-js", "solid-js/web"],

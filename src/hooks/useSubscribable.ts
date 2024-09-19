@@ -107,6 +107,7 @@ export function useSubscribable<T>(
 export function useSubscribableStore<T extends object>(
   subscribable: Subscribable<T>,
   options?: {
+    /** @deprecated use `createSubscribable`'s plugin `autoCacheInIndexedDB` instead */
     canCachedByIndexDB?: boolean
     /** name is for indexedDB */
     dbName?: string
