@@ -18,6 +18,10 @@ dist
 .DS_Store
 *.pem
 
+# vitePress
+docs/.vitepress/dist
+docs/.vitepress/cache
+
 # debug
 npm-debug.log*
 yarn-debug.log*
