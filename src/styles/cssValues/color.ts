@@ -59,13 +59,19 @@ function isColorItemObj(c: ColorPercent | ColorString | ColorItem | undefined): 
 function isColorItemArray(c: ColorPercent | ColorString | ColorItem | undefined): c is ColorItemArray {
   return isArray(c)
 }
+
 /**
  * **CSS Utility Function**
  *
+ * Creates a new color by mixing the given color with a fully transparent color.
+ * The resulting color's transparency is determined by the provided alpha value.
+ *
  * @example
  * cssOpacity('#fff', 0.1) // => 'rgb(255, 255, 255, 0.1)'
- * @param transparentPercent 0~1
- * @returns color-mix() string
+ *
+ * @param color - The base color to apply opacity to.
+ * @param alpha - A value between 0 (fully transparent) and 1 (fully opaque).
+ * @returns A color-mix() string representing the resulting color.
  */
 export function cssOpacity(color: CSSObject["color"], alpha: number) {
   return cssColorMix(color, ["transparent", 1 - alpha])

@@ -11,12 +11,12 @@ export interface ImageProps {
   /**
    *  also accept multi srcs
    */
-  src?: string | string[] 
-  fallbackSrc?: string 
+  src?: string | string[]
+  fallbackSrc?: string
   /**
    *  for readability
    */
-  alt?: string 
+  alt?: string
 
   // TODO: imply it!!!
   resizeable?: boolean
