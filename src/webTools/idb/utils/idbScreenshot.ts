@@ -16,8 +16,8 @@ export type IDBScreenshot = {
  * @param config - The configuration object containing the database name.
  * @returns A promise that resolves to an object containing the entries for each store in the database, or undefined if there was an error.
  * @example
- * getIDBScreenShot({ dbName: "myDB" }).then((entries) => {
- *   console.log(entries);
+ * getIDBScreenShot({ dbName: "myDB" }).then((screenshot) => {
+ *   console.log(screenshot);
  * });
  */
 
@@ -36,6 +36,10 @@ export async function getIDBScreenshot(config: { dbName: string }): Promise<IDBS
  * see {@link setIDBFromScreenshot}'s function name
  * @param config.dbName idb name
  * @param screenshot an object with storeName as key and entries(key + value) as value
+ * @example
+ * getIDBScreenShot({ dbName: "myDB" }).then((screenshot) => {
+ *   setIDBFromScreenshot({ dbName: "myDB", screenshot})
+ * });
  */
 
 export async function setIDBFromScreenshot(config: { dbName: string }, screenshot: IDBScreenshot) {
