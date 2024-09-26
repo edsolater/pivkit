@@ -8,7 +8,7 @@
 
 HTML class 名称（命名这个节点）
 
-## `uikit:varint` （特殊）
+## `uikit:varint` （特殊）（废弃， 用piv:icss就够了）
 
 添加样式模组
 

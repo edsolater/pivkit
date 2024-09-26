@@ -13,16 +13,16 @@ import { type Accessor, createMemo, createEffect } from "solid-js"
 import { loadButtonDefaultICSS } from "./variants"
 import { type KitProps, useKitProps } from "../../createKit"
 import { createRef, createLazyMemo } from "../../hooks"
-import { mergeProps, Piv, renderHTMLDOM, omitProps, shrinkPivChildren } from "../../piv"
+import { mergeProps, Piv, renderHTMLDOM, omitProps, shrinkPivChildren, type PivProps } from "../../piv"
 import { icssClickable } from "../../styles"
 import { useClassRef } from "../../webTools"
 
-export interface ButtonController {
+export interface ButtonState {
   /** button is active. detected by `props:isActive` */
   isActive: Accessor<boolean>
-
+}
+export interface ButtonController extends ButtonState {
   click: () => void
-
   focus: () => void
 }
 
@@ -33,12 +33,12 @@ export const ButtonCSSVariables = {
   outlineWidth: "--Button-outline-width",
 }
 
-export const ButtonState = {
+export const ButtonStateNames = {
   interactive: "interactive", // default
   disabled: "disabled",
 }
 
-export const ButtonVariants = {
+export const ButtonVariantNames = {
   solid: "solid", // default
   outline: "outline",
   ghost: "ghost",
@@ -55,7 +55,7 @@ export interface ButtonProps {
   /**
    * @default ['solid','md']
    */
-  variant?: MayArray<keyof typeof ButtonVariants> /* | (() => void) TODO:not build-in custom variant */
+  variant?: MayArray<keyof typeof ButtonVariantNames>  // TODO: maybe just use icss is ok here
 
   /** button is clicked */
   isActive?: boolean
@@ -74,7 +74,10 @@ export interface ButtonProps {
   }>
 }
 
-export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonController }>
+export type ButtonKitProps = KitProps<
+  ButtonProps,
+  { controller: ButtonController; noNeedDeAccessifyProps: ["variant"] }
+>
 /**
  * feat: build-in click ui effect
  */
@@ -84,7 +87,11 @@ export function Button(kitProps: ButtonKitProps) {
   invoke(loadButtonDefaultICSS, undefined, { once: true })
 
   // ---------------- props ----------------
-  const { props, loadController } = useKitProps(kitProps, { name: "Button", noNeedDeAccessifyChildren: true })
+  const { props, loadController } = useKitProps(kitProps, {
+    name: "Button",
+    noNeedDeAccessifyChildren: true,
+    noNeedDeAccessifyProps: ["variant", "children"], // TODO: should be a build-in noAccessify
+  })
 
   const innerController: ButtonController = {
     isActive: createLazyMemo(() => Boolean(props.isActive)),
@@ -129,10 +136,10 @@ export function Button(kitProps: ButtonKitProps) {
     Object.assign(
       {
         // [ButtonState.interactive]: isInteractive,
-        [ButtonState.disabled]: isDisabled,
+        [ButtonStateNames.disabled]: isDisabled,
       },
       Object.fromEntries(
-        Object.entries(ButtonVariants).map(([key, variantClass]) => [
+        Object.entries(ButtonVariantNames).map(([key, variantClass]) => [
           variantClass,
           () => userInputVariants.includes(key),
         ]),

@@ -1,4 +1,4 @@
-import { ButtonCSSVariables, ButtonState, ButtonVariants } from "./component"
+import { ButtonCSSVariables, ButtonStateNames, ButtonVariantNames } from "./component"
 import { addGlobalCSS } from "../../utils/cssGlobalStyle"
 import { cssOpacity, cssVar, tailwindPaletteColors } from "../../styles"
 
@@ -9,7 +9,7 @@ export function variantButtonPlain() {
   addGlobalCSS(`
     @layer kit-theme {
      .Button {
-       &.${ButtonVariants.plain} {
+       &.${ButtonVariantNames.plain} {
           background-color: transparent;
           color: currentcolor;
         }
@@ -47,25 +47,25 @@ export function loadButtonDefaultICSS() {
         font-size: 16px;
         border-radius: 8px;
         ${ButtonCSSVariables.outlineWidth}: 2px;
-        &.${ButtonVariants.xs} {
+        &.${ButtonVariantNames.xs} {
           padding: 2px 6px;
           font-size: 12px;
           border-radius: 4px;
           ${ButtonCSSVariables.outlineWidth}: 0.5px;
         }
-        &.${ButtonVariants.sm} {
+        &.${ButtonVariantNames.sm} {
           padding: 6px 12px;
           font-size: 14px;
           border-radius: 8px;
           ${ButtonCSSVariables.outlineWidth}: 1px;
         }
-        &.${ButtonVariants.md} {
+        &.${ButtonVariantNames.md} {
           padding: 10px 16px;
           font-size: 16px;
           border-radius: 8px;
           ${ButtonCSSVariables.outlineWidth}: 2px;  
         }
-        &.${ButtonVariants.lg} {
+        &.${ButtonVariantNames.lg} {
           padding: 14px 24px;
           font-size: 16px;
           border-radius: 12px;
@@ -83,7 +83,7 @@ export function loadButtonDefaultICSS() {
         }
 
         /* solid */
-        &.${ButtonVariants.solid} {
+        &.${ButtonVariantNames.solid} {
           background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
           &:hover {
             filter: brightness(95%);
@@ -93,7 +93,7 @@ export function loadButtonDefaultICSS() {
             filter: brightness(90%);
           }
         }
-        &.${ButtonVariants.outline} {
+        &.${ButtonVariantNames.outline} {
           background-color: transparent;
           outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar(ButtonCSSVariables.mainBgColor)};
           outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
@@ -101,21 +101,21 @@ export function loadButtonDefaultICSS() {
             background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85))};
           }
         }
-        &.${ButtonVariants.ghost} {
+        &.${ButtonVariantNames.ghost} {
           background-color: transparent;
           &:hover {
             background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4))};
           }
           color: currentcolor;
         }
-        &.${ButtonVariants.plain} {
+        &.${ButtonVariantNames.plain} {
           background-color: transparent;
           color: currentcolor;
         }
 
 
         /* ---------- special ------------ */
-        &.${ButtonState.disabled} {
+        &.${ButtonStateNames.disabled} {
           opacity: .3;
           filter: grayscale(.8) brightness(.6);
           cursor: not-allowed;

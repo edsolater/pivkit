@@ -1,7 +1,6 @@
 import {
   AnyFn,
   AnyObj,
-  MayFn,
   createConfigableFunction,
   filter,
   arrify,
@@ -11,16 +10,15 @@ import {
   overwriteFunctionName,
   shrinkFn,
   type ConfigableFunction,
-  type MayArray,
   type MayDeepArray,
   deepArrify,
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
 // just for type, just use goober is not enough
 import type * as CSS from "csstype" // or it will have bug when `pnpm build`
-import type { LoadController, ValidController } from "../typeTools"
+import type { MayFixedFn, ValidController } from "../typeTools"
 
-export type ICSSObject<Controller extends ValidController = ValidController> = LoadController<CSSObject, Controller> // rename  for ICSSObject may be a superset of CSSObject
+export type ICSSObject<Controller extends ValidController = ValidController> = MayFixedFn<CSSObject, Controller> // rename  for ICSSObject may be a superset of CSSObject
 
 // export type CSSObject = JSX.CSSProperties & {
 //   '&:hover'?: JSX.CSSProperties
@@ -30,7 +28,7 @@ export type CSSObject = CSSAttribute
 
 export type ICSS<Controller extends ValidController = ValidController> = MayDeepArray<
   // for more composeable, have to
-  LoadController<boolean | string | number | null | undefined, Controller> | ICSSObject<Controller>
+  MayFixedFn<boolean | string | number | null | undefined | void, Controller> | ICSSObject<Controller>
 >
 
 const isTaggedICSSSymbol = Symbol("isTaggedICSS")
@@ -223,7 +221,7 @@ function combineTwoCSSRotateValue(oldCssValue: string | undefined, newCssValue: 
       ? `calc(${oldCssValue} + ${newCssValue})`
       : isMeaningfullCSSValue(newCssValue)
         ? newCssValue
-        : oldCssValue ?? ""
+        : (oldCssValue ?? "")
   return merged
 }
 
@@ -234,6 +232,6 @@ function combineTwoCSSScaleValue(oldCssValue: string | number | undefined, newCs
       ? `calc(${oldCssValue} * ${newCssValue})`
       : isMeaningfullCSSValue(newCssValue)
         ? newCssValue
-        : oldCssValue ?? ""
+        : (oldCssValue ?? "")
   return merged
 }

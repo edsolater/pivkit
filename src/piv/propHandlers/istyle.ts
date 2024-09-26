@@ -1,9 +1,9 @@
 import { MayArray, arrify, mergeObjects, shakeNil, shrinkFn } from "@edsolater/fnkit"
 import { JSX } from "solid-js"
-import { LoadController, ValidController } from "../typeTools"
+import { MayFixedFn, ValidController } from "../typeTools"
 
 export type IStyle<Controller extends ValidController = ValidController> = MayArray<
-  LoadController<JSX.HTMLAttributes<any>["style"] | undefined, Controller>
+  MayFixedFn<JSX.HTMLAttributes<any>["style"] | undefined, Controller>
 >
 
 export function parseIStyles<Controller extends ValidController = ValidController>(
