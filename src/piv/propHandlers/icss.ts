@@ -1,9 +1,12 @@
+// just for type, just use goober is not enough
+import type * as CSS from "csstype" // or it will have bug when `pnpm build`
 import {
   AnyFn,
   AnyObj,
-  createConfigableFunction,
-  filter,
   arrify,
+  createConfigableFunction,
+  deepArrify,
+  filter,
   isObject,
   isString,
   mergeObjectsWithConfigs,
@@ -11,11 +14,9 @@ import {
   shrinkFn,
   type ConfigableFunction,
   type MayDeepArray,
-  deepArrify,
 } from "@edsolater/fnkit"
 import { CSSAttribute, css } from "goober"
-// just for type, just use goober is not enough
-import type * as CSS from "csstype" // or it will have bug when `pnpm build`
+
 import type { MayFixedFn, ValidController } from "../typeTools"
 
 export type ICSSObject<Controller extends ValidController = ValidController> = MayFixedFn<CSSObject, Controller> // rename  for ICSSObject may be a superset of CSSObject

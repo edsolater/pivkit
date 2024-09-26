@@ -1,21 +1,20 @@
 import {
-  type MayArray,
-  type MayFn,
+  arrify,
   type Booleanable,
   invoke,
   isMeanfulArray,
-  arrify,
-  shrinkFn,
-  flap,
+  type MayArray,
+  type MayFn,
   mergeObjects,
+  shrinkFn,
 } from "@edsolater/fnkit"
-import { type Accessor, createMemo, createEffect } from "solid-js"
-import { loadButtonDefaultICSS } from "./variants"
+import { type Accessor, createEffect, createMemo } from "solid-js"
 import { type KitProps, useKitProps } from "../../createKit"
-import { createRef, createLazyMemo } from "../../hooks"
-import { mergeProps, Piv, renderHTMLDOM, omitProps, shrinkPivChildren, type PivProps } from "../../piv"
+import { createLazyMemo, createRef } from "../../hooks"
+import { mergeProps, omitProps, Piv, renderHTMLDOM, shrinkPivChildren } from "../../piv"
 import { icssClickable } from "../../styles"
 import { useClassRef } from "../../webTools"
+import { loadButtonDefaultICSS } from "./variants"
 
 export interface ButtonState {
   /** button is active. detected by `props:isActive` */
@@ -31,37 +30,12 @@ export interface ButtonController extends ButtonState, BasicController {
   focus: () => void
 }
 
-export const ButtonCSSVariables = {
-  mainBgColor: "--Button-bg",
-  mainTextColor: "--Button-text",
-  hoverBgColor: "--Button-hover-bg",
-  outlineWidth: "--Button-outline-width",
-}
-
 export const ButtonStateNames = {
   interactive: "interactive", // default
   disabled: "disabled",
 }
 
-export const ButtonVariantNames = {
-  solid: "solid", // default
-  outline: "outline",
-  ghost: "ghost",
-  plain: "plain", // have button's feature but no outside appearance
-
-  // ---------------- size ----------------
-  lg: "lg",
-  md: "md", // default
-  sm: "sm",
-  xs: "xs",
-}
-
 export interface ButtonProps {
-  /**
-   * @default ['solid','md']
-   */
-  variant?: MayArray<keyof typeof ButtonVariantNames> // TODO: maybe just use icss is ok here
-
   /** button is clicked */
   isActive?: boolean
 
@@ -79,10 +53,7 @@ export interface ButtonProps {
   }>
 }
 
-export type ButtonKitProps = KitProps<
-  ButtonProps,
-  { controller: ButtonController; noNeedDeAccessifyProps: ["variant"] }
->
+export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonController }>
 /**
  * feat: build-in click ui effect
  */
@@ -95,7 +66,6 @@ export function Button(kitProps: ButtonKitProps) {
   const { props, shadowProps, loadController } = useKitProps(kitProps, {
     name: "Button",
     noNeedDeAccessifyChildren: true,
-    noNeedDeAccessifyProps: ["variant", "children"], // TODO: should be a build-in noAccessify
   })
 
   const controller: ButtonController = {
@@ -136,21 +106,12 @@ export function Button(kitProps: ButtonKitProps) {
     }
   })
 
-  const userInputVariants = flap(props.variant ?? []) as string[]
   // ---------------- stateClass sizeClass and variantClass ----------------
   const { setClassRef: setStateClassRef } = useClassRef(
-    Object.assign(
-      {
-        // [ButtonState.interactive]: isInteractive,
-        [ButtonStateNames.disabled]: isDisabled,
-      },
-      Object.fromEntries(
-        Object.entries(ButtonVariantNames).map(([key, variantClass]) => [
-          variantClass,
-          () => userInputVariants.includes(key),
-        ]),
-      ),
-    ),
+    Object.assign({
+      // [ButtonState.interactive]: isInteractive,
+      [ButtonStateNames.disabled]: isDisabled,
+    }),
   )
 
   return (

@@ -1,13 +1,32 @@
-import { ButtonCSSVariables, ButtonStateNames, ButtonVariantNames } from "./component"
+import { ButtonStateNames } from "./component"
 import { addGlobalCSS } from "../../utils/cssGlobalStyle"
 import { cssOpacity, cssVar, tailwindPaletteColors } from "../../styles"
 import { asyncInvoke } from "@edsolater/fnkit"
 
+const ButtonCSSVariables = {
+  mainBgColor: "--Button-bg",
+  mainTextColor: "--Button-text",
+  hoverBgColor: "--Button-hover-bg",
+  outlineWidth: "--Button-outline-width",
+}
+
+const ButtonVariantNames = {
+  solid: "solid", // default
+  outline: "outline",
+  ghost: "ghost",
+  plain: "plain", // have button's feature but no outside appearance
+
+  // ---------------- size ----------------
+  lg: "lg",
+  md: "md", // default
+  sm: "sm",
+  xs: "xs",
+}
 /**
  * @example
- * <Button icss={[variantButtonPlain]}>Hi</Button>
+ * <Button icss={[buttonVariantPlain]}>Hi</Button>
  */
-export const variantButtonPlain = createVariantIcssFunction(
+export const buttonVariantPlain = createVariantIcssFunction(
   ButtonVariantNames.plain,
   `
   @layer kit-theme {
@@ -15,6 +34,125 @@ export const variantButtonPlain = createVariantIcssFunction(
       &.${ButtonVariantNames.plain} {
         background-color: transparent;
         color: currentcolor;
+      }
+    }
+  }
+  `,
+)
+
+export const buttonVariantSolid = createVariantIcssFunction(
+  ButtonVariantNames.solid,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.solid} {
+        background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
+        &:hover {
+          filter: brightness(95%);
+        }
+        &:active {
+          transform: scale(0.98);
+          filter: brightness(90%);
+        }
+      }
+    }
+  }
+  `,
+)
+
+export const buttonVariantOutline = createVariantIcssFunction(
+  ButtonVariantNames.outline,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.outline} {
+        background-color: transparent;
+        outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar(ButtonCSSVariables.mainBgColor)};
+        outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
+        &:hover {
+          background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85))};
+        }
+      }
+    }
+  }
+  `,
+)
+
+export const buttonVariantGhost = createVariantIcssFunction(
+  ButtonVariantNames.ghost,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.ghost} {
+        background-color: transparent;
+        &:hover {
+          background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4))};
+        }
+        color: currentcolor;
+      }
+    }
+  }
+  `,
+)
+
+export const buttonSizeXS = createVariantIcssFunction(
+  ButtonVariantNames.xs,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.xs} {
+        padding: 2px 6px;
+        font-size: 12px;
+        border-radius: 4px;
+        ${ButtonCSSVariables.outlineWidth}: 0.5px;
+      }
+    }
+  }
+  `,
+)
+
+export const buttonSizeSM = createVariantIcssFunction(
+  ButtonVariantNames.sm,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.sm} {
+        padding: 6px 12px;
+        font-size: 14px;
+        border-radius: 8px;
+        ${ButtonCSSVariables.outlineWidth}: 1px;
+      }
+    }
+  }
+  `,
+)
+
+export const buttonSizeMD = createVariantIcssFunction(
+  ButtonVariantNames.md,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.md} {
+        padding: 10px 16px;
+        font-size: 16px;
+        border-radius: 8px;
+        ${ButtonCSSVariables.outlineWidth}: 2px;
+      }
+    }
+  }
+  `,
+)
+
+export const buttonSizeLG = createVariantIcssFunction(
+  ButtonVariantNames.lg,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.lg} {
+        padding: 14px 24px;
+        font-size: 16px;
+        border-radius: 12px;
+        ${ButtonCSSVariables.outlineWidth}: 2px;
       }
     }
   }
@@ -30,10 +168,10 @@ export const variantButtonPlain = createVariantIcssFunction(
  */
 function createVariantIcssFunction(className: string, cssRule: string) {
   let haveRenderCSSRule = false
-  return (el: () => HTMLElement | undefined) => {
+  return (params: { el: () => HTMLElement | undefined }) => {
     asyncInvoke(() => {
       // ensure el is loaded on screen
-      el()?.classList.add(className)
+      params.el()?.classList.add(className)
     })
 
     if (!haveRenderCSSRule) {
@@ -65,39 +203,15 @@ export function loadButtonDefaultICSS() {
         grid-auto-flow: column;
         font-size: 16px;
         border-radius: 8px;
-        font-weight: 500;
+        font-weight: 500;ButtonCSSVariables
 
-        /* ---------- size ------------ */
+        /* ---------- default size ------------ */
         padding: 10px 16px;
         font-size: 16px;
         border-radius: 8px;
         ${ButtonCSSVariables.outlineWidth}: 2px;
-        &.${ButtonVariantNames.xs} {
-          padding: 2px 6px;
-          font-size: 12px;
-          border-radius: 4px;
-          ${ButtonCSSVariables.outlineWidth}: 0.5px;
-        }
-        &.${ButtonVariantNames.sm} {
-          padding: 6px 12px;
-          font-size: 14px;
-          border-radius: 8px;
-          ${ButtonCSSVariables.outlineWidth}: 1px;
-        }
-        &.${ButtonVariantNames.md} {
-          padding: 10px 16px;
-          font-size: 16px;
-          border-radius: 8px;
-          ${ButtonCSSVariables.outlineWidth}: 2px;  
-        }
-        &.${ButtonVariantNames.lg} {
-          padding: 14px 24px;
-          font-size: 16px;
-          border-radius: 12px;
-          ${ButtonCSSVariables.outlineWidth}: 2px;
-        }
-        
-        /* ---------- state ------------ */
+
+        /* ---------- default variant ------------ */
         background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
         &:hover {
           filter: brightness(95%);
@@ -107,32 +221,6 @@ export function loadButtonDefaultICSS() {
           filter: brightness(90%);
         }
 
-        /* solid */
-        &.${ButtonVariantNames.solid} {
-          background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
-          &:hover {
-            filter: brightness(95%);
-          }
-          &:active {
-            transform: scale(0.98);
-            filter: brightness(90%);
-          }
-        }
-        &.${ButtonVariantNames.outline} {
-          background-color: transparent;
-          outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar(ButtonCSSVariables.mainBgColor)};
-          outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
-          &:hover {
-            background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85))};
-          }
-        }
-        &.${ButtonVariantNames.ghost} {
-          background-color: transparent;
-          &:hover {
-            background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4))};
-          }
-          color: currentcolor;
-        }
 
         /* ---------- special ------------ */
         &.${ButtonStateNames.disabled} {
