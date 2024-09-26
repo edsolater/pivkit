@@ -48,11 +48,11 @@ export interface ButtonProps {
   /**
    * @default 'solid'
    */
-  variant?: keyof typeof ButtonVariant
+  variant?: keyof typeof ButtonVariant /* | (() => void) TODO:not build-in custom variant */
   /**
    * @default 'md'
    */
-  size?: keyof typeof ButtonSize
+  size?: keyof typeof ButtonSize /* TODO: should in `variant` */
 
   /** button is clicked */
   isActive?: boolean

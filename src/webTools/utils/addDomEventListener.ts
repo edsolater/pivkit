@@ -47,6 +47,8 @@ export type EventCallback<K extends keyof any, El extends HTMLElement | Document
   stopPropagation(): void
   preventDefault(): void
   eventPath(): HTMLElement[]
+  /** abort() may invoked in an if */
+  abortListener(): void
 }
 
 // TODO: !!! move to webTools
@@ -108,6 +110,7 @@ export function listenDomEvent<
       el,
       ev: ev as any,
       eventListenerController: controller,
+      abortListener: controller.cancel,
       isSelf: () => el === ev.target,
       isBubbled: () => el !== ev.target,
       stopPropagation: () => ev.stopPropagation(),
@@ -115,7 +118,7 @@ export function listenDomEvent<
       eventPath: () => ev.composedPath().filter(isHTMLElement),
     })
   }
-  const shouldUseRAF = options && "restrict" in options ? options?.debounce === "rAF" : useRAFEventNames.has(eventName)
+  const shouldUseRAF = options && "restrict" in options ? options?.debounce === "rAF" : shouldUseRAFEventNames.has(eventName)
 
   const throttled = throttle(coreEventListener, { rAF: shouldUseRAF })
   const registedListener = (ev: Event) => {
@@ -154,4 +157,4 @@ function abortEvent(
   listenerCacheMaps.delete(el)
 }
 
-const useRAFEventNames = new Set(["pointermove", "mousemove", "pointermove", "scroll", "resize", "wheel"])
+const shouldUseRAFEventNames = new Set(["pointermove", "mousemove", "pointermove", "scroll", "resize", "wheel"])
