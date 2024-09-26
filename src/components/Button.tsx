@@ -1,4 +1,14 @@
-import { Booleanable, MayArray, MayFn, arrify, invoke, isMeanfulArray, mergeObjects, shrinkFn } from "@edsolater/fnkit"
+import {
+  Booleanable,
+  MayArray,
+  MayFn,
+  arrify,
+  flap,
+  invoke,
+  isMeanfulArray,
+  mergeObjects,
+  shrinkFn,
+} from "@edsolater/fnkit"
 import { createEffect, createMemo, type Accessor } from "solid-js"
 import { KitProps, useKitProps } from "../createKit"
 import { createLazyMemo } from "../hooks"
@@ -30,29 +40,24 @@ export const ButtonState = {
   disabled: "disabled",
 }
 
-export const ButtonSize = {
+export const ButtonVariants = {
+  solid: "solid", // default
+  outline: "outline",
+  ghost: "ghost",
+  plain: "plain", // have button's feature but no outside appearance
+
+  // ---------------- size ----------------
   lg: "lg",
   md: "md", // default
   sm: "sm",
   xs: "xs",
 }
 
-export const ButtonVariant = {
-  solid: "solid", // default
-  outline: "outline",
-  ghost: "ghost",
-  plain: "plain", // have button's feature but no outside appearance
-}
-
 export interface ButtonProps {
   /**
-   * @default 'solid'
+   * @default ['solid','md']
    */
-  variant?: keyof typeof ButtonVariant /* | (() => void) TODO:not build-in custom variant */
-  /**
-   * @default 'md'
-   */
-  size?: keyof typeof ButtonSize /* TODO: should in `variant` */
+  variant?: MayArray<keyof typeof ButtonVariants> /* | (() => void) TODO:not build-in custom variant */
 
   /** button is clicked */
   isActive?: boolean
@@ -120,6 +125,7 @@ export function Button(kitProps: ButtonKitProps) {
     }
   })
 
+  const userInputVariants = flap(props.variant ?? []) as string[]
   // ---------------- stateClass sizeClass and variantClass ----------------
   const { setClassRef: setStateClassRef } = useClassRef(
     Object.assign(
@@ -127,9 +133,11 @@ export function Button(kitProps: ButtonKitProps) {
         // [ButtonState.interactive]: isInteractive,
         [ButtonState.disabled]: isDisabled,
       },
-      Object.fromEntries(Object.entries(ButtonSize).map(([key, sizeClass]) => [sizeClass, () => props.size === key])),
       Object.fromEntries(
-        Object.entries(ButtonVariant).map(([key, variantClass]) => [variantClass, () => props.variant === key]),
+        Object.entries(ButtonVariants).map(([key, variantClass]) => [
+          variantClass,
+          () => userInputVariants.includes(key),
+        ]),
       ),
     ),
   )
@@ -177,41 +185,49 @@ function loadButtonDefaultICSS() {
         font-size: 16px;
         border-radius: 8px;
         font-weight: 500;
-        &.${ButtonState.disabled} {
-          opacity: .3;
-          filter: grayscale(.8) brightness(.6);
-          cursor: not-allowed;
-        }
-        &.${ButtonSize.xs} {
+
+        /* ---------- size ------------ */
+        padding: 10px 16px;
+        font-size: 16px;
+        border-radius: 8px;
+        ${ButtonCSSVariables.outlineWidth}: 2px;
+        &.${ButtonVariants.xs} {
           padding: 2px 6px;
           font-size: 12px;
           border-radius: 4px;
           ${ButtonCSSVariables.outlineWidth}: 0.5px;
         }
-        &.${ButtonSize.sm} {
+        &.${ButtonVariants.sm} {
           padding: 6px 12px;
           font-size: 14px;
           border-radius: 8px;
           ${ButtonCSSVariables.outlineWidth}: 1px;
         }
-        &.${ButtonSize.md},
-        &${Object.values(ButtonSize)
-          .map((c) => `:not(.${c})`)
-          .join("")} {
+        &.${ButtonVariants.md} {
           padding: 10px 16px;
           font-size: 16px;
           border-radius: 8px;
-          ${ButtonCSSVariables.outlineWidth}: 2px;
+          ${ButtonCSSVariables.outlineWidth}: 2px;  
         }
-        &.${ButtonSize.lg} {
+        &.${ButtonVariants.lg} {
           padding: 14px 24px;
           font-size: 16px;
           border-radius: 12px;
           ${ButtonCSSVariables.outlineWidth}: 2px;
         }
-        &:is(&.${ButtonVariant.solid}, &${Object.values(ButtonVariant)
-          .map((c) => `:not(.${c})`)
-          .join("")}) {
+        
+        /* ---------- state ------------ */
+        background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
+        &:hover {
+          filter: brightness(95%);
+        }
+        &:active {
+          transform: scale(0.98);
+          filter: brightness(90%);
+        }
+
+        /* solid */
+        &.${ButtonVariants.solid} {
           background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
           &:hover {
             filter: brightness(95%);
@@ -221,7 +237,7 @@ function loadButtonDefaultICSS() {
             filter: brightness(90%);
           }
         }
-        &.${ButtonVariant.outline} {
+        &.${ButtonVariants.outline} {
           background-color: transparent;
           outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar(ButtonCSSVariables.mainBgColor)};
           outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
@@ -229,16 +245,24 @@ function loadButtonDefaultICSS() {
             background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85))};
           }
         }
-        &.${ButtonVariant.ghost} {
+        &.${ButtonVariants.ghost} {
           background-color: transparent;
           &:hover {
             background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4))};
           }
           color: currentcolor;
         }
-        &.${ButtonVariant.plain} {
+        &.${ButtonVariants.plain} {
           background-color: transparent;
           color: currentcolor;
+        }
+
+
+        /* ---------- special ------------ */
+        &.${ButtonState.disabled} {
+          opacity: .3;
+          filter: grayscale(.8) brightness(.6);
+          cursor: not-allowed;
         }
       }
     }
