@@ -1,5 +1,3 @@
-// just for type, just use goober is not enough
-import type * as CSS from "csstype" // or it will have bug when `pnpm build`
 import {
   AnyFn,
   AnyObj,
