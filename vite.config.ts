@@ -34,4 +34,7 @@ export default defineConfig({
       mangle: false, // Disable variable name mangling
     },
   },
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("development"), // only in development mode (remain console.log)
+  },
 })

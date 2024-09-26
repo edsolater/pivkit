@@ -21,7 +21,12 @@ export interface ButtonState {
   /** button is active. detected by `props:isActive` */
   isActive: Accessor<boolean>
 }
-export interface ButtonController extends ButtonState {
+
+type BasicController = {
+  el(): HTMLButtonElement | undefined
+}
+
+export interface ButtonController extends ButtonState, BasicController {
   click: () => void
   focus: () => void
 }
@@ -55,7 +60,7 @@ export interface ButtonProps {
   /**
    * @default ['solid','md']
    */
-  variant?: MayArray<keyof typeof ButtonVariantNames>  // TODO: maybe just use icss is ok here
+  variant?: MayArray<keyof typeof ButtonVariantNames> // TODO: maybe just use icss is ok here
 
   /** button is clicked */
   isActive?: boolean
@@ -87,13 +92,14 @@ export function Button(kitProps: ButtonKitProps) {
   invoke(loadButtonDefaultICSS, undefined, { once: true })
 
   // ---------------- props ----------------
-  const { props, loadController } = useKitProps(kitProps, {
+  const { props, shadowProps, loadController } = useKitProps(kitProps, {
     name: "Button",
     noNeedDeAccessifyChildren: true,
     noNeedDeAccessifyProps: ["variant", "children"], // TODO: should be a build-in noAccessify
   })
 
-  const innerController: ButtonController = {
+  const controller: ButtonController = {
+    el: dom,
     isActive: createLazyMemo(() => Boolean(props.isActive)),
     click: () => {
       dom()?.click()
@@ -102,7 +108,7 @@ export function Button(kitProps: ButtonKitProps) {
       dom()?.focus()
     },
   }
-  loadController(innerController)
+  loadController(controller)
 
   // ---------------- validation ----------------
   const failedTestValidator = createMemo(() =>
@@ -149,20 +155,20 @@ export function Button(kitProps: ButtonKitProps) {
 
   return (
     <Piv<"button">
+      shadowProps={omitProps(shadowProps, "onClick")} // omit onClick for need to invoke the function manually, see below 👇
       defineSelf={(selfProps) => renderHTMLDOM("button", selfProps)}
-      shadowProps={omitProps(props, "onClick")} // omit onClick for need to invoke the function manually, see below 👇
       onClick={(arg) => {
         if (!isInteractive()) return
         if ("onClick" in props) {
           const { ev } = arg
           ev.stopPropagation()
-          props.onClick?.(mergeObjects(arg, innerController))
+          props.onClick?.(mergeObjects(arg, controller))
         }
       }}
       icss={icssClickable}
       domRef={[setDom, setStateClassRef]}
     >
-      {shrinkPivChildren(props.children, [innerController])}
+      {shrinkPivChildren(props.children, [controller])}
     </Piv>
   )
 }

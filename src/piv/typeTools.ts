@@ -8,6 +8,7 @@ export type ValidProps = Record<keyof any, any>
  */
 export type ValidController = AnyObj
 
+
 export type HTMLTag = keyof JSX.HTMLElementTags
 /**
  * auto omit P2's same name props

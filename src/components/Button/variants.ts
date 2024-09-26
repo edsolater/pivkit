@@ -1,21 +1,46 @@
 import { ButtonCSSVariables, ButtonStateNames, ButtonVariantNames } from "./component"
 import { addGlobalCSS } from "../../utils/cssGlobalStyle"
 import { cssOpacity, cssVar, tailwindPaletteColors } from "../../styles"
+import { asyncInvoke } from "@edsolater/fnkit"
 
-let haveRenderVariantButtonPlain = false
-export function variantButtonPlain() {
-  if (haveRenderVariantButtonPlain) return
-  haveRenderVariantButtonPlain = true
-  addGlobalCSS(`
-    @layer kit-theme {
-     .Button {
-       &.${ButtonVariantNames.plain} {
-          background-color: transparent;
-          color: currentcolor;
-        }
+/**
+ * @example
+ * <Button icss={[variantButtonPlain]}>Hi</Button>
+ */
+export const variantButtonPlain = createVariantIcssFunction(
+  ButtonVariantNames.plain,
+  `
+  @layer kit-theme {
+    .Button {
+      &.${ButtonVariantNames.plain} {
+        background-color: transparent;
+        color: currentcolor;
       }
-   }
-  `)
+    }
+  }
+  `,
+)
+
+/**
+ * a variant helper function
+ *
+ * @param className
+ * @param cssRule
+ * @returns
+ */
+function createVariantIcssFunction(className: string, cssRule: string) {
+  let haveRenderCSSRule = false
+  return (el: () => HTMLElement | undefined) => {
+    asyncInvoke(() => {
+      // ensure el is loaded on screen
+      el()?.classList.add(className)
+    })
+
+    if (!haveRenderCSSRule) {
+      haveRenderCSSRule = true
+      addGlobalCSS(cssRule)
+    }
+  }
 }
 
 /**
@@ -108,11 +133,6 @@ export function loadButtonDefaultICSS() {
           }
           color: currentcolor;
         }
-        &.${ButtonVariantNames.plain} {
-          background-color: transparent;
-          color: currentcolor;
-        }
-
 
         /* ---------- special ------------ */
         &.${ButtonStateNames.disabled} {
