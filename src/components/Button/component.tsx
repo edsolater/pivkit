@@ -1,23 +1,21 @@
 import {
-  Booleanable,
-  MayArray,
-  MayFn,
-  arrify,
-  flap,
+  type MayArray,
+  type MayFn,
+  type Booleanable,
   invoke,
   isMeanfulArray,
-  mergeObjects,
+  arrify,
   shrinkFn,
+  flap,
+  mergeObjects,
 } from "@edsolater/fnkit"
-import { createEffect, createMemo, type Accessor } from "solid-js"
-import { KitProps, useKitProps } from "../createKit"
-import { createLazyMemo } from "../hooks"
-import { createRef } from "../hooks/createRef"
-import { Piv, mergeProps, omitProps, shrinkPivChildren } from "../piv"
-import { renderHTMLDOM } from "../piv/propHandlers/renderHTMLDOM"
-import { cssOpacity, cssVar, icssClickable, tailwindPaletteColors } from "../styles"
-import { addGlobalCSS } from "../utils/cssGlobalStyle"
-import { useClassRef } from "../webTools"
+import { type Accessor, createMemo, createEffect } from "solid-js"
+import { loadButtonDefaultICSS } from "./variants"
+import { type KitProps, useKitProps } from "../../createKit"
+import { createRef, createLazyMemo } from "../../hooks"
+import { mergeProps, Piv, renderHTMLDOM, omitProps, shrinkPivChildren } from "../../piv"
+import { icssClickable } from "../../styles"
+import { useClassRef } from "../../webTools"
 
 export interface ButtonController {
   /** button is active. detected by `props:isActive` */
@@ -77,10 +75,10 @@ export interface ButtonProps {
 }
 
 export type ButtonKitProps = KitProps<ButtonProps, { controller: ButtonController }>
-
 /**
  * feat: build-in click ui effect
  */
+
 export function Button(kitProps: ButtonKitProps) {
   const [dom, setDom] = createRef<HTMLButtonElement>()
   invoke(loadButtonDefaultICSS, undefined, { once: true })
@@ -160,111 +158,4 @@ export function Button(kitProps: ButtonKitProps) {
       {shrinkPivChildren(props.children, [innerController])}
     </Piv>
   )
-}
-
-// TODO: no css-in-js anymore
-/**
- * use global css to style basic button theme
- */
-function loadButtonDefaultICSS() {
-  addGlobalCSS(`
-    @layer kit-theme {
-      .Button {
-        /* transition: 50ms cubic-bezier(0.22, 0.61, 0.36, 1); */
-        border: none;
-        ${ButtonCSSVariables.mainTextColor}: ${cssOpacity(cssVar("--text-primary", tailwindPaletteColors.gray700), 0.75)};
-        ${ButtonCSSVariables.mainBgColor}: ${cssVar("--secondary", tailwindPaletteColors.gray300)};
-        color: ${cssVar(ButtonCSSVariables.mainTextColor)};
-        cursor: pointer;
-        user-select: none;
-        width: max-content;
-        display: inline-grid;
-        gap: 4px;
-        place-items: center;
-        grid-auto-flow: column;
-        font-size: 16px;
-        border-radius: 8px;
-        font-weight: 500;
-
-        /* ---------- size ------------ */
-        padding: 10px 16px;
-        font-size: 16px;
-        border-radius: 8px;
-        ${ButtonCSSVariables.outlineWidth}: 2px;
-        &.${ButtonVariants.xs} {
-          padding: 2px 6px;
-          font-size: 12px;
-          border-radius: 4px;
-          ${ButtonCSSVariables.outlineWidth}: 0.5px;
-        }
-        &.${ButtonVariants.sm} {
-          padding: 6px 12px;
-          font-size: 14px;
-          border-radius: 8px;
-          ${ButtonCSSVariables.outlineWidth}: 1px;
-        }
-        &.${ButtonVariants.md} {
-          padding: 10px 16px;
-          font-size: 16px;
-          border-radius: 8px;
-          ${ButtonCSSVariables.outlineWidth}: 2px;  
-        }
-        &.${ButtonVariants.lg} {
-          padding: 14px 24px;
-          font-size: 16px;
-          border-radius: 12px;
-          ${ButtonCSSVariables.outlineWidth}: 2px;
-        }
-        
-        /* ---------- state ------------ */
-        background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
-        &:hover {
-          filter: brightness(95%);
-        }
-        &:active {
-          transform: scale(0.98);
-          filter: brightness(90%);
-        }
-
-        /* solid */
-        &.${ButtonVariants.solid} {
-          background-color: ${cssVar(ButtonCSSVariables.mainBgColor)};
-          &:hover {
-            filter: brightness(95%);
-          }
-          &:active {
-            transform: scale(0.98);
-            filter: brightness(90%);
-          }
-        }
-        &.${ButtonVariants.outline} {
-          background-color: transparent;
-          outline: ${cssVar(ButtonCSSVariables.outlineWidth)} solid ${cssVar(ButtonCSSVariables.mainBgColor)};
-          outline-offset: calc(-1 * ${cssVar(ButtonCSSVariables.outlineWidth)});
-          &:hover {
-            background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.85))};
-          }
-        }
-        &.${ButtonVariants.ghost} {
-          background-color: transparent;
-          &:hover {
-            background-color: ${cssVar(ButtonCSSVariables.hoverBgColor, cssOpacity(cssVar(ButtonCSSVariables.mainBgColor), 0.4))};
-          }
-          color: currentcolor;
-        }
-        &.${ButtonVariants.plain} {
-          background-color: transparent;
-          color: currentcolor;
-        }
-
-
-        /* ---------- special ------------ */
-        &.${ButtonState.disabled} {
-          opacity: .3;
-          filter: grayscale(.8) brightness(.6);
-          cursor: not-allowed;
-        }
-      }
-    }
-  `)
 }
