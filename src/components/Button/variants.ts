@@ -1,7 +1,8 @@
 import { ButtonStateNames } from "./component"
 import { addGlobalCSS } from "../../utils/cssGlobalStyle"
 import { cssOpacity, cssVar, tailwindPaletteColors } from "../../styles"
-import { asyncInvoke } from "@edsolater/fnkit"
+import { asyncInvoke, type AnyFn } from "@edsolater/fnkit"
+import type { ICSS } from "../../piv"
 
 const ButtonCSSVariables = {
   mainBgColor: "--Button-bg",
@@ -22,6 +23,7 @@ const ButtonVariantNames = {
   sm: "sm",
   xs: "xs",
 }
+
 /**
  * @example
  * <Button icss={[buttonVariantPlain]}>Hi</Button>
@@ -168,17 +170,13 @@ export const buttonSizeLG = createVariantIcssFunction(
  */
 function createVariantIcssFunction(className: string, cssRule: string) {
   let haveRenderCSSRule = false
-  return (params: { el: () => HTMLElement | undefined }) => {
-    asyncInvoke(() => {
-      // ensure el is loaded on screen
-      params.el()?.classList.add(className)
-    })
-
+  return (() => {
     if (!haveRenderCSSRule) {
       haveRenderCSSRule = true
       addGlobalCSS(cssRule)
     }
-  }
+    return className
+  }) as ICSS & AnyFn
 }
 
 /**
