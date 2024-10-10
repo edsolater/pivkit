@@ -30,3 +30,6 @@ TODO：接收：`[string(color), string(size), function(customize)]`
 
 - （默认）props可以接收`T | (() => T)` 类型
 - （特殊）此props的function传参有特殊含义， 并不会像默认props一般自动解function props
+
+# plugins 查询
+- withTooltip（任何组件）

@@ -46,7 +46,7 @@ export type Plugin<
   C extends ValidController = any,
 > = ConfigableFunction<{
   (options?: PluginOptions): { plugin: PluginCoreFn<T, C>; state: PluginState }
-  [isPluginObjSymbol]: true
+  [isPluginObjStringSymbol]: true
   priority?: number
   pluginName?: string
 }>
@@ -63,8 +63,7 @@ export type PluginCoreFn<T extends ValidProps = any, C extends ValidController =
   utils: PluginCorePayload<C>,
 ) => Accessify<Partial<KitProps<T, { controller: C }>>> | undefined | void // TODO: should support 'plugin' and 'shadowProps' for easier compose
 
-export const plugin = Symbol("pluginCore")
-export const isPluginObjSymbol = Symbol("isPlugin")
+export const isPluginObjStringSymbol = "$__isPlugin__"
 
 /** plugin can only have one level */
 export function createPlugin<
@@ -94,7 +93,7 @@ export function createPlugin<
     return renamedMayPluginCore
   }, options?.defaultOptions)
 
-  Object.assign(pluginCoreFn, { [isPluginObjSymbol]: true })
+  Object.assign(pluginCoreFn, { [isPluginObjStringSymbol]: true })
 
   // @ts-expect-error no need to check
   return pluginCoreFn
@@ -109,5 +108,5 @@ export function extractPluginCore<T extends ValidProps, C extends ValidControlle
 }
 
 export function isPluginObj(v: any): v is Plugin<any> {
-  return Reflect.has(v, isPluginObjSymbol)
+  return Reflect.has(v, isPluginObjStringSymbol)
 }
