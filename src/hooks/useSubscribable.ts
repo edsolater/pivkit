@@ -21,11 +21,13 @@ type SignalReturnedPair<U> = [
 export function useSubscribable<T, U>(
   subscribable: Subscribable<T>,
   options: {
+    equalCheck?: (a: T, b: T) => boolean
     /** only if raw subscribable is deep*/
+    /** @deprecated not good! use `subscribe.pipe()` instead  */
     targetPath?: string
-    /** @deprecated */
+    /** @deprecated not good! use `subscribe.pipe()` instead  */
     onPickFromSubscribable: (subscribeValue: T) => U
-    /** @deprecated */
+    /** @deprecated not good! use `subscribe.pipe()` instead  */
     onSetToSubscribable: (newValue: U, subscribable: Subscribable<T>) => void
   },
 ): SignalReturnedPair<U>
@@ -33,6 +35,7 @@ export function useSubscribable<T>(subscribable: Subscribable<T>): SignalReturne
 export function useSubscribable<T>(
   subscribable: Subscribable<T>,
   options?: {
+    equalCheck?(a: T, b: T): boolean
     onPickFromSubscribable?: (subscribeValue: T) => any
     onSetToSubscribable?: (newValue: any, currentValue: any) => any
   },
@@ -49,9 +52,10 @@ export function useSubscribable<T>(
   const initValue = getPickedValue(subscribable())
   const [value, _setValue] = createSignal(initValue)
 
+  const equalCheck = options?.equalCheck ?? Object.is
   // @ts-expect-error force
   const setValue: Setter<any> = (v) => {
-    if (isShallowEqual(v, untrack(value))) return
+    if (equalCheck(v, untrack(value))) return
     _setValue(v)
   }
 
