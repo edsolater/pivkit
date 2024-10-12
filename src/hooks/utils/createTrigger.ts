@@ -1,6 +1,6 @@
 import { createEventCenter, type AnyFn, type ID } from "@edsolater/fnkit"
 import type { Accessor } from "solid-js"
-import { createSignal } from "../createISignal"
+import { createSignal } from "../createSignal"
 import { createUUID } from "./createUUID"
 
 // global cache
