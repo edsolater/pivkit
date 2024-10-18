@@ -1,62 +1,60 @@
 import {
-  asyncInvoke,
+  assert,
   createSubscribable,
-  createSubscribablePlugin,
   isObject,
-  syncDataBetweenTwoSubscribable
-} from "@edsolater/fnkit";
-import { createIDBStoreManager } from "../idb";
+  type SubscribablePlugin
+} from "@edsolater/fnkit"
+import { getIDBStoreValue, setIDBStoreValue } from "../idb"
 
 /**
  * {@link createSubscribable}‘s plugin
  *
  * sync with indexedDB
  */
-export const autoCacheInIndexedDB = (options: { dbName?: string; keyName: string }) =>
-  createSubscribablePlugin(({ name: subscribableName }) => {
-    //#region ---------------- define innerStoreValue and innerScribableValue ----------------
-    const innerStoreValue = createSubscribable<any>()
-    const innerScribableValue = createSubscribable<any>()
-    syncDataBetweenTwoSubscribable(innerStoreValue, innerScribableValue)
-    //#endregion
+export const autoCacheInIndexedDB = (options: {
+  dbName?: string
+  storeName?: string
+  keyName: string
+}): SubscribablePlugin<any> =>
+  (({ params, self }) => {
+    const idbTargetConfig = {
+      dbName: options.dbName ?? params.name ?? "default",
+      storeName: options.storeName ?? "default",
+    }
 
-    //#region ---------------- inner state => indexedDB store ----------------
-    let currentStoreValue: any
-    const idbManager = createIDBStoreManager<any>({
-      dbName: options.dbName ?? subscribableName ?? "default",
-      onStoreLoaded: async ({ get }) => {
-        const storeValue = await get(options?.keyName)
-        if (storeValue) {
-          innerStoreValue.set(storeValue)
-          currentStoreValue = storeValue
+    function checkIDBValueIsEqualWithInnerValue(idbValue: any, innerValue: any) {
+      if (isObject(idbValue) && isObject(innerValue)) {
+        return JSON.stringify(idbValue) === JSON.stringify(innerValue)
+      } else {
+        return idbValue === innerValue
+      }
+    }
+
+    async function getDataFromIDB() {
+      return getIDBStoreValue(idbTargetConfig, options.keyName)
+    }
+
+    function setDataToIDB(storeValue: any) {
+      console.log("new to idb stored value: ", storeValue)
+      setIDBStoreValue(idbTargetConfig, options.keyName, storeValue)
+    }
+
+    let isInitSyncing = false // prevent infinite set-get-set-get loop
+
+    self.then((s) => {
+      getDataFromIDB().then((idbValue) => {
+        if (!checkIDBValueIsEqualWithInnerValue(idbValue, s())) {
+          assert(!isInitSyncing, "why isInitSyncing is 🤔🤔🤔?")
+          s.set(idbValue)
+          isInitSyncing = true
         }
-      },
-    })
-    asyncInvoke(() => {
-      innerStoreValue.subscribe((storeValue) => {
-        if (currentStoreValue !== storeValue) {
-          idbManager.set(options.keyName, storeValue)
-          currentStoreValue = storeValue
+      })
+      s.subscribe((newValue) => {
+        if (!isInitSyncing) {
+          setDataToIDB(newValue)
+        } else {
+          isInitSyncing = false
         }
       })
     })
-    //#endregion
-
-    return {
-      onInit({ self, ...rest }) {
-        self.then((self) => {
-          //#region ---------------- inner subscribable value => self ----------------
-          innerScribableValue.subscribe((syncedStoreValue) => {
-            self.set(syncedStoreValue)
-          })
-          //#endregion
-        })
-      },
-      onSet(value, prevValue) {
-        console.log("🎉 plugin autoCacheInIndexedDB: subscribe and set to indexedDB: ", value)
-        if (isObject(value) && Object.keys(value).length) {
-          innerScribableValue.set(() => value)
-        }
-      },
-    }
-  })
+  }) as SubscribablePlugin<any>
