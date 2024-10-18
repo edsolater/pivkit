@@ -80,6 +80,7 @@ export const buttonVariantOutline = createVariantIcssFunction(
   `,
 )
 
+// hover:solid + normal:text
 export const buttonVariantGhost = createVariantIcssFunction(
   ButtonVariantNames.ghost,
   `
@@ -229,4 +230,38 @@ export function loadButtonDefaultICSS() {
       }
     }
   `)
+}
+
+export type ButtonVariant = keyof typeof variantStyles | `${ButtonVariantStates} ${ButtonVariantSizes}`
+export type ButtonVariantSizes = keyof typeof variantSizeNames
+export type ButtonVariantStates = keyof typeof variantStateNames
+
+const variantStateNames = {
+  solid: buttonVariantSolid,
+  outline: buttonVariantOutline,
+  plain: buttonVariantPlain,
+}
+
+const variantSizeNames = {
+  xs: buttonSizeXS,
+  sm: buttonSizeSM,
+  md: buttonSizeMD,
+  lg: buttonSizeLG,
+}
+
+const variantStyles = {
+  ...variantStateNames,
+  ...variantSizeNames,
+}
+
+/**
+ * for component Button
+ */
+export function getIcssPluginByVariant(inputVariant = "solid md") {
+  const variantIcssPlugins = [] as ICSS[]
+  const inputVariantStateName = Object.keys(variantStateNames).find((key) => inputVariant.includes(key)) ?? "solid"
+  variantIcssPlugins.push(variantStateNames[inputVariantStateName])
+  const inputVariantSizeName = Object.keys(variantSizeNames).find((key) => inputVariant.includes(key)) ?? "md"
+  variantIcssPlugins.push(variantSizeNames[inputVariantSizeName])
+  return variantIcssPlugins
 }

@@ -49,3 +49,8 @@ if use hooks to hold state, the user's component's code will be too complicated 
 Main idea:
 - normal props can accept promise and fn which return value   
   
+
+# Q&A
+### what is different from `props:variant` and `props:icss`? 
+  - `props:icss` reflect componet's verbose style, which is the "looks like" of the component.
+  - `props:variant` reflect component's state, which is the "is like" of the component.

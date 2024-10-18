@@ -7,6 +7,7 @@ import {
   type MayFn,
   mergeObjects,
   shrinkFn,
+  wrapArr,
 } from "@edsolater/fnkit"
 import { type Accessor, createEffect, createMemo } from "solid-js"
 import { type KitProps, useKitProps } from "../../createKit"
@@ -14,7 +15,7 @@ import { createLazyMemo, createRef } from "../../hooks"
 import { mergeProps, omitProps, Piv, renderHTMLDOM, shrinkPivChildren } from "../../piv"
 import { icssClickable } from "../../styles"
 import { useClassRef } from "../../webTools"
-import { loadButtonDefaultICSS } from "./variants"
+import { type ButtonVariant, getIcssPluginByVariant, loadButtonDefaultICSS } from "./variants"
 
 export interface ButtonState {
   /** button is active. detected by `props:isActive` */
@@ -36,6 +37,8 @@ export const ButtonStateNames = {
 }
 
 export interface ButtonProps {
+  variant?: ButtonVariant
+
   /** button is clicked */
   isActive?: boolean
 
@@ -67,6 +70,8 @@ export function Button(kitProps: ButtonKitProps) {
     name: "Button",
     noNeedDeAccessifyChildren: true,
   })
+
+  const vairantIcssPlugins = getIcssPluginByVariant(props.variant)
 
   const controller: ButtonController = {
     el: dom,
@@ -126,10 +131,14 @@ export function Button(kitProps: ButtonKitProps) {
           props.onClick?.(mergeObjects(arg, controller))
         }
       }}
-      icss={icssClickable}
+      icss={[icssClickable, ...vairantIcssPlugins]}
       domRef={[setDom, setStateClassRef]}
     >
       {shrinkPivChildren(props.children, [controller])}
     </Piv>
   )
+}
+
+function multiMapByRule<T, R>(arr: T[], fn: (item: T) => R): R[] {
+  return arr.map(fn)
 }
