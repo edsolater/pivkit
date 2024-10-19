@@ -64,20 +64,20 @@ export function useLocalStorageValue(
 }
 
 export function useIDBValue<V = any>(opts: {
-  dbName?: string
-  key: string
+  dbName: string
+  storeName: string
   defaultValue?: V
 }): [Accessor<V | undefined>, Setter<V | undefined>] {
   const [value, setValue] = createSignal<V | undefined>(opts.defaultValue)
   const idbManager = createIDBStoreManager<V | undefined>({
-    dbName: opts.dbName ?? "useIDBValue",
-    storeName: opts.key,
+    dbName: opts.dbName,
+    storeName: opts.storeName,
   })
   createEffect(
     on(value, async () => {
-      const storedValue = await idbManager.get(opts.key)
+      const storedValue = await idbManager.get(opts.storeName)
       if (storedValue !== value()) {
-        idbManager.set(opts.key, value())
+        idbManager.set(opts.storeName, value())
       }
     }),
   )
