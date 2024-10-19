@@ -1,5 +1,5 @@
-import { setIntervalWithSecondes } from "@edsolater/fnkit"
-import { onCleanup, createEffect, onMount } from "solid-js"
+import { setIntervalWithSecondes, setTimeoutWithSecondes } from "@edsolater/fnkit"
+import { onCleanup, onMount } from "solid-js"
 
 /**
  * **DOM API (setInterval)**
@@ -9,7 +9,14 @@ import { onCleanup, createEffect, onMount } from "solid-js"
  */
 export function useInterval(callback: () => void, s = 1, delay?: number) {
   onMount(() => {
-    const intervalId = setIntervalWithSecondes(callback, s)
-    onCleanup(() => clearInterval(intervalId))
+    if (delay) {
+      setTimeoutWithSecondes(() => {
+        const intervalId = setIntervalWithSecondes(callback, s)
+        onCleanup(() => clearInterval(intervalId))
+      }, delay)
+    } else {
+      const intervalId = setIntervalWithSecondes(callback, s)
+      onCleanup(() => clearInterval(intervalId))
+    }
   })
 }
