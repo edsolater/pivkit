@@ -1,5 +1,5 @@
-import { isTimeSignal, setInterval, setTimeout, type TimeSignal } from "@edsolater/fnkit";
-import { onCleanup, onMount } from "solid-js";
+import { isTimeSignal, setInterval, setTimeout, type IntervalTaskFunction, type TimeSignal } from "@edsolater/fnkit"
+import { onCleanup, onMount } from "solid-js"
 
 type Options = { interval?: TimeSignal; delay?: TimeSignal; immediate?: boolean }
 
@@ -10,7 +10,9 @@ type Options = { interval?: TimeSignal; delay?: TimeSignal; immediate?: boolean 
  * will auto clear when component unmount
  */
 export function useInterval(
-  ...args: [callback: () => void, s?: TimeSignal, delay?: TimeSignal] | [callback: () => void, options?: Options]
+  ...args:
+    | [callback: IntervalTaskFunction, s?: TimeSignal, delay?: TimeSignal]
+    | [callback: IntervalTaskFunction, options?: Options]
 ) {
   const callback = args[0]
   const options = (
