@@ -32,6 +32,9 @@ export default defineConfig({
     minify: false, // Disable overall compression
     terserOptions: {
       mangle: false, // Disable variable name mangling
+      compress: {
+        drop_console: false, // Disable console.log removal
+      },
     },
   },
   define: {

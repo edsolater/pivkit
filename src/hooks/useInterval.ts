@@ -1,7 +1,7 @@
 import { isTimeSignal, setInterval, setTimeout, type TimeSignal } from "@edsolater/fnkit";
 import { onCleanup, onMount } from "solid-js";
 
-type Options = { interval?: TimeSignal; delay?: TimeSignal; runImmediate?: boolean }
+type Options = { interval?: TimeSignal; delay?: TimeSignal; immediate?: boolean }
 
 /**
  * **DOM API (setInterval)**
