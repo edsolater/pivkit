@@ -1,8 +1,18 @@
-import { isTimeSignal, setInterval, setTimeout, type IntervalTaskFunction, type TimeSignal } from "@edsolater/fnkit"
-import { onCleanup, onMount } from "solid-js"
+import {
+  isTimeType,
+  setInterval,
+  type IntervalTaskFunction,
+  type SetIntervalOptions,
+  type TimeType
+} from "@edsolater/fnkit"
+import { onCleanup } from "solid-js"
 
-type Options = { interval?: TimeSignal; delay?: TimeSignal; immediate?: boolean }
+type Options = SetIntervalOptions
 
+export type IntervalController = {
+  run(): void
+  cancel(): void
+}
 /**
  * **DOM API (setInterval)**
  *
@@ -11,25 +21,29 @@ type Options = { interval?: TimeSignal; delay?: TimeSignal; immediate?: boolean 
  */
 export function useInterval(
   ...args:
-    | [callback: IntervalTaskFunction, s?: TimeSignal, delay?: TimeSignal]
+    | [callback: IntervalTaskFunction, s?: TimeType, delay?: TimeType]
     | [callback: IntervalTaskFunction, options?: Options]
-) {
+): IntervalController {
   const callback = args[0]
   const options = (
-    args.length > 2 || isTimeSignal(args[1]) ? { interval: args[1] ?? 1, delay: args[2] } : (args[1] ?? { interval: 1 })
-  ) as Options & { interval: TimeSignal }
-  onMount(() => {
-    if (options.delay) {
-      setTimeout(
-        () => {
-          const { cancel } = setInterval(callback, options)
-          onCleanup(cancel)
-        },
-        { delay: options.delay },
-      )
-    } else {
-      const { cancel } = setInterval(callback, options)
-      onCleanup(cancel)
-    }
-  })
+    args.length > 2 || isTimeType(args[1]) ? { interval: args[1] ?? 1, delay: args[2] } : (args[1] ?? { interval: 1 })
+  ) as Options & { interval: TimeType }
+
+  const { haveManuallyController, ...restOptions } = options
+
+  const tools = {
+    run(): void {
+      throw new Error("runAction not ready yet")
+    },
+    cancel(): void {
+      throw new Error("cancel not ready yet")
+    },
+  }
+
+  const { run, cancel } = setInterval(callback, { haveManuallyController, ...restOptions })
+  onCleanup(cancel)
+  tools.cancel = cancel
+  tools.run = run
+
+  return tools
 }
