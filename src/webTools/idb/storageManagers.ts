@@ -1,10 +1,10 @@
-import { mapGet, shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
+import { isFunction, mapGet, shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
 import { automaticlyOpenIDB } from "./openDB"
 import { IDBStoreEntry } from "./utils/idbStoreEntry"
 import { getStoreObjectEntries } from "./utils/idbStoreEntry"
 
 export interface IDBStoreManager<V> {
-  set(key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: Promise<V | undefined>]>): Promise<void>
+  set(key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: V | undefined]>): Promise<void>
   get(key: IDBValidKey | IDBKeyRange): Promise<V | undefined>
   getAll(): Promise<IDBStoreEntry[] | undefined>
   has(key: IDBValidKey | IDBKeyRange): Promise<boolean>
@@ -88,12 +88,12 @@ export function createIDBStoreManager<T = unknown>({
     close,
   })
 
-  async function set(key: IDBValidKey, body: MayFn<MayPromise<T | undefined>, [prev: Promise<T | undefined>]>) {
+  async function set(key: IDBValidKey, body: MayFn<MayPromise<T | undefined>, [prev: T | undefined]>) {
     return db
-      .then((db) => {
+      .then(async (db) => {
         const transaction = db.transaction(storeName, "readwrite")
         const prevValue = get(key)
-        const newValue = shrinkFn(body, [prevValue])
+        const newValue = isFunction(body) && body.length > 0 ? shrinkFn(body, [await prevValue]) : body
         Promise.resolve(newValue).then((value) => transaction.objectStore(storeName).put(value, key))
       })
       .catch((e) => {
