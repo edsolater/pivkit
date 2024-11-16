@@ -3,9 +3,9 @@ import {
   setInterval,
   type IntervalTaskFunction,
   type SetIntervalOptions,
-  type TimeType
+  type TimeType,
 } from "@edsolater/fnkit"
-import { onCleanup } from "solid-js"
+import { onCleanup, onMount } from "solid-js"
 
 type Options = SetIntervalOptions
 
@@ -40,10 +40,12 @@ export function useInterval(
     },
   }
 
-  const { run, cancel } = setInterval(callback, { haveManuallyController, ...restOptions })
-  onCleanup(cancel)
-  tools.cancel = cancel
-  tools.run = run
+  onMount(() => {
+    const { run, cancel } = setInterval(callback, { haveManuallyController, ...restOptions })
+    onCleanup(cancel)
+    tools.cancel = cancel
+    tools.run = run
+  })
 
   return tools
 }
