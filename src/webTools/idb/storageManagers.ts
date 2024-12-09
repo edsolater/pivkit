@@ -1,10 +1,9 @@
-import { isFunction, mapGet, shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
+import { shrinkFn, type MayFn, type MayPromise } from "@edsolater/fnkit"
 import { automaticlyOpenIDB } from "./openDB"
-import { IDBStoreEntry } from "./utils/idbStoreEntry"
-import { getStoreObjectEntries } from "./utils/idbStoreEntry"
+import { getStoreObjectEntries, IDBStoreEntry } from "./utils/idbStoreEntry"
 
 export interface IDBStoreManager<V> {
-  set(key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: V | undefined]>): Promise<void>
+  set(key: IDBValidKey, body: MayFn<MayPromise<V | undefined>, [prev: Promise<V | undefined>]>): Promise<void>
   get(key: IDBValidKey | IDBKeyRange): Promise<V | undefined>
   getAll(): Promise<IDBStoreEntry[] | undefined>
   has(key: IDBValidKey | IDBKeyRange): Promise<boolean>
@@ -88,12 +87,12 @@ export function createIDBStoreManager<T = unknown>({
     close,
   })
 
-  async function set(key: IDBValidKey, body: MayFn<MayPromise<T | undefined>, [prev: T | undefined]>) {
+  async function set(key: IDBValidKey, body: MayFn<MayPromise<T | undefined>, [prev: Promise<T | undefined>]>) {
     return db
-      .then(async (db) => {
+      .then((db) => {
         const transaction = db.transaction(storeName, "readwrite")
         const prevValue = get(key)
-        const newValue = isFunction(body) && body.length > 0 ? shrinkFn(body, [await prevValue]) : body
+        const newValue = shrinkFn(body, [prevValue])
         Promise.resolve(newValue).then((value) => transaction.objectStore(storeName).put(value, key))
       })
       .catch((e) => {
@@ -162,7 +161,7 @@ export function createIDBStoreManager<T = unknown>({
 export async function setIDBStoreValue<V>(
   config: IDBStoreManagerConfiguration,
   key: IDBValidKey,
-  value: V | ((prev: V | undefined) => V),
+  value: MayPromise<V> | ((prev: Promise<V | undefined>) => MayPromise<V>),
 ): Promise<void> {
   const manager = createIDBStoreManager(config)
   return manager.set(key, value).finally(() => manager.close())

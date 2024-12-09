@@ -12,6 +12,7 @@ type Options = SetIntervalOptions
 export type IntervalController = {
   run(): void
   cancel(): void
+  forceRunNextLoop(): void
 }
 /**
  * **DOM API (setInterval)**
@@ -38,13 +39,17 @@ export function useInterval(
     cancel(): void {
       throw new Error("cancel not ready yet")
     },
+    forceRunNextLoop(): void {
+      throw new Error("forceRunNextLoop not ready yet")
+    },
   }
 
   onMount(() => {
-    const { run, cancel } = setInterval(callback, { haveManuallyController, ...restOptions })
+    const { run, cancel, forceRunNextLoop } = setInterval(callback, { haveManuallyController, ...restOptions })
     onCleanup(cancel)
     tools.cancel = cancel
     tools.run = run
+    tools.forceRunNextLoop = forceRunNextLoop
   })
 
   return tools
