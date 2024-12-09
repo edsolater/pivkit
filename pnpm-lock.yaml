@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@edsolater/fnkit':
-        specifier: ^0.2.11
-        version: 0.2.11
+        specifier: ^0.2.12
+        version: 0.2.12
       csstype:
         specifier: ^3.1.3
         version: 3.1.3
@@ -251,8 +251,8 @@ packages:
       search-insights:
         optional: true
 
-  '@edsolater/fnkit@0.2.11':
-    resolution: {integrity: sha512-wkz5uZ2jZuF7VYo2Ld13jp8BKRKV+c3flFlOelDro750/bao3eUgDZMFo8dAHgf7ysA6xyG5AC61LGSo3Cdxkw==}
+  '@edsolater/fnkit@0.2.12':
+    resolution: {integrity: sha512-qwctS9nPfKl5vVtZfpSAnHfAOdg0jjEWmJbD+uT6aWmS+QZs39q2zIxDbe062WSsfWrHXHV8NZDBETyR0jfcGA==}
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -1705,7 +1705,7 @@ snapshots:
     transitivePeerDependencies:
       - '@algolia/client-search'
 
-  '@edsolater/fnkit@0.2.11': {}
+  '@edsolater/fnkit@0.2.12': {}
 
   '@esbuild/aix-ppc64@0.21.5':
     optional: true
